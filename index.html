@@ -55,17 +55,11 @@
             //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
 
             // Need a free camera for collisions
-            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(40, 35, -70), scene);
+            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(40, 15, -50), scene);
 				var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
 				camera.rotationQuaternion = q;
 
             //camera.attachControl(canvas, false);
-
-            //Set gravity for the scene (G force like, on Y-axis)
-            //scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
-
-            // Enable Collisions
-            //scene.collisionsEnabled = true;
 
 				scene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
 

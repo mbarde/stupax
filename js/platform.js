@@ -55,6 +55,11 @@ class Platform extends Entity {
           }
           if (hit) {
 				 guy._direction.x = - guy._direction.x;
+				 if (guy._direction.x > 0) {
+					 guy._angle = 0.0;
+				 } else {
+					 guy._angle = 180.0;
+				 }
 			 }
 		});
 	}

@@ -34,6 +34,7 @@ class Level {
 
 		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
 		background.material = material;
+		background.position.z = CONS_SCALE/2;
 	}
 
 	update() {
@@ -43,7 +44,7 @@ class Level {
 		var movHeight = this._movablePlatform._height;
 
 		if (guyPos.x >= movPos.x - movWidth*CONS_SCALE/2 && guyPos.x <= movPos.x + movWidth*CONS_SCALE/2
-			&& guyPos.y >= movPos.y && guyPos.y <= movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE) {
+			&& guyPos.y >= movPos.y && guyPos.y <= movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {
 					this._guy._isOnMovablePlatform = true;
 		} else {
 			this._guy._isOnMovablePlatform = false;
