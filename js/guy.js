@@ -6,14 +6,14 @@ class Guy extends Entity {
 			var d = 0.5;
 			super(h, w, d, scene);
 
-			this._accelerationX = 0.2;
-			this._maxSpeedX = 5;
-			this._maxSpeedY = 3;
+			this._accelerationX = 0.2 * CONS_SCALE;
+			this._maxSpeedX = 1 * CONS_SCALE;
+			this._maxSpeedY = 0.1 * CONS_SCALE;
 			this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 			this._isOnMovablePlatform = false;
 
 			var color = {
-				r: 0.0,
+				r: 0.7,
 				g: 0.0,
 				b: 0.0
 			}

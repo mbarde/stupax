@@ -14,10 +14,26 @@ class Level {
 		var p = new Platform(3, 1, 0, 0, clr, this._guy, this._scene);
 		var p = new Platform(1, 1, 0, 1, clr, this._guy, this._scene);
 		var p = new Platform(5, 1, 10, 5, clr, this._guy, this._scene);
-		var p = new Platform(1, 5, 12, 0, clr, this._guy, this._scene);
+		var p = new Platform(1, 5, 12, 3, clr, this._guy, this._scene);
+		var p = new Platform(5, 5, 17, 5, clr, this._guy, this._scene);
 
 		clr = {r: 0.9, g: 0.0, b: 0.0};
 		this._movablePlatform = new MovablePlatform(2, 1, 4, 0, clr, this._guy, this._scene);
+
+		this.initBackground();
+
+		this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
+	}
+
+	initBackground() {
+		var material = new BABYLON.StandardMaterial("Mat", this._scene);
+		material.diffuseTexture = new BABYLON.Texture("textures/set8_example_2.png", this._scene);
+		material.backFaceCulling = false;
+		material.diffuseTexture.uScale = 10.0;
+		material.diffuseTexture.vScale = 10.0;
+
+		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
+		background.material = material;
 	}
 
 	update() {
@@ -37,6 +53,9 @@ class Level {
 		this._movablePlatform.update();
 
 		this._camera.position.x = movPos.x;
+
+		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
+		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
 	}
 
 	keyDown(keyCode) {

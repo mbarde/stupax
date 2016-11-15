@@ -10,13 +10,26 @@ class Platform extends Entity {
 
 	initGeometry(posX, posY) {
 		this._mesh = BABYLON.MeshBuilder.CreateBox("platform", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
-		var material = new BABYLON.StandardMaterial("ground", this._scene);
+		/**var material = new BABYLON.StandardMaterial("ground", this._scene);
 		material.diffuseColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);
 		material.specularColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);
-		material.emissiveColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);
+		material.emissiveColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);**/
+
+		var material = new BABYLON.StandardMaterial("Mat", this._scene);
+
+		if (this.constructor.name == "MovablePlatform") {
+			material.diffuseTexture = new BABYLON.Texture("textures/set8_example_4.png", this._scene);
+			material.alpha = 0.8;
+		} else {
+			material.diffuseTexture = new BABYLON.Texture("textures/set8_example_1.png", this._scene);
+		}
+		material.diffuseTexture.uScale = this._width;
+		material.diffuseTexture.vScale = this._height;
+
+	   material.diffuseTexture.hasAlpha = true;
 		this._mesh.material = material;
-		this._mesh.position.x = (posX + this._width/2 - 0.5)  * CONS_SCALE;
-		this._mesh.position.y = posY * CONS_SCALE;
+		this._mesh.position.x = (posX + this._width/2 - 0.5) * CONS_SCALE;
+		this._mesh.position.y = (posY - this._height/2 - 0.5) * CONS_SCALE;
 		this._mesh.position.z = 0;
 	}
 
