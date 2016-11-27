@@ -11,11 +11,12 @@ class Level {
 		this._guy = new Guy(1, 1, this._scene);
 
 		var clr = {r: 0.9, g: 0.9, b: 0.9};
-		var p = new Platform(3, 1, 0, 0, clr, this._guy, this._scene);
-		var p = new Platform(1, 1, 0, 1, clr, this._guy, this._scene);
-		var p = new Platform(5, 1, 10, 5, clr, this._guy, this._scene);
-		var p = new Platform(1, 5, 12, 3, clr, this._guy, this._scene);
-		var p = new Platform(5, 5, 17, 5, clr, this._guy, this._scene);
+		var p0 = new Platform(3, 1, 0, 0, clr, this._guy, this._scene);
+		this._platforms.push( p0 );
+		this._platforms.push( new Platform(1, 1, 0, 1, clr, this._guy, this._scene) );
+		this._platforms.push( new Platform(5, 1, 10, 5, clr, this._guy, this._scene) );
+		this._platforms.push( new Platform(1, 5, 12, 3, clr, this._guy, this._scene) );
+		this._platforms.push( new Platform(5, 5, 17, 5, clr, this._guy, this._scene) );
 
 		clr = {r: 0.9, g: 0.0, b: 0.0};
 		this._movablePlatform = new MovablePlatform(2, 1, 4, 0, clr, this._guy, this._scene);
@@ -27,14 +28,15 @@ class Level {
 
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		material.diffuseTexture = new BABYLON.Texture("textures/set8_example_2.png", this._scene);
+		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
 		material.backFaceCulling = false;
-		material.diffuseTexture.uScale = 10.0;
-		material.diffuseTexture.vScale = 10.0;
+		material.diffuseTexture.uScale = 30.0;
+		material.diffuseTexture.vScale = 30.0;
 
 		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
 		background.material = material;
 		background.position.z = CONS_SCALE/2;
+		background.receiveShadows = true;
 	}
 
 	update() {

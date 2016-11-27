@@ -1,8 +1,7 @@
-class Game {
+class Game extends Mode {
 
 	constructor(scene, camera) {
-		this._scene = scene;
-		this._camera = camera;
+		super(scene, camera);
 
 		this._level = new Level("42", this._scene, this._camera);
 	}

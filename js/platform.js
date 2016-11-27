@@ -16,18 +16,65 @@ class Platform extends Entity {
 		material.emissiveColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);**/
 
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-
+		var texture = ""; // = new BABYLON.Texture("textures/cartoon_wooden_crate_03.jpg", this._scene);
 		if (this.constructor.name == "MovablePlatform") {
-			material.diffuseTexture = new BABYLON.Texture("textures/set8_example_4.png", this._scene);
-			material.alpha = 0.8;
+			texture = "textures/cartoon_wooden_crate_03.jpg";
+			//material.alpha = 0.8;
 		} else {
-			material.diffuseTexture = new BABYLON.Texture("textures/set8_example_1.png", this._scene);
+			texture = "textures/cartoon_wooden_crate_02.jpg";
 		}
-		material.diffuseTexture.uScale = this._width;
-		material.diffuseTexture.vScale = this._height;
 
-	   material.diffuseTexture.hasAlpha = true;
-		this._mesh.material = material;
+		// MATERIAL -----------------------------------------------------------
+		//Define a material
+		var FrontMaterial = new BABYLON.StandardMaterial("cubeFront", this._scene);
+		FrontMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		FrontMaterial.diffuseTexture.uScale = this._width;
+		FrontMaterial.diffuseTexture.vScale = this._height;
+
+		var BackMaterial = new BABYLON.StandardMaterial("cubeBack", this._scene);
+		BackMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		BackMaterial.diffuseTexture.uScale = this._width;
+		BackMaterial.diffuseTexture.vScale = this._height;
+
+		var LeftMaterial = new BABYLON.StandardMaterial("cubeLeft", this._scene);
+		LeftMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		LeftMaterial.diffuseTexture.uScale = this._height;
+		LeftMaterial.diffuseTexture.vScale = this._depth;
+
+		var RightMaterial = new BABYLON.StandardMaterial("cubeRight", this._scene);
+		RightMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		RightMaterial.diffuseTexture.uScale = this._height;
+		RightMaterial.diffuseTexture.vScale = this._depth;
+
+		var TopMaterial = new BABYLON.StandardMaterial("cubeTop", this._scene);
+		TopMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		TopMaterial.diffuseTexture.uScale = this._depth;
+		TopMaterial.diffuseTexture.vScale = this._width;
+
+		var BottomMaterial = new BABYLON.StandardMaterial("cubeBottom", this._scene);
+		BottomMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
+		BottomMaterial.diffuseTexture.uScale = this._depth;
+		BottomMaterial.diffuseTexture.vScale = this._width;
+
+		var cubeMultiMat = new BABYLON.MultiMaterial("cubeMulti", this._scene);
+		cubeMultiMat.subMaterials.push(BackMaterial);
+		cubeMultiMat.subMaterials.push(FrontMaterial);
+		cubeMultiMat.subMaterials.push(RightMaterial);
+		cubeMultiMat.subMaterials.push(LeftMaterial);
+		cubeMultiMat.subMaterials.push(TopMaterial);
+		cubeMultiMat.subMaterials.push(BottomMaterial);
+
+		this._mesh.subMeshes = [];
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(0, 0,  4,  0, 6, this._mesh));
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(1, 4,  4,  6, 6, this._mesh));
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(2, 8,  4, 12, 6, this._mesh));
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(3, 12, 4, 18, 6, this._mesh));
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(4, 16, 4, 24, 6, this._mesh));
+		this._mesh.subMeshes.push(new BABYLON.SubMesh(5, 20, 4, 30, 6, this._mesh));
+
+		this._mesh.material = cubeMultiMat;
+		// --------------------------------------------------------------------
+
 		this._mesh.position.x = (posX + this._width/2 - 0.5) * CONS_SCALE;
 		this._mesh.position.y = (posY - this._height/2 - 0.5) * CONS_SCALE;
 		this._mesh.position.z = 0;
@@ -48,7 +95,7 @@ class Platform extends Entity {
           if (pickInfo.hit) {
       			var normal = pickInfo.getNormal(false, true);
 					if (guy._direction.x > 0) {
-              		hit = normal.x < 0.5 && Math.abs(normal.y) < 0.5;
+              		hit = normal.x < 1.0 && Math.abs(normal.y) < 0.5;
 				 	} else if (guy._direction.x < 0) {
               		hit = normal.x > 0.5 && Math.abs(normal.y) < 0.5;
 					}

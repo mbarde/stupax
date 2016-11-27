@@ -12,6 +12,8 @@
         <script src="http://www.babylonjs.com/babylon.js"></script>
 
 		  <!-- Game files -->
+        <script src="js/mode.js"></script>
+        <script src="js/editor.js"></script>
         <script src="js/game.js"></script>
         <script src="js/level.js"></script>
 		  <script src="js/entity.js"></script>
@@ -43,7 +45,7 @@
 		  var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
 
-		  var game;
+		  var mode;
 		  var camera;
 		  var light0;
 		  var light1;
@@ -63,14 +65,20 @@
 
 				scene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
 
-				game = new Game(scene, camera);
+
+	 		  	var last = window.location.href.split('?').pop();
+	 		  	if (last == "editor") {
+					mode = new Editor(scene, camera);
+				} else {
+					mode = new Game(scene, camera);
+				}
 
             // Controls
             window.addEventListener("keydown", function(event){
-						game.keyDown(event.keyCode);
+						mode.keyDown(event.keyCode);
             }, false);
 				window.addEventListener("keyup", function(event){
-						game.keyUp(event.keyCode);
+						mode.keyUp(event.keyCode);
             }, false);
 
             return scene;
@@ -79,7 +87,7 @@
         var scene = createScene();
 
         engine.runRenderLoop(function () {
-			  	game.update();
+			  	mode.update();
             scene.render();
         });
 

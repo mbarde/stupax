@@ -8,7 +8,7 @@ class MovablePlatform extends Platform {
 
 		this._keyPressed = false;
 
-		this._speed = 6 * CONS_SCALE;
+		this._speed = 3 * CONS_SCALE;
 		this._mesh.getPhysicsImpostor().setMass(1);
 
 		this._keysDown = [];
@@ -39,7 +39,7 @@ class MovablePlatform extends Platform {
 		if (this._guy._isOnMovablePlatform) {
 			var imp = this._direction;
 			imp.y = 0;
-			this._guy._mesh.getPhysicsImpostor().applyImpulse(imp, this._guy._mesh.getAbsolutePosition());
+			//this._guy._mesh.getPhysicsImpostor().applyImpulse(imp, this._guy._mesh.getAbsolutePosition());
 		}
 
 		//var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
