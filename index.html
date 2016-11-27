@@ -12,6 +12,7 @@
         <script src="http://www.babylonjs.com/babylon.js"></script>
 
 		  <!-- Game files -->
+        <script src="js/marker.js"></script>
         <script src="js/mode.js"></script>
         <script src="js/editor.js"></script>
         <script src="js/game.js"></script>
@@ -40,7 +41,7 @@
 <body>
     <canvas id="renderCanvas"></canvas>
     <script>
-	 	  var CONS_SCALE = 3.0;
+	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
 
 		  var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
@@ -57,7 +58,7 @@
             //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
 
             // Need a free camera for collisions
-            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(40, 15, -50), scene);
+            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), scene);
 				var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
 				camera.rotationQuaternion = q;
 

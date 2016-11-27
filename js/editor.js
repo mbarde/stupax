@@ -21,11 +21,23 @@ class Editor extends Mode {
 		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
 		background.material = material;
 		background.position.z = CONS_SCALE/2;
-		background.receiveShadows = true;
+		background.receiveShadows = false;
 
-		var light0 = new BABYLON.DirectionalLight("Dir0", new BABYLON.Vector3(0, 0, 1), this._scene);
+		var light0 = new BABYLON.HemisphericLight("Hemi0", new BABYLON.Vector3(0, 1000, -1000), this._scene);
 		light0.diffuse = new BABYLON.Color3(1, 1, 1);
 		light0.specular = new BABYLON.Color3(1, 1, 1);
+		light0.groundColor = new BABYLON.Color3(0, 0, 0);
+
+		//When pointer down event is raised
+		this._scene.onPointerDown = function (evt, pickResult) {
+      	// if the click hits the ground object, we change the impact position
+			console.log(pickResult.hit && pickResult.pickedMesh == background);
+        	if (pickResult.hit) {
+         	console.log(pickResult.pickedPoint.x + " | " + pickResult.pickedPoint.y);
+				var clr = {r: 1.0, g: 0.0, b: 0.0};
+				var marker = new Marker(pickResult.pickedPoint.x, pickResult.pickedPoint.y, clr, this);
+        	}
+    	};
 	}
 
 	update() {
