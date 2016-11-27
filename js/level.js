@@ -30,8 +30,8 @@ class Level {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
 		material.backFaceCulling = false;
-		material.diffuseTexture.uScale = 30.0;
-		material.diffuseTexture.vScale = 30.0;
+		material.diffuseTexture.uScale = 500.0 / CONS_SCALE;
+		material.diffuseTexture.vScale = 500.0 / CONS_SCALE;
 
 		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
 		background.material = material;

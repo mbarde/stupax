@@ -3,23 +3,32 @@ class Editor extends Mode {
 	constructor(scene, camera) {
 		super(scene, camera);
 
-		this.initBackground();
-
 		this._keysLeft = [65, 37];
 		this._keysRight = [68, 39];
 		this._keysUp = [87, 38];
 		this._keysDown = [83, 40];
+
+		this._levelWidth = 500;
+		this._levelHeight = 20;
+
+		this.initBackground();
+
+		this._camera.position.x = 10 * CONS_SCALE;
+		this._camera.position.y = 10 * CONS_SCALE;
 	}
 
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
 		material.backFaceCulling = false;
-		material.diffuseTexture.uScale = 30.0;
-		material.diffuseTexture.vScale = 30.0;
+		material.diffuseTexture.uScale = (this._levelWidth)
+		material.diffuseTexture.vScale = (this._levelHeight)
 
-		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: 500.0, height: 500.0}, this._scene);
+		// Background marks area of level
+		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth * CONS_SCALE), height: (this._levelHeight * CONS_SCALE)}, this._scene);
 		background.material = material;
+		background.position.x = (this._levelWidth * CONS_SCALE) / 2;
+		background.position.y = (this._levelHeight * CONS_SCALE) / 2;
 		background.position.z = CONS_SCALE/2;
 		background.receiveShadows = false;
 
@@ -28,14 +37,16 @@ class Editor extends Mode {
 		light0.specular = new BABYLON.Color3(1, 1, 1);
 		light0.groundColor = new BABYLON.Color3(0, 0, 0);
 
-		//When pointer down event is raised
+		var clr_red = {r: 1.0, g: 0.0, b: 0.0};
 		this._scene.onPointerDown = function (evt, pickResult) {
-      	// if the click hits the ground object, we change the impact position
-			console.log(pickResult.hit && pickResult.pickedMesh == background);
         	if (pickResult.hit) {
-         	console.log(pickResult.pickedPoint.x + " | " + pickResult.pickedPoint.y);
-				var clr = {r: 1.0, g: 0.0, b: 0.0};
-				var marker = new Marker(pickResult.pickedPoint.x, pickResult.pickedPoint.y, clr, this);
+				if (pickResult.pickedMesh == background) {
+					var posX = Math.floor(pickResult.pickedPoint.x / CONS_SCALE);
+					var posY = Math.floor(pickResult.pickedPoint.y / CONS_SCALE);
+					var marker = new Marker(posX, posY, clr_red, this);
+				} else {
+					pickResult.pickedMesh.dispose();
+				}
         	}
     	};
 	}
