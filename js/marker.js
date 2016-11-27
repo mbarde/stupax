@@ -1,10 +1,21 @@
 class Marker {
 
-	constructor(posX, posY, color, scene) {
+	constructor(posX, posY, mode, scene) {
 		this._scene = scene;
 		this._posX = posX;
 		this._posY = posY;
-		this._color = color;
+		this._mode = mode;
+
+		this._color = {r: 0, g: 0, b: 0};
+		if (mode == CONS_EM_PLATFORM) {
+			this._color = {r: 1.0, g: 0, b: 0};
+		} else
+		if (mode == CONS_EM_GUY) {
+			this._color = {r: 0, g: 1.0, b: 0};
+		} else
+		if (mode == CONS_EM_MOV_PLAT) {
+			this._color = {r: 0, g: 0, b: 1.0};
+		}
 
 		this.initGeometry();
 	}
@@ -21,6 +32,7 @@ class Marker {
 		this._mesh.position.x = (this._posX + 0.5) * CONS_SCALE;
 		this._mesh.position.y = (this._posY + 0.5) * CONS_SCALE;
 		this._mesh.position.z = CONS_SCALE/2 - 0.001;
+		this._mesh.mode = this._mode; // store mode at mesh to make it available when picking mesh
 	}
 
 }

@@ -11,10 +11,14 @@ class Editor extends Mode {
 		this._levelWidth = 500;
 		this._levelHeight = 20;
 
-		this.initBackground();
-
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
+
+		this._curMode = CONS_EM_PLATFORM;
+
+		this._guyMarker = false;
+
+		this.initBackground();
 	}
 
 	initBackground() {
@@ -37,18 +41,35 @@ class Editor extends Mode {
 		light0.specular = new BABYLON.Color3(1, 1, 1);
 		light0.groundColor = new BABYLON.Color3(0, 0, 0);
 
-		var clr_red = {r: 1.0, g: 0.0, b: 0.0};
+		this._scene.editor = this;
 		this._scene.onPointerDown = function (evt, pickResult) {
         	if (pickResult.hit) {
 				if (pickResult.pickedMesh == background) {
 					var posX = Math.floor(pickResult.pickedPoint.x / CONS_SCALE);
 					var posY = Math.floor(pickResult.pickedPoint.y / CONS_SCALE);
-					var marker = new Marker(posX, posY, clr_red, this);
+
+					var marker = new Marker(posX, posY, this.editor._curMode, this);
+					if (this.editor._curMode == CONS_EM_GUY) {
+						if (this.editor._guyMarker) {
+							this.editor._guyMarker._mesh.dispose();
+						}
+						this.editor._guyMarker = marker;
+					}
 				} else {
-					pickResult.pickedMesh.dispose();
+					if (pickResult.pickedMesh.mode == this.editor._curMode) {
+						pickResult.pickedMesh.dispose();
+						if (this.editor._curMode == CONS_EM_GUY) {
+							this.editor._guyMarker = false;
+						}
+					}
 				}
         	}
     	};
+	}
+
+	setCurMode(newMode) {
+		this._curMode = newMode;
+		console.log("Current mode is now: " + newMode);
 	}
 
 	update() {
@@ -66,6 +87,16 @@ class Editor extends Mode {
 		}
 		if ( this._keysUp.indexOf(keyCode) != -1 ) {
 			this._camera.position.y += 10;
+		}
+
+		if (keyCode == 49) {
+			this.setCurMode(CONS_EM_PLATFORM);
+		} else
+		if (keyCode == 50) {
+			this.setCurMode(CONS_EM_GUY);
+		} else
+		if (keyCode == 51) {
+			this.setCurMode(CONS_EM_MOV_PLAT);
 		}
 	}
 
