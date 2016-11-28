@@ -16,7 +16,7 @@ class Marker {
 		if (mode == CONS_EM_MOV_PLAT) {
 			this._color = {r: 0, g: 0, b: 1.0};
 		} else
-		if (mode == CONS_EM_FINISH)
+		if (mode == CONS_EM_FINISH) {
 			this._color = {r: 1.0, g: 1.0, b: 1.0};
 		}
 

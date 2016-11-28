@@ -1,10 +1,9 @@
-class Guy extends Entity {
+class Guy extends Animatable {
 
 	constructor(posX, posY, scene) {
-			var h = 1.0;
-			var w = 1.0;
-			var d = 0.0;
-			super(h, w, d, scene);
+			super(scene);
+			this._width = 1.0;
+			this._height = 1.0;
 
 			this._accelerationX = 0.2 * CONS_SCALE;
 			this._maxSpeedX = 1.0 * CONS_SCALE;
@@ -21,17 +20,29 @@ class Guy extends Entity {
 			}
 
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
-			material.diffuseTexture = new BABYLON.Texture("textures/guy.png", this._scene);
+			material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
 			material.diffuseTexture.hasAlpha = true;
 			material.diffuseTexture.uScale = 0.75;
 			material.diffuseTexture.vScale = 0.75;
 			material.backFaceCulling = false;
 
-			this._mesh = BABYLON.MeshBuilder.CreatePlane("guy", {height: h * CONS_SCALE, width: w * CONS_SCALE}, this._scene);
+			this._mesh = BABYLON.MeshBuilder.CreatePlane("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
 			this._mesh.material = material;
 			this._mesh.position.x = posX  * CONS_SCALE;
 			this._mesh.position.y = posY * CONS_SCALE;
 			this._mesh.position.z = 0;
+
+			this.anim_load_animation([
+				"textures/guy/obj_Run000.png",
+				"textures/guy/obj_Run001.png",
+				"textures/guy/obj_Run002.png",
+				"textures/guy/obj_Run003.png",
+				"textures/guy/obj_Run004.png",
+				"textures/guy/obj_Run005.png",
+				"textures/guy/obj_Run006.png",
+				"textures/guy/obj_Run007.png"
+			]);
+			this.anim_set_animation(0);
 
 			//mesh.checkCollisions = true;
          //mesh.applyGravity = true;
@@ -119,6 +130,10 @@ class Guy extends Entity {
 
 		// Always stay on the same Z coordinate
 		this._mesh.position.z = 0;
+
+		if (this.anim_update()) {
+			this._mesh.material = this.anim_get_cur_texture();
+		}
 	}
 
 	keyDown(keyCode) {
