@@ -54,6 +54,7 @@
 		  var CONS_EM_PLATFORM = 0;
 		  var CONS_EM_GUY = 1;
 		  var CONS_EM_MOV_PLAT = 2;
+		  var CONS_EM_FINISH = 3;
 
 		  var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
@@ -82,7 +83,7 @@
 	 		  	if (last == "editor") {
 					mode = new Editor(scene, camera);
 				} else {
-					var level = "level02";
+					var level = "level01";
 					if (last.indexOf("level") !== -1) {
 						level = last;
 					}

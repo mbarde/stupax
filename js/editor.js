@@ -17,6 +17,7 @@ class Editor extends Mode {
 		this._curMode = CONS_EM_PLATFORM;
 
 		this._guyMarker = false;
+		this._finishMarker = false;
 
 		this.initBackground();
 	}
@@ -54,12 +55,21 @@ class Editor extends Mode {
 							this.editor._guyMarker._mesh.dispose();
 						}
 						this.editor._guyMarker = marker;
+					} else
+					if (this.editor._curMode == CONS_EM_FINISH) {
+						if (this.editor._finishMarker) {
+							this.editor._finishMarker._mesh.dispose();
+						}
+						this.editor._finishMarker = marker;
 					}
 				} else {
 					if (pickResult.pickedMesh.mode == this.editor._curMode) {
 						pickResult.pickedMesh.dispose();
 						if (this.editor._curMode == CONS_EM_GUY) {
 							this.editor._guyMarker = false;
+						} else
+						if (this.editor._curMode == CONS_EM_FINISH) {
+							this.editor._finishMarker = false;
 						}
 					}
 				}
@@ -98,6 +108,9 @@ class Editor extends Mode {
 		if (keyCode == 51) {
 			this.setCurMode(CONS_EM_MOV_PLAT);
 		}
+		if (keyCode == 52) {
+			this.setCurMode(CONS_EM_FINISH);
+		}
 		if (keyCode == 9) {
 			this.saveLevel();
 		}
@@ -108,7 +121,49 @@ class Editor extends Mode {
 
 	saveLevel() {
 		var level = {};
-		level.platforms = this.mergeMarkers();
+
+		if (!this._guyMarker) {
+			alert("No guy marker!");
+			return;
+		}
+		level.guy = {};
+		level.guy._posX = this._guyMarker._posX;
+		level.guy._posY = this._guyMarker._posY;
+
+		if (!this._finishMarker) {
+			alert("No guy marker!");
+			return;
+		}
+		level.finish = {};
+		level.finish._posX = this._finishMarker._posX;
+		level.finish._posY = this._finishMarker._posY;
+		level.finish.target = "levelXX";
+
+		var pms = new Array(); // platform markers
+		var movPms = new Array(); // movable platform markers
+		var h = 0;
+		console.log("Collecting markers ...");
+		console.log(this._scene.meshes.length);
+		for (var h = 0; h < this._scene.meshes.length; h++) {
+			if (this._scene.meshes[h].mode == CONS_EM_PLATFORM) {
+				var m = this._scene.meshes[h].marker;
+				pms.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
+			} else if (this._scene.meshes[h].mode == CONS_EM_MOV_PLAT) {
+				var m = this._scene.meshes[h].marker;
+				movPms.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
+			}
+		}
+		level.platforms = this.mergeMarkers(pms);
+
+		movPms = this.mergeMarkers(movPms);
+		if (movPms.length < 1) {
+			alert("No movable platform!");
+			return;
+		}
+		if (movPms.length > 1) {
+			alert("Multiple movable platforms detected! Only one of them will be saved!");
+		}
+		level.movPlatform = movPms[0];
 
 		var blob = new Blob([JSON.stringify(level)], {type: "text/plain;charset=utf-8"});
 		saveAs(blob, "level.txt");
@@ -117,18 +172,8 @@ class Editor extends Mode {
 	/**
 	* Merge markers to maximal rectangles to create as less platforms as possible.
 	**/
-	mergeMarkers() {
-		var pms = new Array();
-		var h = 0;
-		console.log("Collecting platform markers ...");
-		console.log(this._scene.meshes.length);
-		for (var h = 0; h < this._scene.meshes.length; h++) {
-			if (this._scene.meshes[h].mode == CONS_EM_PLATFORM) {
-				var m = this._scene.meshes[h].marker;
-				pms.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
-			}
-		}
-		console.log("Found: " + pms.length);
+	mergeMarkers(platformMarkers) {
+		var pms = platformMarkers;
 
 		console.log("Merge platform markers ...");
 		var i = 0;

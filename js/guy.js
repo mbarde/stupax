@@ -7,7 +7,7 @@ class Guy extends Entity {
 			super(h, w, d, scene);
 
 			this._accelerationX = 0.2 * CONS_SCALE;
-			this._maxSpeedX = 2 * CONS_SCALE;
+			this._maxSpeedX = 1.0 * CONS_SCALE;
 			this._maxSpeedY = 0.1 * CONS_SCALE;
 			this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 			this._isOnMovablePlatform = false;

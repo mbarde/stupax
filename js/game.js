@@ -5,6 +5,7 @@ class Game extends Mode {
 
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
+		this._camera.rotation.y = 0.2;
 
 		this._level = new Level(levelString, this._scene, this._camera);
 	}
