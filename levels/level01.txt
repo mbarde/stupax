@@ -1,0 +1,1 @@
+﻿{"platforms":[{"_posX":7,"_posY":8,"_width":2,"_height":2},{"_posX":11,"_posY":6,"_width":1,"_height":2},{"_posX":7,"_posY":4,"_width":1,"_height":1}]}

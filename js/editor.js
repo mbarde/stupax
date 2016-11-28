@@ -98,9 +98,65 @@ class Editor extends Mode {
 		if (keyCode == 51) {
 			this.setCurMode(CONS_EM_MOV_PLAT);
 		}
+		if (keyCode == 9) {
+			this.saveLevel();
+		}
 	}
 
 	keyUp(keyCode) {
+	}
+
+	saveLevel() {
+		var level = {};
+		level.platforms = this.mergeMarkers();
+
+		var blob = new Blob([JSON.stringify(level)], {type: "text/plain;charset=utf-8"});
+		saveAs(blob, "level.txt");
+	}
+
+	/**
+	* Merge markers to maximal rectangles to create as less platforms as possible.
+	**/
+	mergeMarkers() {
+		var pms = new Array();
+		var h = 0;
+		console.log("Collecting platform markers ...");
+		console.log(this._scene.meshes.length);
+		for (var h = 0; h < this._scene.meshes.length; h++) {
+			if (this._scene.meshes[h].mode == CONS_EM_PLATFORM) {
+				var m = this._scene.meshes[h].marker;
+				pms.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
+			}
+		}
+		console.log("Found: " + pms.length);
+
+		console.log("Merge platform markers ...");
+		var i = 0;
+		var j = 0;
+		var merged = false;
+		do {
+			i = 0;
+			merged = false;
+			while (i < pms.length) {
+				j = 0;
+				while (j < pms.length) {
+					if (pms[i] && i != j) {
+						if (pms[i].tryMerge(pms[j])) {
+							merged = true;
+							pms.splice(j, 1);
+						} else {
+							j++;
+						}
+					} else {
+						j++;
+					}
+				}
+				i++;
+			}
+		} while (merged);
+
+		console.log(pms);
+		return pms;
 	}
 
 }

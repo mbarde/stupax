@@ -1,7 +1,7 @@
 class MovablePlatform extends Platform {
 
-	constructor(width, height, posX, posY, color, guy, scene) {
-		super(width, height, posX, posY, color, guy, scene);
+	constructor(width, height, posX, posY, guy, scene) {
+		super(width, height, posX, posY, guy, scene);
 		this._guy = guy;
 
 		this._direction = new BABYLON.Vector3(0, 0, 0); // movement direction

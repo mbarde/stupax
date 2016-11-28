@@ -11,7 +11,14 @@
         <script src="http://www.babylonjs.com/oimo.js"></script>
         <script src="http://www.babylonjs.com/babylon.js"></script>
 
+		  <!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) -->
+		  <script src="plugins/FileSaver.min.js"></script>
+
+		  <!-- and jQuery to load level files -->
+		  <script src="plugins/jquery-3.1.1.min.js"></script>
+
 		  <!-- Game files -->
+        <script src="js/platformMarker.js"></script>
         <script src="js/marker.js"></script>
         <script src="js/mode.js"></script>
         <script src="js/editor.js"></script>
@@ -71,20 +78,25 @@
 
 				scene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
 
-
 	 		  	var last = window.location.href.split('?').pop();
 	 		  	if (last == "editor") {
 					mode = new Editor(scene, camera);
 				} else {
-					mode = new Game(scene, camera);
+					var level = "level02";
+					if (last.indexOf("level") !== -1) {
+						level = last;
+					}
+					jQuery.get("levels/" + level + ".txt", function(data) {
+						mode = new Game(data, scene, camera);
+					});
 				}
 
             // Controls
             window.addEventListener("keydown", function(event){
-						mode.keyDown(event.keyCode);
+						if (mode) mode.keyDown(event.keyCode);
             }, false);
 				window.addEventListener("keyup", function(event){
-						mode.keyUp(event.keyCode);
+						if (mode) mode.keyUp(event.keyCode);
             }, false);
 
             return scene;
@@ -93,7 +105,7 @@
         var scene = createScene();
 
         engine.runRenderLoop(function () {
-			  	mode.update();
+			  	if (mode) mode.update();
             scene.render();
         });
 

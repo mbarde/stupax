@@ -1,8 +1,7 @@
 class Platform extends Entity {
 
-	constructor(width, height, posX, posY, color, guy, scene) {
+	constructor(width, height, posX, posY, guy, scene) {
 		super(width, height, 1, scene);
-		this._color = color;
 
 		this.initGeometry(posX, posY);
 		this.initPhysics(guy);
@@ -75,8 +74,8 @@ class Platform extends Entity {
 		this._mesh.material = cubeMultiMat;
 		// --------------------------------------------------------------------
 
-		this._mesh.position.x = (posX + this._width/2 - 0.5) * CONS_SCALE;
-		this._mesh.position.y = (posY - this._height/2 - 0.5) * CONS_SCALE;
+		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
+		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 		this._mesh.position.z = 0;
 	}
 

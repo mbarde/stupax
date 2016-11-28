@@ -33,6 +33,7 @@ class Marker {
 		this._mesh.position.y = (this._posY + 0.5) * CONS_SCALE;
 		this._mesh.position.z = CONS_SCALE/2 - 0.001;
 		this._mesh.mode = this._mode; // store mode at mesh to make it available when picking mesh
+		this._mesh.marker = this;
 	}
 
 }

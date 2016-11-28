@@ -1,0 +1,1 @@
+﻿{"platforms":[{"_posX":6,"_posY":3,"_width":1,"_height":6},{"_posX":7,"_posY":8,"_width":4,"_height":1},{"_posX":15,"_posY":8,"_width":4,"_height":1},{"_posX":23,"_posY":8,"_width":4,"_height":1},{"_posX":24,"_posY":3,"_width":1,"_height":5},{"_posX":31,"_posY":8,"_width":4,"_height":2}]}
