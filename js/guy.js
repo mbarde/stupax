@@ -1,9 +1,9 @@
 class Guy extends Entity {
 
 	constructor(posX, posY, scene) {
-			var h = 0.7;
-			var w = 0.2;
-			var d = 0.4;
+			var h = 1.0;
+			var w = 1.0;
+			var d = 0.0;
 			super(h, w, d, scene);
 
 			this._accelerationX = 0.2 * CONS_SCALE;
@@ -20,7 +20,23 @@ class Guy extends Entity {
 				b: 0.0
 			}
 
-			this._mesh = BABYLON.MeshBuilder.CreateBox("guy", {height: h * CONS_SCALE, width: w * CONS_SCALE, depth: d * CONS_SCALE}, this._scene);
+			var material = new BABYLON.StandardMaterial("guy", this._scene);
+			material.diffuseTexture = new BABYLON.Texture("textures/guy.png", this._scene);
+			material.diffuseTexture.hasAlpha = true;
+			material.diffuseTexture.uScale = 0.75;
+			material.diffuseTexture.vScale = 0.75;
+			material.backFaceCulling = false;
+
+			this._mesh = BABYLON.MeshBuilder.CreatePlane("guy", {height: h * CONS_SCALE, width: w * CONS_SCALE}, this._scene);
+			this._mesh.material = material;
+			this._mesh.position.x = posX  * CONS_SCALE;
+			this._mesh.position.y = posY * CONS_SCALE;
+			this._mesh.position.z = 0;
+
+			//mesh.checkCollisions = true;
+         //mesh.applyGravity = true;
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.001, move: true });
+
 			/**var material = new BABYLON.StandardMaterial("ground", this._scene);
 			material.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b);
 			material.specularColor = new BABYLON.Color3(color.r, color.g, color.b);
@@ -29,6 +45,7 @@ class Guy extends Entity {
 
 			// MATERIAL -----------------------------------------------------------
 			//Define a material
+			/**
 		   var FrontMaterial = new BABYLON.StandardMaterial("cubeFront", scene);
 		   FrontMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/right.jpg", scene);
 
@@ -67,16 +84,7 @@ class Guy extends Entity {
 
 		   this._mesh.material = cubeMultiMat;
 			// --------------------------------------------------------------------
-
-			this._mesh.position.x = posX  * CONS_SCALE;
-			this._mesh.position.y = posY * CONS_SCALE;
-			this._mesh.position.z = 0;
-
-			//mesh.checkCollisions = true;
-         //mesh.applyGravity = true;
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: 0.001, move: true });
-
-			this._mesh.onCollide = function(){   console.log('I am colliding with something')}
+			**/
 	}
 
 	update() {

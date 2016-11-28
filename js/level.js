@@ -30,19 +30,14 @@ class Level {
 										movPlat._posX, movPlat._posY,
 										this._guy, this._scene);
 
-		//this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
-
-		var light0 = new BABYLON.HemisphericLight("Hemi0", new BABYLON.Vector3(0, 1000, -1000), this._scene);
-		light0.diffuse = new BABYLON.Color3(1, 1, 1);
-		light0.specular = new BABYLON.Color3(1, 1, 1);
-		light0.groundColor = new BABYLON.Color3(0, 0, 0);
+		this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 
 		this.initBackground();
 	}
 
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
+		material.diffuseTexture = new BABYLON.Texture("textures/block01.png", this._scene);
 		material.backFaceCulling = false;
 		material.diffuseTexture.uScale = (this._levelWidth + 9 * CONS_SCALE)
 		material.diffuseTexture.uOffset = 0.5;
@@ -75,8 +70,8 @@ class Level {
 
 		this._camera.position.x = movPos.x;
 
-		//this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
-		//this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
+		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
+		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
 	}
 
 	keyDown(keyCode) {

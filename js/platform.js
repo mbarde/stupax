@@ -17,10 +17,10 @@ class Platform extends Entity {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		var texture = ""; // = new BABYLON.Texture("textures/cartoon_wooden_crate_03.jpg", this._scene);
 		if (this.constructor.name == "MovablePlatform") {
-			texture = "textures/cartoon_wooden_crate_03.jpg";
+			texture = "textures/block03.png";
 			//material.alpha = 0.8;
 		} else {
-			texture = "textures/cartoon_wooden_crate_02.jpg";
+			texture = "textures/block04.png";
 		}
 
 		// MATERIAL -----------------------------------------------------------
