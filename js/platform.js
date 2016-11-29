@@ -16,11 +16,13 @@ class Platform extends Entity {
 
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		var texture = ""; // = new BABYLON.Texture("textures/cartoon_wooden_crate_03.jpg", this._scene);
+		var alpha = 1.0;
 		if (this.constructor.name == "MovablePlatform") {
 			texture = "textures/block03.png";
-			//material.alpha = 0.8;
+			alpha = 1.0;
 		} else {
 			texture = "textures/block04.png";
+			alpha = 1.0;
 		}
 
 		// MATERIAL -----------------------------------------------------------
@@ -29,31 +31,37 @@ class Platform extends Entity {
 		FrontMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		FrontMaterial.diffuseTexture.uScale = this._width;
 		FrontMaterial.diffuseTexture.vScale = this._height;
+		FrontMaterial.alpha = alpha;
 
 		var BackMaterial = new BABYLON.StandardMaterial("cubeBack", this._scene);
 		BackMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		BackMaterial.diffuseTexture.uScale = this._width;
 		BackMaterial.diffuseTexture.vScale = this._height;
+		BackMaterial.alpha = alpha;
 
 		var LeftMaterial = new BABYLON.StandardMaterial("cubeLeft", this._scene);
 		LeftMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		LeftMaterial.diffuseTexture.uScale = this._height;
 		LeftMaterial.diffuseTexture.vScale = this._depth;
+		LeftMaterial.alpha = alpha;
 
 		var RightMaterial = new BABYLON.StandardMaterial("cubeRight", this._scene);
 		RightMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		RightMaterial.diffuseTexture.uScale = this._height;
 		RightMaterial.diffuseTexture.vScale = this._depth;
+		RightMaterial.alpha = alpha;
 
 		var TopMaterial = new BABYLON.StandardMaterial("cubeTop", this._scene);
 		TopMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		TopMaterial.diffuseTexture.uScale = this._depth;
 		TopMaterial.diffuseTexture.vScale = this._width;
+		TopMaterial.alpha = alpha;
 
 		var BottomMaterial = new BABYLON.StandardMaterial("cubeBottom", this._scene);
 		BottomMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
 		BottomMaterial.diffuseTexture.uScale = this._depth;
 		BottomMaterial.diffuseTexture.vScale = this._width;
+		BottomMaterial.alpha = alpha;
 
 		var cubeMultiMat = new BABYLON.MultiMaterial("cubeMulti", this._scene);
 		cubeMultiMat.subMaterials.push(BackMaterial);
@@ -81,7 +89,7 @@ class Platform extends Entity {
 
 	initPhysics(guy) {
 		var platform = this._mesh;
-		platform.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: 0.001, move: this.constructor.name == "MovablePlatform" });
+		platform.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: 0.5, move: this.constructor.name == "MovablePlatform" });
 		var impostor = platform.getPhysicsImpostor();
 
 		// What happens we the guy hits this platform?
@@ -94,18 +102,13 @@ class Platform extends Entity {
           if (pickInfo.hit) {
       			var normal = pickInfo.getNormal(false, true);
 					if (guy._direction.x > 0) {
-              		hit = normal.x < 1.0 && Math.abs(normal.y) < 0.5;
+              		hit = normal.x < 1.0 && Math.abs(normal.y) < 0.1;
 				 	} else if (guy._direction.x < 0) {
-              		hit = normal.x > 0.5 && Math.abs(normal.y) < 0.5;
+              		hit = normal.x > 0.5 && Math.abs(normal.y) < 0.1;
 					}
           }
           if (hit) {
-				 guy._direction.x = - guy._direction.x;
-				 if (guy._direction.x > 0) {
-					 guy._angle = 0.0;
-				 } else {
-					 guy._angle = 180.0;
-				 }
+				 guy.toggleDirection();
 			 }
 		});
 	}

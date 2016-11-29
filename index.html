@@ -50,12 +50,18 @@
     <canvas id="renderCanvas"></canvas>
     <script>
 	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
+		  var CONS_EPS = 0.2;
 
 		  // Editor modes
 		  var CONS_EM_PLATFORM = 0;
 		  var CONS_EM_GUY = 1;
 		  var CONS_EM_MOV_PLAT = 2;
 		  var CONS_EM_FINISH = 3;
+
+		  // Guy modes
+		  var CONS_GM_STAND = 0;
+		  var CONS_GM_RUN = 1;
+		  var CONS_GM_JUMP = 2;
 
 		  var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);

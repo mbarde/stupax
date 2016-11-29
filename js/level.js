@@ -58,8 +58,8 @@ class Level {
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
 
-		if (guyPos.x >= movPos.x - movWidth*CONS_SCALE/2 && guyPos.x <= movPos.x + movWidth*CONS_SCALE/2
-			&& guyPos.y >= movPos.y && guyPos.y <= movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {
+		if (guyPos.x > movPos.x - movWidth*CONS_SCALE/2 && guyPos.x < movPos.x + movWidth*CONS_SCALE/2
+			&& guyPos.y > movPos.y && guyPos.y < movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {
 					this._guy._isOnMovablePlatform = true;
 		} else {
 			this._guy._isOnMovablePlatform = false;

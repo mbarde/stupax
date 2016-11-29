@@ -2,6 +2,8 @@ class Guy extends Animatable {
 
 	constructor(posX, posY, scene) {
 			super(scene);
+
+			// Init values --------------------------------------------------------
 			this._width = 1.0;
 			this._height = 1.0;
 
@@ -11,14 +13,9 @@ class Guy extends Animatable {
 			this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 			this._isOnMovablePlatform = false;
 
-			this._angle = 0.0;
+			this._forward = true;
 
-			var color = {
-				r: 0.7,
-				g: 0.0,
-				b: 0.0
-			}
-
+			// Init geometry ------------------------------------------------------
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
 			material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
 			material.diffuseTexture.hasAlpha = true;
@@ -32,6 +29,10 @@ class Guy extends Animatable {
 			this._mesh.position.y = posY * CONS_SCALE;
 			this._mesh.position.z = 0;
 
+			// Init animations ----------------------------------------------------
+			this._tex_uScale = 0.75;
+			this._tex_vScale = 0.75;
+
 			this.anim_load_animation([
 				"textures/guy/obj_Run000.png",
 				"textures/guy/obj_Run001.png",
@@ -41,69 +42,48 @@ class Guy extends Animatable {
 				"textures/guy/obj_Run005.png",
 				"textures/guy/obj_Run006.png",
 				"textures/guy/obj_Run007.png"
-			]);
-			this.anim_set_animation(0);
+			], this._tex_uScale, this._tex_vScale, 120, "run");
+			this.anim_load_animation([
+				"textures/guy/obj_Idle000.png",
+				"textures/guy/obj_Idle001.png",
+				"textures/guy/obj_Idle002.png",
+				"textures/guy/obj_Idle003.png"
+			], this._tex_uScale, this._tex_vScale, 120, "stand");
+			this.anim_load_animation([
+				"textures/guy/obj_JumpHigh000.png"
+			], this._tex_uScale, this._tex_vScale, 120, "jump");
+			this.anim_set_animation_by_name("run");
 
-			//mesh.checkCollisions = true;
-         //mesh.applyGravity = true;
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.001, move: true });
-
-			/**var material = new BABYLON.StandardMaterial("ground", this._scene);
-			material.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b);
-			material.specularColor = new BABYLON.Color3(color.r, color.g, color.b);
-			material.emissiveColor = new BABYLON.Color3(color.r, color.g, color.b);
-			this._mesh.material = material;**/
-
-			// MATERIAL -----------------------------------------------------------
-			//Define a material
-			/**
-		   var FrontMaterial = new BABYLON.StandardMaterial("cubeFront", scene);
-		   FrontMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/right.jpg", scene);
-
-		   var BackMaterial = new BABYLON.StandardMaterial("cubeBack", scene);
-		   BackMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/left.jpg", scene, false, false);
-
-		   var LeftMaterial = new BABYLON.StandardMaterial("cubeLeft", scene);
-		   LeftMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/back.jpg", scene, false, true);
-			LeftMaterial.diffuseTexture.wAng = 90.0 * Math.PI / 180;
-
-		   var RightMaterial = new BABYLON.StandardMaterial("cubeRight", scene);
-		   RightMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/front.jpg", scene);
-			RightMaterial.diffuseTexture.wAng = 90.0 * Math.PI / 180;
-
-		   var TopMaterial = new BABYLON.StandardMaterial("cubeTop", scene);
-		   TopMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/top.jpg", scene);
-
-		   var BottomMaterial = new BABYLON.StandardMaterial("cubeBottom", scene);
-		   BottomMaterial.diffuseTexture = new BABYLON.Texture("textures/guy/bottom.jpg", scene);
-
-		   var cubeMultiMat = new BABYLON.MultiMaterial("cubeMulti", scene);
-		   cubeMultiMat.subMaterials.push(BackMaterial);
-		   cubeMultiMat.subMaterials.push(FrontMaterial);
-		   cubeMultiMat.subMaterials.push(RightMaterial);
-		   cubeMultiMat.subMaterials.push(LeftMaterial);
-		   cubeMultiMat.subMaterials.push(TopMaterial);
-		   cubeMultiMat.subMaterials.push(BottomMaterial);
-
-		   this._mesh.subMeshes = [];
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(0, 0,  4,  0, 6, this._mesh));
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(1, 4,  4,  6, 6, this._mesh));
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(2, 8,  4, 12, 6, this._mesh));
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(3, 12, 4, 18, 6, this._mesh));
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(4, 16, 4, 24, 6, this._mesh));
-		   this._mesh.subMeshes.push(new BABYLON.SubMesh(5, 20, 4, 30, 6, this._mesh));
-
-		   this._mesh.material = cubeMultiMat;
-			// --------------------------------------------------------------------
-			**/
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.5, move: true });
 	}
 
 	update() {
 		if (!this._isOnMovablePlatform) {
 			if (this._mesh.getPhysicsImpostor().getLinearVelocity().y > this._maxSpeedY) {
-				var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
-				vel.y = this._maxSpeedY;
-				this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+				var veloc = this._mesh.getPhysicsImpostor().getLinearVelocity();
+				veloc.y = this._maxSpeedY;
+				this._mesh.getPhysicsImpostor().setLinearVelocity(veloc);
+			}
+		}
+
+		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS) {
+			this.anim_set_animation_by_name("stand");
+			this._curMode = CONS_GM_STAND;
+		} else {
+			if (!this._isOnMovablePlatform
+				&&this._curMode != CONS_GM_JUMP
+				&& Math.abs(vel.y) > CONS_EPS
+			) {
+				this.anim_set_animation_by_name("jump");
+				this._curMode = CONS_GM_JUMP;
+			}
+			if (this._curMode != CONS_GM_RUN
+				&& Math.abs(vel.y) <= CONS_EPS
+			 	&& Math.abs(vel.x) >= CONS_EPS
+			) {
+				this.anim_set_animation_by_name("run");
+				this._curMode = CONS_GM_RUN;
 			}
 		}
 
@@ -120,12 +100,11 @@ class Guy extends Animatable {
 		}
 
 		// Movement
-		this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+		if (this._curMode != CONS_GM_JUMP) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 
 		// Prevent rotation in any way
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
-
-		var q = BABYLON.Quaternion.RotationYawPitchRoll(this._angle * Math.PI/180, 0, 0);
+		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;
 
 		// Always stay on the same Z coordinate
@@ -133,7 +112,19 @@ class Guy extends Animatable {
 
 		if (this.anim_update()) {
 			this._mesh.material = this.anim_get_cur_texture();
+			if (!this._forward) this._mesh.material.diffuseTexture.uScale = -this._tex_uScale;
+			else this._mesh.material.diffuseTexture.uScale = this._tex_uScale;
 		}
+	}
+
+	toggleDirection() {
+		this._direction.x = - this._direction.x;
+		this._forward = !this._forward;
+
+		if (!this._forward) this._mesh.material.diffuseTexture.uScale = -this._tex_uScale;
+		else this._mesh.material.diffuseTexture.uScale = this._tex_uScale;;
+
+		return this._forward;
 	}
 
 	keyDown(keyCode) {
