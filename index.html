@@ -68,6 +68,7 @@
         var engine = new BABYLON.Engine(canvas, true);
 
 		  var mode;
+		  var scene;
 		  var camera;
 		  var light0;
 		  var light1;
@@ -76,52 +77,56 @@
 			  $('#spanLog').text("> " + message);
 		  }
 
+		  function loadLevel(name) {
+			  jQuery.get("levels/" + name + ".txt", function(data) {
+			 	  scene = createScene();
+				  mode = new Game(data, scene, camera, loadLevel);
+			  });
+		  }
+
         var createScene = function () {
-            var scene = new BABYLON.Scene(engine);
+            var myScene = new BABYLON.Scene(engine);
 
             // Lights
             //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
 
             // Need a free camera for collisions
-            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), scene);
+            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
 				var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
 				camera.rotationQuaternion = q;
 
             //camera.attachControl(canvas, false);
 
-				scene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
+				myScene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
 
-	 		  	var last = window.location.href.split('?').pop();
-	 		  	if (last == "editor") {
-					$('#spanLog').show();
-					log("Use 1 - 4 to switch between modes | Press TAB to save");
-					mode = new Editor(scene, camera, log);
-				} else {
-					var level = "level01";
-					if (last.indexOf("level") !== -1) {
-						level = last;
-					}
-					jQuery.get("levels/" + level + ".txt", function(data) {
-						mode = new Game(data, scene, camera);
-					});
-				}
-
-            // Controls
-            window.addEventListener("keydown", function(event){
-						if (mode) mode.keyDown(event.keyCode);
-            }, false);
-				window.addEventListener("keyup", function(event){
-						if (mode) mode.keyUp(event.keyCode);
-            }, false);
-
-            return scene;
+            return myScene;
         }
 
-        var scene = createScene();
+		  var last = window.location.href.split('?').pop();
+		  if (last == "editor") {
+			  $('#spanLog').show();
+			  log("Use 1 - 4 to switch between modes | Press TAB to save");
+       	  var scene = createScene();
+			  mode = new Editor(scene, camera, log);
+		  } else {
+			  var level = "level01";
+			  if (last.indexOf("level") !== -1) {
+				  level = last;
+			  }
+			  loadLevel(level);
+		  }
+
+		  // Controls
+		  window.addEventListener("keydown", function(event){
+				  if (mode) mode.keyDown(event.keyCode);
+		  }, false);
+		  window.addEventListener("keyup", function(event){
+				  if (mode) mode.keyUp(event.keyCode);
+		  }, false);
 
         engine.runRenderLoop(function () {
 			  	if (mode) mode.update();
-            scene.render();
+            if (scene) scene.render();
         });
 
         // Resize

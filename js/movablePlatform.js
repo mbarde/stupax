@@ -25,25 +25,21 @@ class MovablePlatform extends Platform {
 		var thisPos = this._mesh.getAbsolutePosition();
 
 		if (this._keysDown.indexOf(37) > -1) { // left
-			//if (!coll || guyPos.x > thisPos.x) {
 			if (!(coll && guyPos.x < thisPos.x)) {
 				this._direction.x = -this._speed;
 			}
 		}
 		if (this._keysDown.indexOf(39) > -1) { // right
-			//if (!coll || guyPos.x < thisPos.x) {
 			if (!(coll && guyPos.x > thisPos.x)) {
 				this._direction.x =  this._speed;
 			}
 		}
 		if (this._keysDown.indexOf(38) > -1) {
-			//if (!coll || guyPos.y < thisPos.y) {
 			if (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform) {
 				this._direction.y = this._speed; // up
 			}
 		}
 		if (this._keysDown.indexOf(40) > -1) {
-			//if (!coll || guyPos.y > thisPos.y) {
 			if (!(coll && guyPos.y < thisPos.y)) {
 				this._direction.y = -this._speed; // down
 			}
