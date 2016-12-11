@@ -103,12 +103,12 @@ class Level {
 		}
 	}
 
-	keyDown(keyCode) {
-		this._movablePlatform.keyDown(keyCode);
+	keyDown(ctrlCode) {
+		this._movablePlatform.keyDown(ctrlCode);
 	}
 
-	keyUp(keyCode) {
-		this._movablePlatform.keyUp(keyCode);
+	keyUp(ctrlCode) {
+		this._movablePlatform.keyUp(ctrlCode);
 	}
 
 }

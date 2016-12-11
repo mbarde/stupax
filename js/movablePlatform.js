@@ -24,22 +24,22 @@ class MovablePlatform extends Platform {
 		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var thisPos = this._mesh.getAbsolutePosition();
 
-		if (this._keysDown.indexOf(37) > -1) { // left
+		if (this._keysDown.indexOf(CTRL_LEFT) > -1) { // left
 			if (!(coll && guyPos.x < thisPos.x)) {
 				this._direction.x = -this._speed;
 			}
 		}
-		if (this._keysDown.indexOf(39) > -1) { // right
+		if (this._keysDown.indexOf(CTRL_RIGHT) > -1) { // right
 			if (!(coll && guyPos.x > thisPos.x)) {
 				this._direction.x =  this._speed;
 			}
 		}
-		if (this._keysDown.indexOf(38) > -1) {
+		if (this._keysDown.indexOf(CTRL_UP) > -1) {
 			if (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform) {
 				this._direction.y = this._speed; // up
 			}
 		}
-		if (this._keysDown.indexOf(40) > -1) {
+		if (this._keysDown.indexOf(CTRL_DOWN) > -1) {
 			if (!(coll && guyPos.y < thisPos.y)) {
 				this._direction.y = -this._speed; // down
 			}
@@ -58,15 +58,15 @@ class MovablePlatform extends Platform {
 		}
 	}
 
-	keyDown(keyCode) {
-		var index = this._keysDown.indexOf(keyCode);
+	keyDown(ctrlCode) {
+		var index = this._keysDown.indexOf(ctrlCode);
 		if (index === -1) {
-			this._keysDown.push(keyCode);
+			this._keysDown.push(ctrlCode);
 		}
 	}
 
-	keyUp(keyCode) {
-		var index = this._keysDown.indexOf(keyCode);
+	keyUp(ctrlCode) {
+		var index = this._keysDown.indexOf(ctrlCode);
 		if (index > -1) {
 			this._keysDown.splice(index, 1);
 		}

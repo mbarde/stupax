@@ -12,10 +12,10 @@ class Mode {
 	update() {
 	}
 
-	keyDown(keyCode) {
+	keyDown(ctrlCode) {
 	}
 
-	keyUp(keyCode) {
+	keyUp(ctrlCode) {
 	}
 
 }

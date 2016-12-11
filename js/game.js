@@ -14,12 +14,12 @@ class Game extends Mode {
 		this._level.update();
 	}
 
-	keyDown(keyCode) {
-		this._level.keyDown(keyCode);
+	keyDown(ctrlCode) {
+		this._level.keyDown(ctrlCode);
 	}
 
-	keyUp(keyCode) {
-		this._level.keyUp(keyCode);
+	keyUp(ctrlCode) {
+		this._level.keyUp(ctrlCode);
 	}
 
 }

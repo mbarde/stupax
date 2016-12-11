@@ -29,6 +29,7 @@
    	  <script src="js/platform.js"></script>
    	  <script src="js/movablePlatform.js"></script>
    	  <script src="js/guy.js"></script>
+   	  <script src="js/controls.js"></script>
 
         <style>
             html, body {
@@ -69,6 +70,7 @@
 
 		  var mode;
 		  var scene;
+		  var controls;
 		  var camera;
 		  var light0;
 		  var light1;
@@ -76,6 +78,13 @@
 		  function log(message) {
 			  $('#spanLog').text("> " + message);
 		  }
+
+		  function onKeyDown(ctrlCode) {
+			  if (mode) mode.keyDown(ctrlCode);
+		  }
+  		  function onKeyUp(ctrlCode) {
+  			  if (mode) mode.keyUp(ctrlCode);
+  		  }
 
 		  function loadLevel(name) {
 			  jQuery.get("levels/" + name + ".txt", function(data) {
@@ -116,17 +125,20 @@
 			  loadLevel(level);
 		  }
 
-		  // Controls
-		  window.addEventListener("keydown", function(event){
-				  if (mode) mode.keyDown(event.keyCode);
-		  }, false);
-		  window.addEventListener("keyup", function(event){
-				  if (mode) mode.keyUp(event.keyCode);
-		  }, false);
-
+		  controls = new Controls(onKeyDown, onKeyUp);
+		  /**
+	  		window.addEventListener("keydown", function(event){
+	  				if (mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+	  		}, false);
+	  		window.addEventListener("keyup", function(event){
+	  				if (mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+	  		}, false);
+			**/
+			
         engine.runRenderLoop(function () {
 			  	if (mode) mode.update();
             if (scene) scene.render();
+				if (controls) controls.update();
         });
 
         // Resize

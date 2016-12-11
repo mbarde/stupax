@@ -5,10 +5,10 @@ class Editor extends Mode {
 
 		this._log_function = log_function;
 
-		this._keysLeft = [65, 37];
-		this._keysRight = [68, 39];
-		this._keysUp = [87, 38];
-		this._keysDown = [83, 40];
+		this._keysLeft = [CTRL_LEFT, 65, 37];
+		this._keysRight = [CTRL_RIGHT, 68, 39];
+		this._keysUp = [CTRL_UP, 87, 38];
+		this._keysDown = [CTRL_DOWN, 83, 40];
 
 		this._levelWidth = 500;
 		this._levelHeight = 20;
@@ -87,33 +87,33 @@ class Editor extends Mode {
 	update() {
 	}
 
-	keyDown(keyCode) {
-		if ( this._keysLeft.indexOf(keyCode) != -1 ) {
+	keyDown(ctrlCode) {
+		if ( this._keysLeft.indexOf(ctrlCode) != -1 ) {
 			this._camera.position.x -= 10;
 		}
-		if ( this._keysRight.indexOf(keyCode) != -1 ) {
+		if ( this._keysRight.indexOf(ctrlCode) != -1 ) {
 			this._camera.position.x += 10;
 		}
-		if ( this._keysDown.indexOf(keyCode) != -1 ) {
+		if ( this._keysDown.indexOf(ctrlCode) != -1 ) {
 			this._camera.position.y -= 10;
 		}
-		if ( this._keysUp.indexOf(keyCode) != -1 ) {
+		if ( this._keysUp.indexOf(ctrlCode) != -1 ) {
 			this._camera.position.y += 10;
 		}
 
-		if (keyCode == 49) {
+		if (ctrlCode == 49) {
 			this.setCurMode(CONS_EM_PLATFORM);
 		} else
-		if (keyCode == 50) {
+		if (ctrlCode == 50) {
 			this.setCurMode(CONS_EM_GUY);
 		} else
-		if (keyCode == 51) {
+		if (ctrlCode == 51) {
 			this.setCurMode(CONS_EM_MOV_PLAT);
 		}
-		if (keyCode == 52) {
+		if (ctrlCode == 52) {
 			this.setCurMode(CONS_EM_FINISH);
 		}
-		if (keyCode == 9) {
+		if (ctrlCode == 9) {
 			this.saveLevel();
 		}
 	}
