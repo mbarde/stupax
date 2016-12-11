@@ -1,7 +1,9 @@
 class Editor extends Mode {
 
-	constructor(scene, camera) {
+	constructor(scene, camera, log_function) {
 		super(scene, camera);
+
+		this._log_function = log_function;
 
 		this._keysLeft = [65, 37];
 		this._keysRight = [68, 39];
@@ -79,7 +81,7 @@ class Editor extends Mode {
 
 	setCurMode(newMode) {
 		this._curMode = newMode;
-		console.log("Current mode is now: " + newMode);
+		log("Changed to " + this.modeIDtoName(newMode));
 	}
 
 	update() {
@@ -202,6 +204,25 @@ class Editor extends Mode {
 
 		console.log(pms);
 		return pms;
+	}
+
+	modeIDtoName(modeID) {
+		var name = "Unkown";
+		switch (modeID) {
+			case CONS_EM_PLATFORM:
+				name = "Platform mode";
+				break;
+			case CONS_EM_GUY:
+				name = "Guy spawn mode";
+				break;
+			case CONS_EM_MOV_PLAT:
+				name = "Movable platform mode";
+				break;
+			case CONS_EM_FINISH:
+				name = "Finish mode";
+				break;
+		}
+		return name;
 	}
 
 }

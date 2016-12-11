@@ -1,0 +1,1 @@
+﻿{"guy":{"_posX":2,"_posY":7},"finish":{"_posX":26,"_posY":10,"target":"levelXX"},"platforms":[{"_posX":0,"_posY":4,"_width":1,"_height":2},{"_posX":1,"_posY":4,"_width":4,"_height":1},{"_posX":22,"_posY":9,"_width":6,"_height":1},{"_posX":27,"_posY":10,"_width":1,"_height":4}],"movPlatform":{"_posX":5,"_posY":4,"_width":4,"_height":1}}

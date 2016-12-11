@@ -20,17 +20,33 @@ class MovablePlatform extends Platform {
 		this._direction.x = 0;
 		this._direction.y = 0;
 
+		var coll = this._mesh.intersectsMesh(this._guy._mesh);
+		var guyPos = this._guy._mesh.getAbsolutePosition();
+		var thisPos = this._mesh.getAbsolutePosition();
+
 		if (this._keysDown.indexOf(37) > -1) { // left
-			this._direction.x = -this._speed;
+			//if (!coll || guyPos.x > thisPos.x) {
+			if (!(coll && guyPos.x < thisPos.x)) {
+				this._direction.x = -this._speed;
+			}
 		}
 		if (this._keysDown.indexOf(39) > -1) { // right
-			this._direction.x =  this._speed;
+			//if (!coll || guyPos.x < thisPos.x) {
+			if (!(coll && guyPos.x > thisPos.x)) {
+				this._direction.x =  this._speed;
+			}
 		}
 		if (this._keysDown.indexOf(38) > -1) {
-			this._direction.y = this._speed; // up
+			//if (!coll || guyPos.y < thisPos.y) {
+			if (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform) {
+				this._direction.y = this._speed; // up
+			}
 		}
 		if (this._keysDown.indexOf(40) > -1) {
-			this._direction.y = -this._speed; // down
+			//if (!coll || guyPos.y > thisPos.y) {
+			if (!(coll && guyPos.y < thisPos.y)) {
+				this._direction.y = -this._speed; // down
+			}
 		}
 		//if (this._direction.length > 0) {
 		this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
@@ -44,13 +60,6 @@ class MovablePlatform extends Platform {
 			imp.y = 0;
 			//this._guy._mesh.getPhysicsImpostor().applyImpulse(imp, this._guy._mesh.getAbsolutePosition());
 		}
-
-		//var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
-		//target.rotationQuaternion = q.multiply(mq);
-		//this._mesh.getPhysicsImpostor().setQuaternion(this._mesh.getPhysicsImpostor().rotationQuaternion);
-
-		//this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
-		//}
 	}
 
 	keyDown(keyCode) {

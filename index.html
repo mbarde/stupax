@@ -47,6 +47,7 @@
         </style>
     </head>
 <body>
+	 <span id="spanLog" style="display:None"></span>
     <canvas id="renderCanvas"></canvas>
     <script>
 	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
@@ -71,6 +72,10 @@
 		  var light0;
 		  var light1;
 
+		  function log(message) {
+			  $('#spanLog').text("> " + message);
+		  }
+
         var createScene = function () {
             var scene = new BABYLON.Scene(engine);
 
@@ -88,7 +93,9 @@
 
 	 		  	var last = window.location.href.split('?').pop();
 	 		  	if (last == "editor") {
-					mode = new Editor(scene, camera);
+					$('#spanLog').show();
+					log("Use 1 - 4 to switch between modes | Press TAB to save");
+					mode = new Editor(scene, camera, log);
 				} else {
 					var level = "level01";
 					if (last.indexOf("level") !== -1) {

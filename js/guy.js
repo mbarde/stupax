@@ -54,7 +54,8 @@ class Guy extends Animatable {
 			], this._tex_uScale, this._tex_vScale, 120, "jump");
 			this.anim_set_animation_by_name("run");
 
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.5, move: true });
+			//this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.5, move: true });
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: 0.5, move: true });
 	}
 
 	update() {

@@ -67,7 +67,6 @@ class Animatable {
 		}
 		this._anim_intervals.push( interval );
 		this._anim_names[name] = this._animations.length-1;
-		console.log(this._anim_names);
 	}
 
 }
