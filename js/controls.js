@@ -2,6 +2,7 @@ var CTRL_LEFT = 0;
 var CTRL_RIGHT = 1;
 var CTRL_UP = 2;
 var CTRL_DOWN = 3;
+var CTRL_RESTART = 4;
 
 /**
 * Class to abstract from input device.
@@ -84,8 +85,11 @@ class Controls {
 			case 40:
 				ctrlCode = CTRL_DOWN;
 				break;
-			}
-			return ctrlCode;
+			case 82: // R
+				ctrlCode = CTRL_RESTART;
+				break;
+		}
+		return ctrlCode;
 	}
 
 }

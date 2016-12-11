@@ -49,10 +49,14 @@
     </head>
 <body>
 	 <span id="spanLog" style="display:None"></span>
+	 <span id="spanFps" style="display:None"></span>
     <canvas id="renderCanvas"></canvas>
     <script>
 	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
 		  var CONS_EPS = 0.2;
+
+		  var CONS_LEVEL_BOTTOM = 0;
+		  var CONS_LEVEL_TOP = 13;
 
 		  // Editor modes
 		  var CONS_EM_PLATFORM = 0;
@@ -64,6 +68,7 @@
 		  var CONS_GM_STAND = 0;
 		  var CONS_GM_RUN = 1;
 		  var CONS_GM_JUMP = 2;
+
 
 		  var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
@@ -110,6 +115,7 @@
 
             return myScene;
         }
+			  $('#spanLog').show();
 
 		  var last = window.location.href.split('?').pop();
 		  if (last == "editor") {
@@ -119,6 +125,7 @@
 			  mode = new Editor(scene, camera, log);
 		  } else {
 			  var level = "level01";
+			  $('#spanFps').show();
 			  if (last.indexOf("level") !== -1) {
 				  level = last;
 			  }
@@ -126,17 +133,18 @@
 		  }
 
 		  controls = new Controls(onKeyDown, onKeyUp);
-		  /**
+
 	  		window.addEventListener("keydown", function(event){
 	  				if (mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
 	  		}, false);
 	  		window.addEventListener("keyup", function(event){
 	  				if (mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
 	  		}, false);
-			**/
-			
+
+
         engine.runRenderLoop(function () {
 			  	if (mode) mode.update();
+				$('#spanFps').text( engine.fps );
             if (scene) scene.render();
 				if (controls) controls.update();
         });

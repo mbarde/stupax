@@ -38,6 +38,14 @@ class Level {
 		this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 
 		this.initBackground();
+
+		this._levelObject = lvl;
+	}
+
+	restart() {
+		var lvl = this._levelObject;
+		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
+		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 	}
 
 	initFinish(finishObject) {
@@ -101,10 +109,20 @@ class Level {
 		if (this._finish.intersectsMesh(this._guy._mesh)) {
 			this._onFinished(this._finish.target);
 		}
+
+		if (this._guy._mesh.getAbsolutePosition().y < (CONS_LEVEL_BOTTOM-2) * CONS_SCALE) {
+			this.restart();
+		}
 	}
 
 	keyDown(ctrlCode) {
 		this._movablePlatform.keyDown(ctrlCode);
+
+		switch (ctrlCode) {
+			case CTRL_RESTART:
+				this.restart();
+				return;
+		}
 	}
 
 	keyUp(ctrlCode) {

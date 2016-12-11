@@ -7,6 +7,10 @@ class Animatable {
 		this._anim_intervals = new Array(); // array of intervals between frames
 		this._anim_names = new Array(); // array: key is name, value is corresponding index of this._animations
 
+		this.anim_reset();
+	}
+
+	anim_reset() {
 		this._anim_cur_anim = -1;
 		this._anim_cur_frame = -1;
 		this._anim_last_update = -1;

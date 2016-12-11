@@ -4,8 +4,8 @@ class Guy extends Animatable {
 			super(scene);
 
 			// Init values --------------------------------------------------------
-			this._width = 1.0;
-			this._height = 1.0;
+			this._width = 0.9;
+			this._height = 0.9;
 
 			this._accelerationX = 0.2 * CONS_SCALE;
 			this._maxSpeedX = 1.0 * CONS_SCALE;
@@ -25,8 +25,8 @@ class Guy extends Animatable {
 
 			this._mesh = BABYLON.MeshBuilder.CreatePlane("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
 			this._mesh.material = material;
-			this._mesh.position.x = posX  * CONS_SCALE;
-			this._mesh.position.y = posY * CONS_SCALE;
+			this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
+			this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 			this._mesh.position.z = 0;
 
 			// Init animations ----------------------------------------------------
@@ -54,8 +54,23 @@ class Guy extends Animatable {
 			], this._tex_uScale, this._tex_vScale, 120, "jump");
 			this.anim_set_animation_by_name("run");
 
-			//this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 8, restitution: 0.5, move: true });
 			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: 0.5, move: true });
+	}
+
+	// Reset guy, for example when restarting level
+	reset(posX, posY) {
+		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
+		this._isOnMovablePlatform = false;
+		this._forward = true;
+
+		this._mesh.position.x = posX  * CONS_SCALE;
+		this._mesh.position.y = posY * CONS_SCALE;
+
+		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+		vel.x = 0;
+		vel.y = 0;
+		this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
 	}
 
 	update() {

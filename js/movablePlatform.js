@@ -9,11 +9,26 @@ class MovablePlatform extends Platform {
 		this._keyPressed = false;
 
 		this._speed = 3 * CONS_SCALE;
-		//this._mesh.getPhysicsImpostor().setRestitution(0.8);
 		this._mesh.getPhysicsImpostor().setMass(1);
 
 		this._keysDown = [];
 		this._mesh.platform = this;
+	}
+
+	// Reset movable platform, for example when level restart
+	reset(posX, posY) {
+		this._keyPressed = false;
+		this._keysDown = [];
+		this._direction = new BABYLON.Vector3(0, 0, 0);
+
+		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
+		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
+
+		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+		vel.x = 0;
+		vel.y = 0;
+		this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
 	}
 
 	update() {
@@ -35,12 +50,13 @@ class MovablePlatform extends Platform {
 			}
 		}
 		if (this._keysDown.indexOf(CTRL_UP) > -1) {
-			if (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform) {
+			if ( (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform)
+					&& thisPos.y < CONS_LEVEL_TOP * CONS_SCALE) {
 				this._direction.y = this._speed; // up
 			}
 		}
 		if (this._keysDown.indexOf(CTRL_DOWN) > -1) {
-			if (!(coll && guyPos.y < thisPos.y)) {
+			if (!(coll && guyPos.y < thisPos.y) && thisPos.y > CONS_LEVEL_BOTTOM * CONS_SCALE) {
 				this._direction.y = -this._speed; // down
 			}
 		}
