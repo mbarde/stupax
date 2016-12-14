@@ -64,7 +64,7 @@ class Guy extends Animatable {
 
 			this.anim_set_animation_by_name("run");
 
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: 0.5, move: true });
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
 
 	// Reset guy, for example when restarting level
@@ -74,8 +74,8 @@ class Guy extends Animatable {
 		this._forward = true;
 		this._stopOnWin = false;
 
-		this._mesh.position.x = posX  * CONS_SCALE;
-		this._mesh.position.y = posY * CONS_SCALE;
+		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
+		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		vel.x = 0;

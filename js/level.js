@@ -124,7 +124,7 @@ class Level {
 		this._camera.position.x = movPos.x;
 
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
-		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
+		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y + (this._movablePlatform._height/2) * CONS_SCALE;
 
 		if (this._finished) {
 			var time = new Date().getTime();

@@ -89,7 +89,7 @@ class Platform extends Entity {
 
 	initPhysics(guy) {
 		var platform = this._mesh;
-		platform.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: 0.5, move: this.constructor.name == "MovablePlatform" });
+		platform.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: this.constructor.name == "MovablePlatform" });
 		var impostor = platform.getPhysicsImpostor();
 
 		// What happens we the guy hits this platform?

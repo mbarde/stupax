@@ -53,8 +53,12 @@
     <canvas id="renderCanvas"></canvas>
     <script>
 	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
-		  var CONS_EPS = 0.2; // Defines
+		  var CONS_EPS = 0.2; // Epsilon value used as constant for some fine tuning (use search function)
 		  var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
+
+		  // Restitution defines how "bumpy" the physics is. The higher the bumpier.
+		  var CONS_RESTITUTION_GUY = 0.3;
+		  var CONS_RESTITUTION_PLAT = 0.3;
 
 		  var CONS_LEVEL_BOTTOM = 0;
 		  var CONS_LEVEL_TOP = 13;

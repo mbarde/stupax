@@ -139,7 +139,8 @@ class Editor extends Mode {
 		level.finish = {};
 		level.finish._posX = this._finishMarker._posX;
 		level.finish._posY = this._finishMarker._posY;
-		level.finish.target = "levelXX";
+		var target = prompt("Please enter target", "level01");
+		level.finish.target = target;
 
 		var pms = new Array(); // platform markers
 		var movPms = new Array(); // movable platform markers
