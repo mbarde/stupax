@@ -14,6 +14,7 @@ class Guy extends Animatable {
 			this._isOnMovablePlatform = false;
 
 			this._forward = true;
+			this._stopOnWin = false;
 
 			// Init geometry ------------------------------------------------------
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
@@ -52,6 +53,15 @@ class Guy extends Animatable {
 			this.anim_load_animation([
 				"textures/guy/obj_JumpHigh000.png"
 			], this._tex_uScale, this._tex_vScale, 120, "jump");
+			this.anim_load_animation([
+				"textures/guy/obj_Box000.png",
+				"textures/guy/obj_Box001.png",
+				"textures/guy/obj_Box002.png",
+				"textures/guy/obj_Box003.png",
+				"textures/guy/obj_Box004.png",
+				"textures/guy/obj_Box005.png"
+			], this._tex_uScale, this._tex_vScale, 80, "win");
+
 			this.anim_set_animation_by_name("run");
 
 			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: 0.5, move: true });
@@ -62,6 +72,7 @@ class Guy extends Animatable {
 		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 		this._isOnMovablePlatform = false;
 		this._forward = true;
+		this._stopOnWin = false;
 
 		this._mesh.position.x = posX  * CONS_SCALE;
 		this._mesh.position.y = posY * CONS_SCALE;
@@ -84,7 +95,7 @@ class Guy extends Animatable {
 
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS) {
-			this.anim_set_animation_by_name("stand");
+			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
 			this._curMode = CONS_GM_STAND;
 		} else {
 			if (!this._isOnMovablePlatform
@@ -116,7 +127,7 @@ class Guy extends Animatable {
 		}
 
 		// Movement
-		if (this._curMode != CONS_GM_JUMP) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+		if (this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 
 		// Prevent rotation in any way
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
@@ -131,6 +142,12 @@ class Guy extends Animatable {
 			if (!this._forward) this._mesh.material.diffuseTexture.uScale = -this._tex_uScale;
 			else this._mesh.material.diffuseTexture.uScale = this._tex_uScale;
 		}
+	}
+
+	// fired when player reaches door
+	onWin() {
+		this._stopOnWin = true;
+		this.anim_set_animation_by_name("win");
 	}
 
 	toggleDirection() {

@@ -53,7 +53,8 @@
     <canvas id="renderCanvas"></canvas>
     <script>
 	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
-		  var CONS_EPS = 0.2;
+		  var CONS_EPS = 0.2; // Defines
+		  var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
 
 		  var CONS_LEVEL_BOTTOM = 0;
 		  var CONS_LEVEL_TOP = 13;
@@ -115,7 +116,6 @@
 
             return myScene;
         }
-		  $('#spanLog').show();
 
 		  // If URL looks like "...?editor" start editor, else start game
 		  var editor = false;
@@ -149,6 +149,7 @@
   		  } else {
 			  var level = "level01";
 			  $('#spanFps').show();
+			  var last = arr.pop();
 			  if (last.indexOf("level") !== -1) {
 				  level = last;
 			  }

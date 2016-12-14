@@ -5,6 +5,7 @@ class Level {
 		this._scene = scene;
 		this._camera = camera;
 		this._onFinished = onFinished; // function to execute when player reaches finish
+		this._finished = false; // will contain timestamp of win when player reaches door
 		this.loadLevel(levelString);
 	}
 
@@ -44,12 +45,13 @@ class Level {
 
 	restart() {
 		var lvl = this._levelObject;
+		this._finished = false;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 	}
 
 	initFinish(finishObject) {
-		// Create invisible mesh for collision detection
+		// Create invisible mesh for collision detection -------------------------
 		var material = new BABYLON.StandardMaterial("finish", this._scene);
 		material.alpha = 0.0;
 
@@ -62,8 +64,26 @@ class Level {
 		// Rotate plane to make it stand orthogonal to players plane
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(90, 0, 0);
 		this._finish.rotationQuaternion = q;
+		// -----------------------------------------------------------------------
 
-		this._light1 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(this._finish.position.x, this._finish.position.y-0.5, 0), this._scene);
+		// Create plane containing the finish texture ----------------------------
+		material = new BABYLON.StandardMaterial("finish", this._scene);
+		material.diffuseTexture = new BABYLON.Texture("textures/door.png", this._scene);
+		material.diffuseTexture.hasAlpha = true;
+		material.backFaceCulling = true;
+
+		var mesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
+		mesh.material = material;
+		mesh.position.x = (finishObject._posX + 0.5)  * CONS_SCALE;
+		mesh.position.y = (finishObject._posY + 0.5) * CONS_SCALE;
+		mesh.position.z = CONS_SCALE/2 - 0.001;
+		// -----------------------------------------------------------------------
+
+		this._light1 = new BABYLON.SpotLight("Spot0",
+							new BABYLON.Vector3((finishObject._posX + 0.5) * CONS_SCALE, (finishObject._posY + 1) * CONS_SCALE, -2 * CONS_SCALE),
+							new BABYLON.Vector3(0, 0, 1), 1.2, 30, this._scene);
+		this._light1.diffuse = new BABYLON.Color3(1, 0, 0);
+		this._light1.specular = new BABYLON.Color3(1, 0, 0);
 
 		this._finish.target = finishObject.target;
 	}
@@ -71,7 +91,7 @@ class Level {
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		material.diffuseTexture = new BABYLON.Texture("textures/block01.png", this._scene);
-		material.backFaceCulling = false;
+		material.backFaceCulling = true;
 		material.diffuseTexture.uScale = (this._levelWidth + 9 * CONS_SCALE)
 		material.diffuseTexture.uOffset = 0.5;
 		material.diffuseTexture.vScale = (this._levelHeight)
@@ -106,8 +126,16 @@ class Level {
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
 		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
 
-		if (this._finish.intersectsMesh(this._guy._mesh)) {
-			this._onFinished(this._finish.target);
+		if (this._finished) {
+			var time = new Date().getTime();
+			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
+				this._onFinished(this._finish.target);
+			}
+		} else if (this._finish.intersectsMesh(this._guy._mesh)) {
+			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
+			this._light1.specular = new BABYLON.Color3(0, 1, 0);
+			this._guy.onWin();
+			this._finished = new Date().getTime();
 		}
 
 		if (this._guy._mesh.getAbsolutePosition().y < (CONS_LEVEL_BOTTOM-2) * CONS_SCALE) {

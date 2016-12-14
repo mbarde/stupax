@@ -27,7 +27,7 @@ class Editor extends Mode {
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
-		material.backFaceCulling = false;
+		material.backFaceCulling = true;
 		material.diffuseTexture.uScale = (this._levelWidth)
 		material.diffuseTexture.vScale = (this._levelHeight)
 
