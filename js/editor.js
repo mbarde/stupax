@@ -202,8 +202,30 @@ class Editor extends Mode {
 			}
 		} while (merged);
 
-		console.log(pms);
 		return pms;
+	}
+
+	loadLevel(level) {
+		var lvl = JSON.parse(level);
+		this._guyMarker = new Marker(lvl.guy._posX, lvl.guy._posY, CONS_EM_GUY, this._scene);
+		this._finishMarker = new Marker(lvl.finish._posX, lvl.finish._posY, CONS_EM_FINISH, this._scene);
+
+		var movPlat = lvl.movPlatform;
+		for (var x = 0; x < movPlat._width; x++) {
+			for (var y = 0; y < movPlat._height; y++) {
+				var marker = new Marker(movPlat._posX + x, movPlat._posY + y, CONS_EM_MOV_PLAT, this._scene);
+			}
+		}
+
+		var platforms = lvl.platforms;
+		for (var i = 0; i < platforms.length; i++) {
+			var plat = platforms[i];
+			for (var x = 0; x < plat._width; x++) {
+				for (var y = 0; y < plat._height; y++) {
+					var marker = new Marker(plat._posX + x, plat._posY + y, CONS_EM_PLATFORM, this._scene);
+				}
+			}
+		}
 	}
 
 	modeIDtoName(modeID) {

@@ -115,15 +115,38 @@
 
             return myScene;
         }
-			  $('#spanLog').show();
+		  $('#spanLog').show();
 
-		  var last = window.location.href.split('?').pop();
-		  if (last == "editor") {
-			  $('#spanLog').show();
-			  log("Use 1 - 4 to switch between modes | Press TAB to save");
-       	  var scene = createScene();
-			  mode = new Editor(scene, camera, log);
-		  } else {
+		  // If URL looks like "...?editor" start editor, else start game
+		  var editor = false;
+		  var arr = window.location.href.split('?');
+		  if (arr.length > 2) {
+			 if (arr[arr.length-2] == "editor") {
+				 editor = true;
+			 }
+		 } else {
+			 if (arr[arr.length-1] == "editor") {
+				 editor = true;
+			 }
+		 }
+
+		 if (editor) {
+			 $('#spanLog').show();
+  			 log("Use 1 - 4 to switch between modes | Press TAB to save");
+
+			 var scene = createScene();
+		 	mode = new Editor(scene, camera, log);
+
+			 // If URL looks like "...?editor?levelXX" load levelXX
+			 var last = arr.pop();
+			 if (last.indexOf("level") !== -1) {
+				 level = last;
+				 jQuery.get("levels/" + level + ".txt", function(data) {
+					 console.log(data);
+					 mode.loadLevel(data);
+				 });
+	 		 }
+  		  } else {
 			  var level = "level01";
 			  $('#spanFps').show();
 			  if (last.indexOf("level") !== -1) {

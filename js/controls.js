@@ -19,7 +19,6 @@ class Controls {
 			{ "key" : 13, "map" : CTRL_RIGHT, "pressed" : false },
 			{ "key" : 15, "map" : CTRL_DOWN, "pressed" : false }
 		];
-		console.log(this._gamepad_mapping);
 
 		this._pressed = [];
 	}

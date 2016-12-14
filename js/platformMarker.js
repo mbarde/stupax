@@ -28,7 +28,7 @@ class PlatformMarker {
 	isBottomNeighbor(pMarker) {
 		return (pMarker._width == this._width
 					&& pMarker._posX == this._posX
-					&& pMarker._posY + this._height == this._posY);
+					&& pMarker._posY + pMarker._height == this._posY);
 	}
 
 	tryMerge(pMarker) {
