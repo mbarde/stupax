@@ -57,15 +57,17 @@ class Animatable {
 		return this._animations[this._anim_cur_anim][this._anim_cur_frame];
 	}
 
-	anim_load_animation(frames, uScale, vScale, interval, name) {
+	anim_load_animation(frames, uScale, vScale, uOffset, vOffset, interval, name) {
 		this._animations.push( new Array() );
 		var index = this._animations.length - 1;
 		for (var i = 0; i < frames.length; i++) {
 				var material = new BABYLON.StandardMaterial("guy", this._scene);
 				material.diffuseTexture = new BABYLON.Texture(frames[i], this._scene);
-				material.diffuseTexture.hasAlpha = true;
+				material.diffuseTexture.hasAlpha = true;/**
 				material.diffuseTexture.uScale = uScale;
 				material.diffuseTexture.vScale = vScale;
+				material.diffuseTexture.uOffset = uOffset;
+				material.diffuseTexture.vOffset = vOffset;**/
 				material.backFaceCulling = false;
 			  	this._animations[index].push(material);
 		}

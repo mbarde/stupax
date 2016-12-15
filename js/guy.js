@@ -4,7 +4,7 @@ class Guy extends Animatable {
 			super(scene);
 
 			// Init values --------------------------------------------------------
-			this._width = 0.9;
+			this._width = 0.6;
 			this._height = 0.9;
 
 			this._accelerationX = 0.2 * CONS_SCALE;
@@ -17,23 +17,33 @@ class Guy extends Animatable {
 			this._stopOnWin = false;
 
 			// Init geometry ------------------------------------------------------
+			this._tex_uScale = 1;
+			this._tex_vScale = 1;
+			this._tex_uOffset = 0;
+			this._tex_vOffset = 0;
+
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
 			material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
 			material.diffuseTexture.hasAlpha = true;
-			material.diffuseTexture.uScale = 0.75;
-			material.diffuseTexture.vScale = 0.75;
+			material.diffuseTexture.uScale = this._tex_uScale;
+			material.diffuseTexture.vScale = this._tex_vScale;
+			material.diffuseTexture.uOffset = this._tex_uOffset;
+			material.diffuseTexture.vOffset = this._tex_vOffset;
 			material.backFaceCulling = false;
 
-			this._mesh = BABYLON.MeshBuilder.CreatePlane("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
+			this._planeMesh = BABYLON.MeshBuilder.CreatePlane("guyPlane", {height: 1.5 * CONS_SCALE, width: 1 * CONS_SCALE}, this._scene);
+			this._planeMesh.material = material;
+
+			// Impostor mesh for the physics
+			var material = new BABYLON.StandardMaterial("guy", this._scene);
+			material.alpha = 0.4;
+			this._mesh = BABYLON.MeshBuilder.CreateBox("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 			this._mesh.material = material;
 			this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 			this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 			this._mesh.position.z = 0;
 
 			// Init animations ----------------------------------------------------
-			this._tex_uScale = 0.75;
-			this._tex_vScale = 0.75;
-
 			this.anim_load_animation([
 				"textures/guy/obj_Run000.png",
 				"textures/guy/obj_Run001.png",
@@ -43,16 +53,16 @@ class Guy extends Animatable {
 				"textures/guy/obj_Run005.png",
 				"textures/guy/obj_Run006.png",
 				"textures/guy/obj_Run007.png"
-			], this._tex_uScale, this._tex_vScale, 120, "run");
+			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "run");
 			this.anim_load_animation([
 				"textures/guy/obj_Idle000.png",
 				"textures/guy/obj_Idle001.png",
 				"textures/guy/obj_Idle002.png",
 				"textures/guy/obj_Idle003.png"
-			], this._tex_uScale, this._tex_vScale, 120, "stand");
+			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "stand");
 			this.anim_load_animation([
 				"textures/guy/obj_JumpHigh000.png"
-			], this._tex_uScale, this._tex_vScale, 120, "jump");
+			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "jump");
 			this.anim_load_animation([
 				"textures/guy/obj_Box000.png",
 				"textures/guy/obj_Box001.png",
@@ -60,11 +70,11 @@ class Guy extends Animatable {
 				"textures/guy/obj_Box003.png",
 				"textures/guy/obj_Box004.png",
 				"textures/guy/obj_Box005.png"
-			], this._tex_uScale, this._tex_vScale, 80, "win");
+			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 80, "win");
 
 			this.anim_set_animation_by_name("run");
 
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 8, restitution: CONS_RESTITUTION_GUY, move: true });
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 5, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
 
 	// Reset guy, for example when restarting level
@@ -85,6 +95,9 @@ class Guy extends Animatable {
 	}
 
 	update() {
+		this._planeMesh.position = this._mesh.getAbsolutePosition();
+		this._planeMesh.position.y += 0.7;
+
 		if (!this._isOnMovablePlatform) {
 			if (this._mesh.getPhysicsImpostor().getLinearVelocity().y > this._maxSpeedY) {
 				var veloc = this._mesh.getPhysicsImpostor().getLinearVelocity();
@@ -138,9 +151,9 @@ class Guy extends Animatable {
 		this._mesh.position.z = 0;
 
 		if (this.anim_update()) {
-			this._mesh.material = this.anim_get_cur_texture();
-			if (!this._forward) this._mesh.material.diffuseTexture.uScale = -this._tex_uScale;
-			else this._mesh.material.diffuseTexture.uScale = this._tex_uScale;
+			this._planeMesh.material = this.anim_get_cur_texture();
+			if (!this._forward) this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
+			else this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
 		}
 	}
 
@@ -154,8 +167,13 @@ class Guy extends Animatable {
 		this._direction.x = - this._direction.x;
 		this._forward = !this._forward;
 
-		if (!this._forward) this._mesh.material.diffuseTexture.uScale = -this._tex_uScale;
-		else this._mesh.material.diffuseTexture.uScale = this._tex_uScale;;
+		if (!this._forward) {
+			this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
+			this._planeMesh.material.diffuseTexture.uOffset = -this._tex_uOffset;
+		} else {
+			this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
+			this._planeMesh.material.diffuseTexture.uOffset = this._tex_uOffset;
+		}
 
 		return this._forward;
 	}

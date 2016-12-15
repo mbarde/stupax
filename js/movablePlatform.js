@@ -40,38 +40,48 @@ class MovablePlatform extends Platform {
 		var thisPos = this._mesh.getAbsolutePosition();
 
 		if (this._keysDown.indexOf(CTRL_LEFT) > -1) { // left
-			if (!(coll && guyPos.x < thisPos.x)) {
+			//if (!(coll && guyPos.x < thisPos.x)) {
 				this._direction.x = -this._speed;
-			}
+			//}
 		}
 		if (this._keysDown.indexOf(CTRL_RIGHT) > -1) { // right
-			if (!(coll && guyPos.x > thisPos.x)) {
+			//if (!(coll && guyPos.x > thisPos.x)) {
 				this._direction.x =  this._speed;
-			}
+			//}
 		}
 		if (this._keysDown.indexOf(CTRL_UP) > -1) {
-			if ( (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform)
-					&& thisPos.y < CONS_LEVEL_TOP * CONS_SCALE) {
+			//if ( (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform)
+			//		&& thisPos.y < CONS_LEVEL_TOP * CONS_SCALE) {
 				this._direction.y = this._speed; // up
-			}
+			//}
 		}
 		if (this._keysDown.indexOf(CTRL_DOWN) > -1) {
-			if (!(coll && guyPos.y < thisPos.y) && thisPos.y > CONS_LEVEL_BOTTOM * CONS_SCALE) {
+			//if (!(coll && guyPos.y < thisPos.y) && thisPos.y > CONS_LEVEL_BOTTOM * CONS_SCALE) {
 				this._direction.y = -this._speed; // down
-			}
+			//}
 		}
 		//if (this._direction.length > 0) {
+		if (this._direction.y < 0.1 && this._direction.y >= 0) this._direction.y = 0.2;
 		this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
 		//this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;
+		this._mesh.position.z = 0;
 
 		if (this._guy._isOnMovablePlatform) {
 			var imp = this._direction;
 			imp.y = 0;
 			//this._guy._mesh.getPhysicsImpostor().applyImpulse(imp, this._guy._mesh.getAbsolutePosition());
 		}
+	}
+
+	setPhysicsState() {
+		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: true });
+	}
+
+	getTextureName() {
+		return "textures/block03.png";
 	}
 
 	keyDown(ctrlCode) {

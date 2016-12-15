@@ -15,15 +15,8 @@ class Platform extends Entity {
 		material.emissiveColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);**/
 
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		var texture = ""; // = new BABYLON.Texture("textures/cartoon_wooden_crate_03.jpg", this._scene);
+		var texture = this.getTextureName();
 		var alpha = 1.0;
-		if (this.constructor.name == "MovablePlatform") {
-			texture = "textures/block03.png";
-			alpha = 1.0;
-		} else {
-			texture = "textures/block04.png";
-			alpha = 1.0;
-		}
 
 		// MATERIAL -----------------------------------------------------------
 		//Define a material
@@ -87,9 +80,17 @@ class Platform extends Entity {
 		this._mesh.position.z = 0;
 	}
 
+	setPhysicsState() {
+		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false });
+	}
+
+	getTextureName() {
+		return "textures/block04.png";
+	}
+
 	initPhysics(guy) {
 		var platform = this._mesh;
-		platform.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: this.constructor.name == "MovablePlatform" });
+		this.setPhysicsState();
 		var impostor = platform.getPhysicsImpostor();
 
 		// What happens we the guy hits this platform?

@@ -2,6 +2,7 @@ class Level {
 
 	constructor(levelString, scene, camera, onFinished) {
 		this._platforms = [];
+		this._boxes = [];
 		this._scene = scene;
 		this._camera = camera;
 		this._onFinished = onFinished; // function to execute when player reaches finish
@@ -17,6 +18,9 @@ class Level {
 
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene);
+
+		var box = new Box(1,1, lvl.guy._posX + 3, lvl.guy._posY + 2, 2, this._guy, this._scene);
+		this._boxes.push(box);
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -94,7 +98,7 @@ class Level {
 		material.backFaceCulling = true;
 		material.diffuseTexture.uScale = (this._levelWidth + 9 * CONS_SCALE)
 		material.diffuseTexture.uOffset = 0.5;
-		material.diffuseTexture.vScale = (this._levelHeight)
+		material.diffuseTexture.vScale = (this._levelHeight);
 
 		// Background marks area of level
 		this._background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
@@ -103,6 +107,8 @@ class Level {
 		this._background.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
 		this._background.position.z = CONS_SCALE/2;
 		this._background.receiveShadows = false;
+
+		this._background.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false });
 	}
 
 	update() {
@@ -110,6 +116,10 @@ class Level {
 		var movPos = this._movablePlatform._mesh.getAbsolutePosition();
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
+
+		//for (var i = 0; i < this._boxes.length; i++) {
+		//	this._boxes[i].update();
+		//}
 
 		if (guyPos.x > movPos.x - movWidth*CONS_SCALE/2 && guyPos.x < movPos.x + movWidth*CONS_SCALE/2
 			&& guyPos.y > movPos.y && guyPos.y < movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {
@@ -124,7 +134,7 @@ class Level {
 		this._camera.position.x = movPos.x;
 
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
-		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y + (this._movablePlatform._height/2) * CONS_SCALE;
+		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
 
 		if (this._finished) {
 			var time = new Date().getTime();
