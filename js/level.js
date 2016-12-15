@@ -19,9 +19,6 @@ class Level {
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene);
 
-		//var box = new Box(1,1, lvl.guy._posX + 3, lvl.guy._posY + 2, 2, this._guy, this._scene);
-		//this._boxes.push(box);
-
 		// Set platforms
 		var ps = lvl.platforms;
 		this._platforms = new Array();
@@ -36,6 +33,15 @@ class Level {
 		this._movablePlatform = new MovablePlatform(movPlat._width, movPlat._height,
 										movPlat._posX, movPlat._posY,
 										this._guy, this._scene);
+
+		// Set boxes
+		this._boxes = new Array();
+		if (lvl.boxes) {
+			for (var i = 0; i < lvl.boxes.length; i++) {
+				var box = lvl.boxes[i];
+				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene));
+			}
+		}
 
 		// Set finish
 		this.initFinish(lvl.finish);
@@ -52,6 +58,18 @@ class Level {
 		this._finished = false;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
+
+		var lvl = this._levelObject;
+		for (var i = 0; i < this._boxes.length; i++) {
+			this._boxes[i]._mesh.dispose();
+		}
+		this._boxes = new Array();
+		if (lvl.boxes) {
+			for (var i = 0; i < lvl.boxes.length; i++) {
+				var box = lvl.boxes[i];
+				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene));
+			}
+		}
 	}
 
 	initFinish(finishObject) {
@@ -117,10 +135,6 @@ class Level {
 		var movPos = this._movablePlatform._mesh.getAbsolutePosition();
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
-
-		//for (var i = 0; i < this._boxes.length; i++) {
-		//	this._boxes[i].update();
-		//}
 
 		if (guyPos.x > movPos.x - movWidth*CONS_SCALE/2 && guyPos.x < movPos.x + movWidth*CONS_SCALE/2
 			&& guyPos.y > movPos.y && guyPos.y < movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {

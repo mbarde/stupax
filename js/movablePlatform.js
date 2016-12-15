@@ -68,6 +68,21 @@ class MovablePlatform extends Platform {
 			this._direction.y = CONS_MOV_PLAT_UPLIFT; // avoid gravity
 			this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
 		} else {
+			// Apply impulse at every corner of every 1-unit-block of the platform
+			/**
+			var imp = this._direction;
+			imp.x = imp.x / (this._width+1) * (this._height+1);
+			imp.y = imp.y / (this._width+1) * (this._height+1);
+			console.log("AHA");
+			for (var x = 0; x <= this._width; x++) {
+				for (var y = 0; y <= this._height; y++) {
+					var pos = this._mesh.getAbsolutePosition().clone();
+					pos.x = pos.x + ( (-this._width/2 + x) * CONS_SCALE );
+					pos.y = pos.y + ( (-this._height/2 + y) * CONS_SCALE );
+					console.log(pos);
+					this._mesh.getPhysicsImpostor().applyImpulse(imp, pos);
+				}
+			}**/
 			this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 		}
 

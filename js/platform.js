@@ -9,10 +9,6 @@ class Platform extends Entity {
 
 	initGeometry(posX, posY) {
 		this._mesh = BABYLON.MeshBuilder.CreateBox("platform", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
-		/**var material = new BABYLON.StandardMaterial("ground", this._scene);
-		material.diffuseColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);
-		material.specularColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);
-		material.emissiveColor = new BABYLON.Color3(this._color.r, this._color.g, this._color.b);**/
 
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		var texture = this.getTextureName();

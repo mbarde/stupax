@@ -59,6 +59,7 @@
 		  var CONS_PLAYER_MASS = 1; // self explanatory
 		  var CONS_MASS_MOV_PLAT = 1; // self explanatory
 		  var CONS_MOV_PLAT_UPLIFT = 0.15; // uplift of movable platform when no movement button is pressed, needed to fight against gravity
+		  var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
 
 		  // Restitution defines how "bumpy" the physics is. The higher the bumpier.
 		  var CONS_RESTITUTION_GUY = 0.3;
@@ -72,6 +73,7 @@
 		  var CONS_EM_GUY = 1;
 		  var CONS_EM_MOV_PLAT = 2;
 		  var CONS_EM_FINISH = 3;
+		  var CONS_EM_BOX = 4;
 
 		  // Guy modes
 		  var CONS_GM_STAND = 0;
@@ -140,7 +142,7 @@
 
 		 if (editor) {
 			 $('#spanLog').show();
-  			 log("Use 1 - 4 to switch between modes | Press TAB to save");
+  			 log("Use 1 - 5 to switch between modes | Press TAB to save");
 
 			 var scene = createScene();
 		 	mode = new Editor(scene, camera, log);

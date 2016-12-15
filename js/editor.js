@@ -113,6 +113,9 @@ class Editor extends Mode {
 		if (ctrlCode == 52) {
 			this.setCurMode(CONS_EM_FINISH);
 		}
+		if (ctrlCode == 53) {
+			this.setCurMode(CONS_EM_BOX);
+		}
 		if (ctrlCode == 9) {
 			this.saveLevel();
 		}
@@ -144,6 +147,7 @@ class Editor extends Mode {
 
 		var pms = new Array(); // platform markers
 		var movPms = new Array(); // movable platform markers
+		var boxMs = new Array(); // box markers
 		var h = 0;
 		console.log("Collecting markers ...");
 		console.log(this._scene.meshes.length);
@@ -154,6 +158,9 @@ class Editor extends Mode {
 			} else if (this._scene.meshes[h].mode == CONS_EM_MOV_PLAT) {
 				var m = this._scene.meshes[h].marker;
 				movPms.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
+			} else if (this._scene.meshes[h].mode == CONS_EM_BOX) {
+				var m = this._scene.meshes[h].marker;
+				boxMs.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
 			}
 		}
 		level.platforms = this.mergeMarkers(pms);
@@ -167,6 +174,8 @@ class Editor extends Mode {
 			alert("Multiple movable platforms detected! Only one of them will be saved!");
 		}
 		level.movPlatform = movPms[0];
+
+		level.boxes = this.mergeMarkers(boxMs);
 
 		var blob = new Blob([JSON.stringify(level)], {type: "text/plain;charset=utf-8"});
 		saveAs(blob, "level.txt");
@@ -243,6 +252,9 @@ class Editor extends Mode {
 				break;
 			case CONS_EM_FINISH:
 				name = "Finish mode";
+				break;
+			case CONS_EM_BOX:
+				name = "Box mode";
 				break;
 		}
 		return name;
