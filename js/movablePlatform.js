@@ -9,7 +9,7 @@ class MovablePlatform extends Platform {
 		this._keyPressed = false;
 
 		this._speed = 3 * CONS_SCALE;
-		this._mesh.getPhysicsImpostor().setMass(1);
+		this._mesh.getPhysicsImpostor().setMass(CONS_MASS_MOV_PLAT);
 
 		this._keysDown = [];
 		this._mesh.platform = this;
@@ -60,10 +60,40 @@ class MovablePlatform extends Platform {
 				this._direction.y = -this._speed; // down
 			//}
 		}
-		//if (this._direction.length > 0) {
-		if (this._direction.y < 0.1 && this._direction.y >= 0) this._direction.y = 0.2;
-		this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
-		//this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+
+		//this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
+
+		if (this._keysDown.length == 0) {
+			this._direction.x = 0;
+			this._direction.y = CONS_MOV_PLAT_UPLIFT; // avoid gravity
+			this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
+		} else {
+			this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+		}
+
+		// Constrain speed to _maxSpeed property
+		if (this._mesh.getPhysicsImpostor().getLinearVelocity().x > this._speed) {
+			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+			vel.x = this._speed;
+			this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		} else
+		if (this._mesh.getPhysicsImpostor().getLinearVelocity().x < -this._speed) {
+			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+			vel.x = -this._speed;
+			this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		}
+		if (this._mesh.getPhysicsImpostor().getLinearVelocity().y > this._speed) {
+			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+			vel.y = this._speed;
+			this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		} else
+		if (this._mesh.getPhysicsImpostor().getLinearVelocity().y < -this._speed) {
+			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+			vel.y = -this._speed;
+			this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
+		}
+
+		// Avoid rotation
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;

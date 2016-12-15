@@ -19,8 +19,8 @@ class Level {
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene);
 
-		var box = new Box(1,1, lvl.guy._posX + 3, lvl.guy._posY + 2, 2, this._guy, this._scene);
-		this._boxes.push(box);
+		//var box = new Box(1,1, lvl.guy._posX + 3, lvl.guy._posY + 2, 2, this._guy, this._scene);
+		//this._boxes.push(box);
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -73,14 +73,15 @@ class Level {
 		// Create plane containing the finish texture ----------------------------
 		material = new BABYLON.StandardMaterial("finish", this._scene);
 		material.diffuseTexture = new BABYLON.Texture("textures/door.png", this._scene);
+		this._tex_doorOpen = new BABYLON.Texture("textures/door_open.png", this._scene);
 		material.diffuseTexture.hasAlpha = true;
 		material.backFaceCulling = true;
 
-		var mesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
-		mesh.material = material;
-		mesh.position.x = (finishObject._posX + 0.5)  * CONS_SCALE;
-		mesh.position.y = (finishObject._posY + 0.5) * CONS_SCALE;
-		mesh.position.z = CONS_SCALE/2 - 0.001;
+		this._doorMesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
+		this._doorMesh.material = material;
+		this._doorMesh.position.x = (finishObject._posX + 0.5)  * CONS_SCALE;
+		this._doorMesh.position.y = (finishObject._posY + 0.5) * CONS_SCALE;
+		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
 		// -----------------------------------------------------------------------
 
 		this._light1 = new BABYLON.SpotLight("Spot0",
@@ -141,7 +142,9 @@ class Level {
 			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
 				this._onFinished(this._finish.target);
 			}
-		} else if (this._finish.intersectsMesh(this._guy._mesh)) {
+		} else if (this._finish.intersectsMesh(this._guy._mesh)) { // What happens when player reaches door
+			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
+			this._doorMesh.material.diffuseTexture.hasAlpha = true;
 			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
 			this._light1.specular = new BABYLON.Color3(0, 1, 0);
 			this._guy.onWin();

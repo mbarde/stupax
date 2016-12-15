@@ -5,7 +5,7 @@ class Guy extends Animatable {
 
 			// Init values --------------------------------------------------------
 			this._width = 0.6;
-			this._height = 0.9;
+			this._height = 0.8;
 
 			this._accelerationX = 0.2 * CONS_SCALE;
 			this._maxSpeedX = 1.0 * CONS_SCALE;
@@ -74,7 +74,7 @@ class Guy extends Animatable {
 
 			this.anim_set_animation_by_name("run");
 
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 5, restitution: CONS_RESTITUTION_GUY, move: true });
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_PLAYER_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
 
 	// Reset guy, for example when restarting level
