@@ -127,7 +127,17 @@ class Level {
 		this._background.position.z = CONS_SCALE/2;
 		this._background.receiveShadows = false;
 
-		this._background.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false });
+		this._background.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
+
+		// Init plane in front of the level
+		var material = new BABYLON.StandardMaterial("Mat", this._scene);
+		material.alpha = 0;
+		var mesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
+		mesh.material = material;
+		mesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
+		mesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
+		mesh.position.z = -CONS_SCALE/2;
+		mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
 	}
 
 	update() {
@@ -135,13 +145,6 @@ class Level {
 		var movPos = this._movablePlatform._mesh.getAbsolutePosition();
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
-
-		if (guyPos.x > movPos.x - movWidth*CONS_SCALE/2 && guyPos.x < movPos.x + movWidth*CONS_SCALE/2
-			&& guyPos.y > movPos.y && guyPos.y < movPos.y + movHeight*CONS_SCALE/2 + this._guy._height*CONS_SCALE + 0.5) {
-					this._guy._isOnMovablePlatform = true;
-		} else {
-			this._guy._isOnMovablePlatform = false;
-		}
 
 		this._guy.update();
 		this._movablePlatform.update();

@@ -74,6 +74,8 @@ class Platform extends Entity {
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 		this._mesh.position.z = 0;
+
+		this._mesh.isWalkable = true;
 	}
 
 	setPhysicsState() {

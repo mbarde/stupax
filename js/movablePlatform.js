@@ -40,28 +40,17 @@ class MovablePlatform extends Platform {
 		var thisPos = this._mesh.getAbsolutePosition();
 
 		if (this._keysDown.indexOf(CTRL_LEFT) > -1) { // left
-			//if (!(coll && guyPos.x < thisPos.x)) {
 				this._direction.x = -this._speed;
-			//}
 		}
 		if (this._keysDown.indexOf(CTRL_RIGHT) > -1) { // right
-			//if (!(coll && guyPos.x > thisPos.x)) {
 				this._direction.x =  this._speed;
-			//}
 		}
 		if (this._keysDown.indexOf(CTRL_UP) > -1) {
-			//if ( (!(coll && guyPos.y > thisPos.y) || this._guy._isOnMovablePlatform)
-			//		&& thisPos.y < CONS_LEVEL_TOP * CONS_SCALE) {
 				this._direction.y = this._speed; // up
-			//}
 		}
 		if (this._keysDown.indexOf(CTRL_DOWN) > -1) {
-			//if (!(coll && guyPos.y < thisPos.y) && thisPos.y > CONS_LEVEL_BOTTOM * CONS_SCALE) {
 				this._direction.y = -this._speed; // down
-			//}
 		}
-
-		//this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
 
 		if (this._keysDown.length == 0) {
 			this._direction.x = 0;
@@ -73,7 +62,6 @@ class MovablePlatform extends Platform {
 			var imp = this._direction;
 			imp.x = imp.x / (this._width+1) * (this._height+1);
 			imp.y = imp.y / (this._width+1) * (this._height+1);
-			console.log("AHA");
 			for (var x = 0; x <= this._width; x++) {
 				for (var y = 0; y <= this._height; y++) {
 					var pos = this._mesh.getAbsolutePosition().clone();
@@ -113,12 +101,6 @@ class MovablePlatform extends Platform {
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;
 		this._mesh.position.z = 0;
-
-		if (this._guy._isOnMovablePlatform) {
-			var imp = this._direction;
-			imp.y = 0;
-			//this._guy._mesh.getPhysicsImpostor().applyImpulse(imp, this._guy._mesh.getAbsolutePosition());
-		}
 	}
 
 	setPhysicsState() {

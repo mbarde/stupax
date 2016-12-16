@@ -11,7 +11,7 @@ class Guy extends Animatable {
 			this._maxSpeedX = 1.0 * CONS_SCALE;
 			this._maxSpeedY = 0.1 * CONS_SCALE;
 			this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
-			this._isOnMovablePlatform = false;
+			this._standingTimestep = false;
 
 			this._forward = true;
 			this._stopOnWin = false;
@@ -36,7 +36,7 @@ class Guy extends Animatable {
 
 			// Impostor mesh for the physics
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
-			material.alpha = 0.4;
+			material.alpha = 0.0;
 			this._mesh = BABYLON.MeshBuilder.CreateBox("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 			this._mesh.material = material;
 			this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
@@ -80,7 +80,6 @@ class Guy extends Animatable {
 	// Reset guy, for example when restarting level
 	reset(posX, posY) {
 		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
-		this._isOnMovablePlatform = false;
 		this._forward = true;
 		this._stopOnWin = false;
 
@@ -98,7 +97,39 @@ class Guy extends Animatable {
 		this._planeMesh.position = this._mesh.getAbsolutePosition();
 		this._planeMesh.position.y += 0.7;
 
-		if (!this._isOnMovablePlatform) {
+		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS) {
+			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
+			this._curMode = CONS_GM_STAND;
+			if (!this._standingTimestep) {
+				this._standingTimestep = new Date().getTime();
+			}
+		} else {
+			// Check if guy is on any kind of walkable ground:
+			// Define ray from guys center, direction (0,-1,0) and length guys height / 2 + epsilon
+			// Pick with ray any mesh which was marked as isWalkable = true
+			// If any mesh was hit, guy is on ground
+			// ~ voilá
+			var posi = this._mesh.position.clone();
+			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE + 0.1);
+			var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+			if (pickInfo.hit) {
+				if (this._curMode != CONS_GM_RUN) {
+					this._standingTimestep = false;
+					if (!this._stopOnWin) this.anim_set_animation_by_name("run");
+					this._curMode = CONS_GM_RUN;
+				}
+			} else {
+				if (this._curMode != CONS_GM_JUMP) {
+					this._standingTimestep = false;
+					if (!this._stopOnWin) this.anim_set_animation_by_name("jump");
+					this._curMode = CONS_GM_JUMP;
+				}
+			}
+		}
+
+		// Constrain Y velocity when guy is not on a platform
+		if (this._curMode == CONS_GM_JUMP) {
 			if (this._mesh.getPhysicsImpostor().getLinearVelocity().y > this._maxSpeedY) {
 				var veloc = this._mesh.getPhysicsImpostor().getLinearVelocity();
 				veloc.y = this._maxSpeedY;
@@ -106,24 +137,11 @@ class Guy extends Animatable {
 			}
 		}
 
-		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
-		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS) {
-			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
-			this._curMode = CONS_GM_STAND;
-		} else {
-			if (!this._isOnMovablePlatform
-				&&this._curMode != CONS_GM_JUMP
-				&& Math.abs(vel.y) > CONS_EPS
-			) {
-				this.anim_set_animation_by_name("jump");
-				this._curMode = CONS_GM_JUMP;
-			}
-			if (this._curMode != CONS_GM_RUN
-				&& Math.abs(vel.y) <= CONS_EPS
-			 	&& Math.abs(vel.x) >= CONS_EPS
-			) {
-				this.anim_set_animation_by_name("run");
-				this._curMode = CONS_GM_RUN;
+		if (this._standingTimestep) {
+			var time = new Date().getTime();
+			if (time - this._standingTimestep >= CONS_GUY_STAND_TOGGLE_TIME) {
+				this._standingTimestep = false;
+				this.toggleDirection();
 			}
 		}
 
