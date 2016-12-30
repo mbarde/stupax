@@ -76,6 +76,7 @@ class Platform extends Entity {
 		this._mesh.position.z = 0;
 
 		this._mesh.isWalkable = true;
+		this._mesh.isWall = true;
 	}
 
 	setPhysicsState() {
@@ -107,7 +108,7 @@ class Platform extends Entity {
 					}
           }
           if (hit) {
-				 guy.toggleDirection();
+				//guy.toggleDirection();
 			 }
 		});
 	}

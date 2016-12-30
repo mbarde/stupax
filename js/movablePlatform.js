@@ -39,20 +39,65 @@ class MovablePlatform extends Platform {
 		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var thisPos = this._mesh.getAbsolutePosition();
 
-		if (this._keysDown.indexOf(CTRL_LEFT) > -1) { // left
+		// Check if movment to certain direction is not possible (because of static obstacles):
+		var ray_distance = 0.1; // distance of check ray from platform
+		var corner_distance = 0.2; //
+
+		var blocked_bottom = false;
+		var blocked_top = false;
+		var blocked_right = false;
+		var blocked_left = false;
+
+		// Bottom:
+		var posi = this._mesh.position.clone();
+		posi.x = posi.x - (this._width/2 * CONS_SCALE) + corner_distance;
+		posi.y = posi.y - (this._height/2 * CONS_SCALE) - ray_distance;
+		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		if (pickInfo.hit) {
+			blocked_bottom = true;
+		}
+
+		// Top:
+		posi.y = posi.y + (this._height * CONS_SCALE) + ray_distance*2;
+		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		if (pickInfo.hit) {
+			blocked_top = true;
+		}
+
+		// Left:
+		posi.x = posi.x - corner_distance - ray_distance;
+		posi.y = posi.y - corner_distance - ray_distance;
+		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		if (pickInfo.hit) {
+			blocked_left = true;
+		}
+
+		// Right:
+		posi.x = posi.x + (this._width * CONS_SCALE) + ray_distance*2;
+		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		if (pickInfo.hit) {
+			blocked_right = true;
+		}
+		// END OF Block check ----------------------------------------------------
+
+		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !blocked_left) { // left
 				this._direction.x = -this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_RIGHT) > -1) { // right
+		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !blocked_right) { // right
 				this._direction.x =  this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_UP) > -1) {
+		if (this._keysDown.indexOf(CTRL_UP) > -1 && !blocked_top) {
 				this._direction.y = this._speed; // up
 		}
-		if (this._keysDown.indexOf(CTRL_DOWN) > -1) {
+		if (this._keysDown.indexOf(CTRL_DOWN) > -1 && !blocked_bottom) {
 				this._direction.y = -this._speed; // down
 		}
 
-		if (this._keysDown.length == 0) {
+		if (this._direction.y == 0 && this._direction.x == 0) {
 			this._direction.x = 0;
 			this._direction.y = CONS_MOV_PLAT_UPLIFT; // avoid gravity
 			this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);

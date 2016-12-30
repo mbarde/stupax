@@ -106,9 +106,9 @@ class Guy extends Animatable {
 			}
 		} else {
 			// Check if guy is on any kind of walkable ground:
-			// Define ray from guys center, direction (0,-1,0) and length guys height / 2 + epsilon
-			// Pick with ray any mesh which was marked as isWalkable = true
-			// If any mesh was hit, guy is on ground
+			// 1.) Define ray: From = guys center, direction = (0,-1,0), length = guys height / 2 + epsilon
+			// 2.) Pick with ray any mesh which was marked as isWalkable = true
+			// 3.) If any mesh was hit, guy is on ground
 			// ~ voilá
 			var posi = this._mesh.position.clone();
 			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE + 0.1);
@@ -125,6 +125,35 @@ class Guy extends Animatable {
 					if (!this._stopOnWin) this.anim_set_animation_by_name("jump");
 					this._curMode = CONS_GM_JUMP;
 				}
+			}
+		}
+
+		// Check if guy hit a wall. Toggle direction if it is the case.
+		var tolerance = 0.1;
+		var corner_distance = 0.2;
+
+		var posi = this._mesh.position.clone();
+		if (this._forward) {
+			posi.x = posi.x + (this._width/2 * CONS_SCALE) + tolerance;
+		} else {
+			posi.x = posi.x - (this._width/2 * CONS_SCALE) - tolerance;
+		}
+		posi.y = posi.y - (this._height/2 * CONS_SCALE) + corner_distance;
+
+		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), this._height/2 * CONS_SCALE - corner_distance*2 );
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
+		if (pickInfo.hit) {
+			this.toggleDirection();
+		} else {
+			// If guy stands in front of a wall higher than: this._height/2 * CONS_SCALE - corner_distance*2
+			// Then the used ray is not able to detect the wall. So we additionally need a ray in x direction.
+			var posi = this._mesh.position.clone();
+			var x_dir = -1;
+			if (this._forward) x_dir = 1;
+			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(x_dir, 0, 0), this._width/2 * CONS_SCALE + tolerance );
+		  	var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
+		  	if (pickInfo.hit) {
+				this.toggleDirection();
 			}
 		}
 
