@@ -31,6 +31,7 @@
    	  <script src="js/box.js"></script>
    	  <script src="js/guy.js"></script>
    	  <script src="js/controls.js"></script>
+   	  <script src="js/loadingScreen.js"></script>
 
         <style>
             html, body {
@@ -49,145 +50,160 @@
         </style>
     </head>
 <body>
-	 <span id="spanLog" style="display:None"></span>
-	 <span id="spanFps" style="display:None"></span>
-    <canvas id="renderCanvas"></canvas>
-    <script>
-	 	  var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
-		  var CONS_EPS = 0.2; // Epsilon value used as constant for some fine tuning (use search function)
-		  var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
-		  var CONS_PLAYER_MASS = 1; // self explanatory
-		  var CONS_MASS_MOV_PLAT = 2; // self explanatory
-		  var CONS_MOV_PLAT_UPLIFT = 0.15; // uplift of movable platform when no movement button is pressed, needed to fight against gravity
-		  var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
-		  var CONS_GUY_STAND_TOGGLE_TIME = 1000; // Time how long guy stands before he changes direction in ms, used to make sure that guy changes direction, even if 'wall-hit-detection' fails
+	<span id="spanLog" style="display:None"></span>
+	<span id="spanFps" style="display:None"></span>
+   <canvas id="renderCanvas"></canvas>
+   <script>
+	  	var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
+		var CONS_EPS = 0.2; // Epsilon value used as constant for some fine tuning (use search function)
+		var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
+		var CONS_PLAYER_MASS = 1; // self explanatory
+		var CONS_MASS_MOV_PLAT = 2; // self explanatory
+		var CONS_MOV_PLAT_UPLIFT = 0.15; // uplift of movable platform when no movement button is pressed, needed to fight against gravity
+		var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
+		var CONS_GUY_STAND_TOGGLE_TIME = 1000; // Time how long guy stands before he changes direction in ms, used to make sure that guy changes direction, even if 'wall-hit-detection' fails
 
-		  // Restitution defines how "bumpy" the physics is. The higher the bumpier.
-		  var CONS_RESTITUTION_GUY = 0.3;
-		  var CONS_RESTITUTION_PLAT = 0.3;
+		// Restitution defines how "bumpy" the physics is. The higher the bumpier.
+		var CONS_RESTITUTION_GUY = 0.3;
+		var CONS_RESTITUTION_PLAT = 0.3;
 
-		  var CONS_LEVEL_BOTTOM = 0;
-		  var CONS_LEVEL_TOP = 13;
+		var CONS_LEVEL_BOTTOM = 0;
+		var CONS_LEVEL_TOP = 13;
 
-		  // Editor modes
-		  var CONS_EM_PLATFORM = 0;
-		  var CONS_EM_GUY = 1;
-		  var CONS_EM_MOV_PLAT = 2;
-		  var CONS_EM_FINISH = 3;
-		  var CONS_EM_BOX = 4;
+		// Editor modes
+		var CONS_EM_PLATFORM = 0;
+		var CONS_EM_GUY = 1;
+		var CONS_EM_MOV_PLAT = 2;
+		var CONS_EM_FINISH = 3;
+		var CONS_EM_BOX = 4;
 
-		  // Guy modes
-		  var CONS_GM_STAND = 0;
-		  var CONS_GM_RUN = 1;
-		  var CONS_GM_JUMP = 2;
+		// Guy modes
+		var CONS_GM_STAND = 0;
+		var CONS_GM_RUN = 1;
+		var CONS_GM_JUMP = 2;
 
+		var canvas = document.getElementById("renderCanvas");
+      var engine = new BABYLON.Engine(canvas, true);
 
-		  var canvas = document.getElementById("renderCanvas");
-        var engine = new BABYLON.Engine(canvas, true);
+		//var loadingScreen = new MyLoadingScreen("I'm loading!!");
+		//engine.loadingScreen = loadingScreen;
 
-		  var mode;
-		  var scene;
-		  var controls;
-		  var camera;
-		  var light0;
-		  var light1;
+		var mode;
+		var scene;
+		var assetsManager;
+		var doRender = false;
+		var controls;
+		var camera;
+		var light0;
+		var light1;
 
-		  function log(message) {
-			  $('#spanLog').text("> " + message);
-		  }
+		function log(message) {
+			$('#spanLog').text("> " + message);
+		}
 
-		  function onKeyDown(ctrlCode) {
-			  if (mode) mode.keyDown(ctrlCode);
-		  }
-  		  function onKeyUp(ctrlCode) {
-  			  if (mode) mode.keyUp(ctrlCode);
-  		  }
+		function onKeyDown(ctrlCode) {
+		  if (mode) mode.keyDown(ctrlCode);
+		}
 
-		  function loadLevel(name) {
-			  jQuery.get("levels/" + name + ".txt", function(data) {
-			 	  scene = createScene();
-				  mode = new Game(data, scene, camera, loadLevel);
-			  });
-		  }
+  		function onKeyUp(ctrlCode) {
+  		  if (mode) mode.keyUp(ctrlCode);
+  		}
 
-        var createScene = function () {
-            var myScene = new BABYLON.Scene(engine);
+		function loadLevel(name) {
+			doRender = false;
+			jQuery.get("levels/" + name + ".txt", function(data) {
+			 	scene = createScene();
+				assetsManager = new BABYLON.AssetsManager(scene);
+				mode = new Game(data, scene, camera, assetsManager, loadLevel);
+				assetsManager.load();
 
-            // Lights
-            //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
+				assetsManager.onFinish = function(tasks) {
+					doRender = true;
+				};
+			});
+		}
 
-            // Need a free camera for collisions
-            camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
-				var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
-				camera.rotationQuaternion = q;
+     	var createScene = function () {
+         var myScene = new BABYLON.Scene(engine);
 
-            //camera.attachControl(canvas, false);
+         // Lights
+         //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
 
-				myScene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
+         // Need a free camera for collisions
+         camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
+			var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
+			camera.rotationQuaternion = q;
 
-            return myScene;
-        }
+         //camera.attachControl(canvas, false);
 
-		  // If URL looks like "...?editor" start editor, else start game
-		  var editor = false;
-		  var arr = window.location.href.split('?');
-		  if (arr.length > 2) {
-			 if (arr[arr.length-2] == "editor") {
+			myScene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
+
+         return myScene;
+       }
+
+	  	// If URL looks like "...?editor" start editor, else start game
+	  	var editor = false;
+	  	var arr = window.location.href.split('?');
+	  	if (arr.length > 2) {
+		 	if (arr[arr.length-2] == "editor") {
+				editor = true;
+		 	}
+	 	} else {
+	 		if (arr[arr.length-1] == "editor") {
 				 editor = true;
-			 }
-		 } else {
-			 if (arr[arr.length-1] == "editor") {
-				 editor = true;
-			 }
-		 }
+		 	}
+	 	}
 
-		 if (editor) {
-			 $('#spanLog').show();
-  			 log("Use 1 - 5 to switch between modes | Press TAB to save");
+		if (editor) {
+			$('#spanLog').show();
+  			log("Use 1 - 5 to switch between modes | Press TAB to save");
 
-			 var scene = createScene();
+			var scene = createScene();
 		 	mode = new Editor(scene, camera, log);
 
-			 // If URL looks like "...?editor?levelXX" load levelXX
-			 var last = arr.pop();
-			 if (last.indexOf("level") !== -1) {
-				 level = last;
-				 jQuery.get("levels/" + level + ".txt", function(data) {
-					 console.log(data);
-					 mode.loadLevel(data);
-				 });
-	 		 }
-  		  } else {
-			  var level = "level01";
-			  $('#spanFps').show();
-			  var last = arr.pop();
-			  if (last.indexOf("level") !== -1) {
-				  level = last;
-			  }
-			  loadLevel(level);
-		  }
+			// If URL looks like "...?editor?levelXX" load levelXX
+			var last = arr.pop();
+			if (last.indexOf("level") !== -1) {
+				level = last;
+				jQuery.get("levels/" + level + ".txt", function(data) {
+					console.log(data);
+					mode.loadLevel(data);
+				});
+	 		}
+			doRender = true;
+  		} else {
+			var level = "level01";
+			$('#spanFps').show();
+			var last = arr.pop();
+			if (last.indexOf("level") !== -1) {
+				level = last;
+		  	}
+			loadLevel(level);
+		}
 
-		  controls = new Controls(onKeyDown, onKeyUp);
+	  controls = new Controls(onKeyDown, onKeyUp);
 
-	  		window.addEventListener("keydown", function(event){
-	  				if (mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
-	  		}, false);
-	  		window.addEventListener("keyup", function(event){
-	  				if (mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
-	  		}, false);
+  		window.addEventListener("keydown", function(event){
+  				if (mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+  		}, false);
+  		window.addEventListener("keyup", function(event){
+  				if (mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+  		}, false);
 
 
-        engine.runRenderLoop(function () {
+     	engine.runRenderLoop(function () {
+			if (doRender) {
 			  	if (mode) mode.update();
-				$('#spanFps').text( engine.fps );
-            if (scene) scene.render();
+				$('#spanFps').text( Math.round(engine.fps) );
+	         if (scene) scene.render();
 				if (controls) controls.update();
-        });
+			}
+     	});
 
-        // Resize
-        window.addEventListener("resize", function () {
-            engine.resize();
-        });
+     	// Resize
+     	window.addEventListener("resize", function () {
+      	engine.resize();
+     	});
     </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 class Guy extends Animatable {
 
-	constructor(posX, posY, scene) {
-			super(scene);
+	constructor(posX, posY, scene, assetsManager) {
+			super(scene, assetsManager);
 
 			// Init values --------------------------------------------------------
 			this._width = 0.6;
@@ -23,14 +23,19 @@ class Guy extends Animatable {
 			this._tex_vOffset = 0;
 
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
-			material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
-			material.diffuseTexture.hasAlpha = true;
-			material.diffuseTexture.uScale = this._tex_uScale;
-			material.diffuseTexture.vScale = this._tex_vScale;
-			material.diffuseTexture.uOffset = this._tex_uOffset;
-			material.diffuseTexture.vOffset = this._tex_vOffset;
-			material.backFaceCulling = false;
-
+			//material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
+/**
+			var textureTask = assetsManager.addTextureTask("image task", "textures/guy/obj_Idle001.png");
+			textureTask.onSuccess = function(task) {
+		    	material.diffuseTexture = task.texture;
+	 			material.diffuseTexture.hasAlpha = true;
+	 			material.diffuseTexture.uScale = this._tex_uScale;
+	 			material.diffuseTexture.vScale = this._tex_vScale;
+	 			material.diffuseTexture.uOffset = this._tex_uOffset;
+	 			material.diffuseTexture.vOffset = this._tex_vOffset;
+	 			material.backFaceCulling = false;
+			}
+**/
 			this._planeMesh = BABYLON.MeshBuilder.CreatePlane("guyPlane", {height: 1.5 * CONS_SCALE, width: 1 * CONS_SCALE}, this._scene);
 			this._planeMesh.material = material;
 
@@ -141,7 +146,7 @@ class Guy extends Animatable {
 		posi.y = posi.y - (this._height/2 * CONS_SCALE) + corner_distance;
 
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), this._height/2 * CONS_SCALE - corner_distance*2 );
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		if (pickInfo.hit) {
 			this.toggleDirection();
 		} else {
@@ -151,7 +156,7 @@ class Guy extends Animatable {
 			var x_dir = -1;
 			if (this._forward) x_dir = 1;
 			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(x_dir, 0, 0), this._width/2 * CONS_SCALE + tolerance );
-		  	var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
+		  	var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		  	if (pickInfo.hit) {
 				this.toggleDirection();
 			}

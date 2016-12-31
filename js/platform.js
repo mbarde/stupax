@@ -1,7 +1,7 @@
 class Platform extends Entity {
 
-	constructor(width, height, posX, posY, guy, scene) {
-		super(width, height, 1, scene);
+	constructor(width, height, posX, posY, guy, scene, assetsManager) {
+		super(width, height, 1, scene, assetsManager);
 
 		this.initGeometry(posX, posY);
 		this.initPhysics(guy);
@@ -10,47 +10,77 @@ class Platform extends Entity {
 	initGeometry(posX, posY) {
 		this._mesh = BABYLON.MeshBuilder.CreateBox("platform", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 
-		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		var texture = this.getTextureName();
+
 		var alpha = 1.0;
 
 		// MATERIAL -----------------------------------------------------------
-		//Define a material
 		var FrontMaterial = new BABYLON.StandardMaterial("cubeFront", this._scene);
-		FrontMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		FrontMaterial.diffuseTexture.uScale = this._width;
-		FrontMaterial.diffuseTexture.vScale = this._height;
-		FrontMaterial.alpha = alpha;
-
 		var BackMaterial = new BABYLON.StandardMaterial("cubeBack", this._scene);
-		BackMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		BackMaterial.diffuseTexture.uScale = this._width;
-		BackMaterial.diffuseTexture.vScale = this._height;
-		BackMaterial.alpha = alpha;
-
 		var LeftMaterial = new BABYLON.StandardMaterial("cubeLeft", this._scene);
-		LeftMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		LeftMaterial.diffuseTexture.uScale = this._height;
-		LeftMaterial.diffuseTexture.vScale = this._depth;
-		LeftMaterial.alpha = alpha;
-
 		var RightMaterial = new BABYLON.StandardMaterial("cubeRight", this._scene);
-		RightMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		RightMaterial.diffuseTexture.uScale = this._height;
-		RightMaterial.diffuseTexture.vScale = this._depth;
-		RightMaterial.alpha = alpha;
-
 		var TopMaterial = new BABYLON.StandardMaterial("cubeTop", this._scene);
-		TopMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		TopMaterial.diffuseTexture.uScale = this._depth;
-		TopMaterial.diffuseTexture.vScale = this._width;
-		TopMaterial.alpha = alpha;
-
 		var BottomMaterial = new BABYLON.StandardMaterial("cubeBottom", this._scene);
-		BottomMaterial.diffuseTexture = new BABYLON.Texture(texture, this._scene);
-		BottomMaterial.diffuseTexture.uScale = this._depth;
-		BottomMaterial.diffuseTexture.vScale = this._width;
-		BottomMaterial.alpha = alpha;
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				FrontMaterial.diffuseTexture = task.texture;
+				FrontMaterial.diffuseTexture.uScale = thisWidth;
+				FrontMaterial.diffuseTexture.vScale = thisHeight;
+				FrontMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				BackMaterial.diffuseTexture = task.texture;
+				BackMaterial.diffuseTexture.uScale = thisWidth;
+				BackMaterial.diffuseTexture.vScale = thisHeight;
+				BackMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				LeftMaterial.diffuseTexture = task.texture;
+				LeftMaterial.diffuseTexture.uScale = thisHeight;
+				LeftMaterial.diffuseTexture.vScale = thisDepth;
+				LeftMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				RightMaterial.diffuseTexture = task.texture;
+				RightMaterial.diffuseTexture.uScale = thisHeight;
+				RightMaterial.diffuseTexture.vScale = thisDepth;
+				RightMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				TopMaterial.diffuseTexture = task.texture;
+				TopMaterial.diffuseTexture.uScale = thisDepth;
+				TopMaterial.diffuseTexture.vScale = thisWidth;
+				TopMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
+
+		var textureTask = this._assetsManager.addTextureTask("image task", texture);
+		(function(thisWidth, thisHeight, thisDepth) {
+			textureTask.onSuccess = function(task) {
+				BottomMaterial.diffuseTexture = task.texture;
+				BottomMaterial.diffuseTexture.uScale = thisDepth;
+				BottomMaterial.diffuseTexture.vScale = thisWidth;
+				BottomMaterial.alpha = alpha;
+			}
+		}) (this._width, this._height, this._depth);
 
 		var cubeMultiMat = new BABYLON.MultiMaterial("cubeMulti", this._scene);
 		cubeMultiMat.subMaterials.push(BackMaterial);
@@ -69,14 +99,12 @@ class Platform extends Entity {
 		this._mesh.subMeshes.push(new BABYLON.SubMesh(5, 20, 4, 30, 6, this._mesh));
 
 		this._mesh.material = cubeMultiMat;
-		// --------------------------------------------------------------------
 
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 		this._mesh.position.z = 0;
 
 		this._mesh.isWalkable = true;
-		this._mesh.isWall = true;
 	}
 
 	setPhysicsState() {

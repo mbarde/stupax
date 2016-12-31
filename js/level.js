@@ -1,9 +1,10 @@
 class Level {
 
-	constructor(levelString, scene, camera, onFinished) {
+	constructor(levelString, scene, camera, assetsManager, onFinished) {
 		this._platforms = [];
 		this._boxes = [];
 		this._scene = scene;
+		this._assetsManager = assetsManager;
 		this._camera = camera;
 		this._onFinished = onFinished; // function to execute when player reaches finish
 		this._finished = false; // will contain timestamp of win when player reaches door
@@ -17,7 +18,7 @@ class Level {
 		this._levelHeight = 20;
 
 		// Spawn guy
-		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene);
+		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -25,21 +26,21 @@ class Level {
 		for (var i = 0; i < ps.length; i++) {
 			this._platforms.push( new Platform(ps[i]._width, ps[i]._height,
 											ps[i]._posX, ps[i]._posY,
-											this._guy, this._scene) );
+											this._guy, this._scene, this._assetsManager) );
 		}
 
 		// Set movable platform
 		var movPlat = lvl.movPlatform;
 		this._movablePlatform = new MovablePlatform(movPlat._width, movPlat._height,
 										movPlat._posX, movPlat._posY,
-										this._guy, this._scene);
+										this._guy, this._scene, this._assetsManager);
 
 		// Set boxes
 		this._boxes = new Array();
 		if (lvl.boxes) {
 			for (var i = 0; i < lvl.boxes.length; i++) {
 				var box = lvl.boxes[i];
-				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene));
+				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene, this._assetsManager));
 			}
 		}
 
@@ -90,10 +91,19 @@ class Level {
 
 		// Create plane containing the finish texture ----------------------------
 		material = new BABYLON.StandardMaterial("finish", this._scene);
-		material.diffuseTexture = new BABYLON.Texture("textures/door.png", this._scene);
-		this._tex_doorOpen = new BABYLON.Texture("textures/door_open.png", this._scene);
-		material.diffuseTexture.hasAlpha = true;
-		material.backFaceCulling = true;
+		var textureTask = assetsManager.addTextureTask("image task", "textures/door.png");
+		textureTask.onSuccess = function(task) {
+			material.diffuseTexture = task.texture;
+			material.diffuseTexture.hasAlpha = true;
+			material.backFaceCulling = true;
+		}
+
+		var textureTask = assetsManager.addTextureTask("image task", "textures/door_open.png");
+		(function(lvl) {
+			textureTask.onSuccess = function(task) {
+				lvl._tex_doorOpen = task.texture;
+			}
+		}) (this);
 
 		this._doorMesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
 		this._doorMesh.material = material;
@@ -113,11 +123,16 @@ class Level {
 
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		material.diffuseTexture = new BABYLON.Texture("textures/block01.png", this._scene);
-		material.backFaceCulling = true;
-		material.diffuseTexture.uScale = (this._levelWidth + 9 * CONS_SCALE)
-		material.diffuseTexture.uOffset = 0.5;
-		material.diffuseTexture.vScale = (this._levelHeight);
+		var textureTask = this._assetsManager.addTextureTask("image task", "textures/block01.png");
+		(function(levelWidth, levelHeight, mat) {
+			textureTask.onSuccess = function(task) {
+				mat.diffuseTexture = task.texture;
+				mat.backFaceCulling = true;
+				mat.diffuseTexture.uScale = (levelWidth + 9 * CONS_SCALE)
+				mat.diffuseTexture.uOffset = 0.5;
+				mat.diffuseTexture.vScale = (levelHeight);
+			}
+		}) (this._levelWidth, this._levelHeight, material);
 
 		// Background marks area of level
 		this._background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);

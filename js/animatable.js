@@ -1,7 +1,8 @@
 class Animatable {
 
-	constructor(scene) {
+	constructor(scene, assetsManager) {
 		this._scene = scene;
+		this._assetsManager = assetsManager;
 
 		this._animations = new Array(); // arry of array of textures
 		this._anim_intervals = new Array(); // array of intervals between frames
@@ -62,14 +63,19 @@ class Animatable {
 		var index = this._animations.length - 1;
 		for (var i = 0; i < frames.length; i++) {
 				var material = new BABYLON.StandardMaterial("guy", this._scene);
-				material.diffuseTexture = new BABYLON.Texture(frames[i], this._scene);
-				material.diffuseTexture.hasAlpha = true;/**
-				material.diffuseTexture.uScale = uScale;
-				material.diffuseTexture.vScale = vScale;
-				material.diffuseTexture.uOffset = uOffset;
-				material.diffuseTexture.vOffset = vOffset;**/
-				material.backFaceCulling = false;
-			  	this._animations[index].push(material);
+				(function (arrayToPush, texName, mat) {
+					var textureTask = assetsManager.addTextureTask("image task", texName);
+					textureTask.onSuccess = function(task) {
+						mat.diffuseTexture = task.texture;
+						mat.diffuseTexture.hasAlpha = true;/**
+						material.diffuseTexture.uScale = uScale;
+						material.diffuseTexture.vScale = vScale;
+						material.diffuseTexture.uOffset = uOffset;
+						material.diffuseTexture.vOffset = vOffset;**/
+						mat.backFaceCulling = false;
+						arrayToPush.push(mat);
+					}
+				})(this._animations[index], frames[i], material);
 		}
 		this._anim_intervals.push( interval );
 		this._anim_names[name] = this._animations.length-1;
