@@ -68,7 +68,7 @@ class Level {
 		if (lvl.boxes) {
 			for (var i = 0; i < lvl.boxes.length; i++) {
 				var box = lvl.boxes[i];
-				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene));
+				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene, this._assetsManager));
 			}
 		}
 	}
