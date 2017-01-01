@@ -105,6 +105,7 @@ class Platform extends Entity {
 		this._mesh.position.z = 0;
 
 		this._mesh.isWalkable = true;
+		this._mesh.isWall = true;
 	}
 
 	setPhysicsState() {

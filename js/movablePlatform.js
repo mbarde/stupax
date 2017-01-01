@@ -54,7 +54,7 @@ class MovablePlatform extends Platform {
 		posi.x = posi.x - (this._width/2 * CONS_SCALE) + corner_distance;
 		posi.y = posi.y - (this._height/2 * CONS_SCALE) - ray_distance;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
 		if (pickInfo.hit) {
 			blocked_bottom = true;
 		}
@@ -62,7 +62,7 @@ class MovablePlatform extends Platform {
 		// Top:
 		posi.y = posi.y + (this._height * CONS_SCALE) + ray_distance*2;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
 		if (pickInfo.hit) {
 			blocked_top = true;
 		}
@@ -71,7 +71,7 @@ class MovablePlatform extends Platform {
 		posi.x = posi.x - corner_distance - ray_distance;
 		posi.y = posi.y - corner_distance - ray_distance;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
 		if (pickInfo.hit) {
 			blocked_left = true;
 		}
@@ -79,7 +79,7 @@ class MovablePlatform extends Platform {
 		// Right:
 		posi.x = posi.x + (this._width * CONS_SCALE) + ray_distance*2;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWall; });
 		if (pickInfo.hit) {
 			blocked_right = true;
 		}

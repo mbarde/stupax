@@ -4,6 +4,8 @@ class Box extends Platform {
 		super(width, height, posX, posY, guy, scene, assetsManager);
 		this._mesh.getPhysicsImpostor().setMass(mass);
 		this._mass = mass;
+
+		this._mesh.isWall = false;
 	}
 
 	getTextureName() {
