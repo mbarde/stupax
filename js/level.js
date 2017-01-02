@@ -55,12 +55,10 @@ class Level {
 	}
 
 	restart() {
-		var lvl = this._levelObject;
 		this._finished = false;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
-		var lvl = this._levelObject;
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
 		}
