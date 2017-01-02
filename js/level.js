@@ -62,14 +62,7 @@ class Level {
 
 		var lvl = this._levelObject;
 		for (var i = 0; i < this._boxes.length; i++) {
-			this._boxes[i]._mesh.dispose();
-		}
-		this._boxes = new Array();
-		if (lvl.boxes) {
-			for (var i = 0; i < lvl.boxes.length; i++) {
-				var box = lvl.boxes[i];
-				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene, this._assetsManager));
-			}
+			this._boxes[i].reset();
 		}
 	}
 
