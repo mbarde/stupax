@@ -61,7 +61,7 @@
 		  		position: absolute;
 				color: white;
 			  	z-index: 10;
-				top: 50%;
+				top: 40%;
 				width: 100%;
 				text-align: center;
 				background-color: rgba(0,0,0,0.5);
@@ -95,11 +95,13 @@
 	<span id="spanLog" style="display:None"></span>
 	<span id="spanFps" style="display:None"></span>
 	<div class="overlay">
-		<span class="title">Help the guy to reach the door!</span><br>
+		<span class="title">Help <i>Stupax</i> to reach the door!</span><br>
 		<br>
 		<span class="sub">Move the platform using the arrow keys (or your gamepad).</span><br>
 		<br>
-		<button class="button" onclick="$('.overlay').hide(); mode.startRunning();">START</button>
+		<span class="sub">Press 'R' to restart level.</span><br>
+		<br>
+		<button class="button" onclick="$('.overlay').hide(); showOverlay = false; mode.startRunning();">START</button>
 	</div>
    <canvas id="renderCanvas"></canvas>
    <script>
@@ -142,6 +144,7 @@
 		var assetsManager;
 		var doRender = false;
 		var isFirstLevel = true;
+		var showOverlay = true;
 		var controls;
 		var camera;
 		var light0;
@@ -208,6 +211,7 @@
 		if (editor) {
 			$('#spanLog').show();
 			$('.overlay').hide();
+			showOverlay = false;
   			log("Use 1 - 5 to switch between modes | Press TAB to save");
 
 			var scene = createScene();
@@ -236,10 +240,10 @@
 	  controls = new Controls(onKeyDown, onKeyUp);
 
   		window.addEventListener("keydown", function(event){
-  				if (mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+  				if (!showOverlay && mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
   		}, false);
   		window.addEventListener("keyup", function(event){
-  				if (mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+  				if (!showOverlay && mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
   		}, false);
 
 
