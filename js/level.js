@@ -18,7 +18,7 @@ class Level {
 		this._levelHeight = 20;
 
 		// Spawn guy
-		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
+		this._guy = new ControllableGuy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -180,6 +180,7 @@ class Level {
 	}
 
 	keyDown(ctrlCode) {
+		this._guy.keyDown(ctrlCode);
 		this._movablePlatform.keyDown(ctrlCode);
 
 		switch (ctrlCode) {
@@ -193,6 +194,7 @@ class Level {
 	}
 
 	keyUp(ctrlCode) {
+		this._guy.keyUp(ctrlCode);
 		this._movablePlatform.keyUp(ctrlCode);
 	}
 

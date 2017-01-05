@@ -99,39 +99,7 @@ class Guy extends Animatable {
 	}
 
 	update() {
-		this._planeMesh.position = this._mesh.getAbsolutePosition();
-		this._planeMesh.position.y += 0.7;
-
-		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
-		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS) {
-			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
-			this._curMode = CONS_GM_STAND;
-			if (!this._standingTimestep) {
-				this._standingTimestep = new Date().getTime();
-			}
-		} else {
-			// Check if guy is on any kind of walkable ground:
-			// 1.) Define ray: From = guys center, direction = (0,-1,0), length = guys height / 2 + epsilon
-			// 2.) Pick with ray any mesh which was marked as isWalkable = true
-			// 3.) If any mesh was hit, guy is on ground
-			// ~ voilá
-			var posi = this._mesh.position.clone();
-			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE + 0.1);
-			var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
-			if (pickInfo.hit) {
-				if (this._curMode != CONS_GM_RUN) {
-					this._standingTimestep = false;
-					if (!this._stopOnWin) this.anim_set_animation_by_name("run");
-					this._curMode = CONS_GM_RUN;
-				}
-			} else {
-				if (this._curMode != CONS_GM_JUMP) {
-					this._standingTimestep = false;
-					if (!this._stopOnWin) this.anim_set_animation_by_name("jump");
-					this._curMode = CONS_GM_JUMP;
-				}
-			}
-		}
+		this.check_animation();
 
 		// Check if guy hit a wall. Toggle direction if it is the case.
 		var tolerance = 0.1;
@@ -171,6 +139,7 @@ class Guy extends Animatable {
 			}
 		}
 
+		// When guy stands a while, he should toggle direction automatically
 		if (this._standingTimestep) {
 			var time = new Date().getTime();
 			if (time - this._standingTimestep >= CONS_GUY_STAND_TOGGLE_TIME) {
@@ -179,6 +148,13 @@ class Guy extends Animatable {
 			}
 		}
 
+		// Movement
+		if (this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+
+		this.check_physic_constraints();
+	}
+
+	check_physic_constraints() {
 		// Constrain speed to _maxSpeed property
 		if (this._mesh.getPhysicsImpostor().getLinearVelocity().x > this._maxSpeedX) {
 			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
@@ -191,9 +167,6 @@ class Guy extends Animatable {
 			this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
 		}
 
-		// Movement
-		if (this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
-
 		// Prevent rotation in any way
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
@@ -201,6 +174,43 @@ class Guy extends Animatable {
 
 		// Always stay on the same Z coordinate
 		this._mesh.position.z = 0;
+
+		this._planeMesh.position = this._mesh.getAbsolutePosition();
+		this._planeMesh.position.y += 0.7;
+	}
+
+	check_animation() {
+		// Check set animation
+		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
+		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS * 2) {
+			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
+			this._curMode = CONS_GM_STAND;
+			if (!this._standingTimestep) {
+				this._standingTimestep = new Date().getTime();
+			}
+		} else {
+			// Check if guy is on any kind of walkable ground:
+			// 1.) Define ray: From = guys center, direction = (0,-1,0), length = guys height / 2 + epsilon
+			// 2.) Pick with ray any mesh which was marked as isWalkable = true
+			// 3.) If any mesh was hit, guy is on ground
+			// ~ voilá
+			var posi = this._mesh.position.clone();
+			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE + 0.1);
+			var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+			if (pickInfo.hit) {
+				if (this._curMode != CONS_GM_RUN) {
+					this._standingTimestep = false;
+					if (!this._stopOnWin) this.anim_set_animation_by_name("run");
+					this._curMode = CONS_GM_RUN;
+				}
+			} else {
+				if (this._curMode != CONS_GM_JUMP) {
+					this._standingTimestep = false;
+					if (!this._stopOnWin) this.anim_set_animation_by_name("jump");
+					this._curMode = CONS_GM_JUMP;
+				}
+			}
+		}
 
 		if (this.anim_update()) {
 			this._planeMesh.material = this.anim_get_cur_texture();

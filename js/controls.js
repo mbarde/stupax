@@ -4,6 +4,9 @@ var CTRL_UP = 2;
 var CTRL_DOWN = 3;
 var CTRL_RESTART = 4;
 var CTRL_NEXT_LEVEL = 5;
+var CTRL_GUY_LEFT = 6;
+var CTRL_GUY_RIGHT = 7;
+var CTRL_GUY_JUMP = 8;
 
 /**
 * Class to abstract from input device.
@@ -90,6 +93,15 @@ class Controls {
 				break;
 			case 78: // N
 				ctrlCode = CTRL_NEXT_LEVEL;
+				break;
+			case 32: // SPACE
+				ctrlCode = CTRL_GUY_JUMP;
+				break;
+			case 65: // A
+				ctrlCode = CTRL_GUY_LEFT;
+				break;
+			case 68: // D
+				ctrlCode = CTRL_GUY_RIGHT;
 				break;
 		}
 		return ctrlCode;

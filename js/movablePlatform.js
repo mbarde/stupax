@@ -36,7 +36,6 @@ class MovablePlatform extends Platform {
 		this._direction.x = 0;
 		this._direction.y = 0;
 
-		var coll = this._mesh.intersectsMesh(this._guy._mesh);
 		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var thisPos = this._mesh.getAbsolutePosition();
 
