@@ -18,7 +18,7 @@ class Level {
 		this._levelHeight = 20;
 
 		// Spawn guy
-		this._guy = new ControllableGuy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
+		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -146,13 +146,13 @@ class Level {
 		mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
 	}
 
-	update() {
+	update(guyDoRun) {
 		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var movPos = this._movablePlatform._mesh.getAbsolutePosition();
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
 
-		this._guy.update();
+		this._guy.update(guyDoRun);
 		this._movablePlatform.update();
 
 		this._camera.position.x = movPos.x;

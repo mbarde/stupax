@@ -1,58 +1,106 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-        <title>Babylon.js sample code</title>
+      <title>Babylon.js sample code</title>
 
-		  <!-- Babylon.js -->
-        <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
-        <script src="http://www.babylonjs.com/cannon.js"></script>
-        <script src="http://www.babylonjs.com/oimo.js"></script>
-        <script src="http://www.babylonjs.com/babylon.js"></script>
+		<!-- Babylon.js -->
+      <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
+      <script src="http://www.babylonjs.com/cannon.js"></script>
+      <script src="http://www.babylonjs.com/oimo.js"></script>
+      <script src="http://www.babylonjs.com/babylon.js"></script>
 
-		  <!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) -->
-		  <script src="plugins/FileSaver.min.js"></script>
+		<!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) -->
+		<script src="plugins/FileSaver.min.js"></script>
 
-		  <!-- and jQuery to load level files -->
-		  <script src="plugins/jquery-3.1.1.min.js"></script>
+		<!-- and jQuery to load level files -->
+		<script src="plugins/jquery-3.1.1.min.js"></script>
 
-		  <!-- Game files -->
-        <script src="js/animatable.js"></script>
-        <script src="js/platformMarker.js"></script>
-        <script src="js/marker.js"></script>
-        <script src="js/mode.js"></script>
-        <script src="js/editor.js"></script>
-        <script src="js/game.js"></script>
-        <script src="js/level.js"></script>
-		  <script src="js/entity.js"></script>
-   	  <script src="js/platform.js"></script>
-   	  <script src="js/movablePlatform.js"></script>
-   	  <script src="js/box.js"></script>
-   	  <script src="js/guy.js"></script>
-   	  <script src="js/ControllableGuy.js"></script>
-   	  <script src="js/controls.js"></script>
-   	  <script src="js/loadingScreen.js"></script>
+		<!-- Game files -->
+		<script src="js/animatable.js"></script>
+		<script src="js/platformMarker.js"></script>
+		<script src="js/marker.js"></script>
+		<script src="js/mode.js"></script>
+		<script src="js/editor.js"></script>
+		<script src="js/game.js"></script>
+		<script src="js/level.js"></script>
+		<script src="js/entity.js"></script>
+		<script src="js/platform.js"></script>
+		<script src="js/movablePlatform.js"></script>
+		<script src="js/box.js"></script>
+		<script src="js/guy.js"></script>
+		<script src="js/ControllableGuy.js"></script>
+		<script src="js/controls.js"></script>
+		<script src="js/loadingScreen.js"></script>
 
-        <style>
-            html, body {
-                overflow: hidden;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
+     	<style>
+         html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+         }
 
-            #renderCanvas {
-                width: 100%;
-                height: 100%;
-                touch-action: none;
-            }
-        </style>
-    </head>
+         #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+         }
+
+			#spanFps {
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				color: lime;
+				z-index: 10;
+			}
+
+			.overlay {
+		  		position: absolute;
+				color: white;
+			  	z-index: 10;
+				top: 50%;
+				width: 100%;
+				text-align: center;
+				background-color: rgba(0,0,0,0.5);
+				padding: 20px;
+			}
+			.overlay .title {
+				font-size: 32px;
+			}
+			.overlay .sub {
+				font-size: 24px;
+			}
+
+			.button {
+				font-size: 25px;
+				color: white;
+				font-family: 'Crimson Text', serif;
+				background-color: Transparent;
+			  	background-repeat:no-repeat;
+				border: 2px white solid;
+				margin-bottom: 5px;
+				border-radius: 15px;
+				cursor: pointer;
+			}
+
+			.button:hover {
+				background-color: rgba(0,0,0,0.4);
+			}
+     	</style>
+   </head>
 <body>
 	<span id="spanLog" style="display:None"></span>
 	<span id="spanFps" style="display:None"></span>
+	<div class="overlay">
+		<span class="title">Help the guy to reach the door!</span><br>
+		<br>
+		<span class="sub">Move the platform using the arrow keys (or your gamepad).</span><br>
+		<br>
+		<button class="button" onclick="$('.overlay').hide(); mode.startRunning();">START</button>
+	</div>
    <canvas id="renderCanvas"></canvas>
    <script>
 	  	var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
@@ -93,6 +141,7 @@
 		var scene;
 		var assetsManager;
 		var doRender = false;
+		var isFirstLevel = true;
 		var controls;
 		var camera;
 		var light0;
@@ -115,7 +164,8 @@
 			jQuery.get("levels/" + name + ".txt", function(data) {
 			 	scene = createScene();
 				assetsManager = new BABYLON.AssetsManager(scene);
-				mode = new Game(data, scene, camera, assetsManager, loadLevel);
+				mode = new Game(data, scene, camera, assetsManager, loadLevel, isFirstLevel);
+				isFirstLevel = false;
 				assetsManager.load();
 
 				assetsManager.onFinish = function(tasks) {
@@ -157,6 +207,7 @@
 
 		if (editor) {
 			$('#spanLog').show();
+			$('.overlay').hide();
   			log("Use 1 - 5 to switch between modes | Press TAB to save");
 
 			var scene = createScene();

@@ -15,6 +15,7 @@ class Guy extends Animatable {
 
 			this._forward = true;
 			this._stopOnWin = false;
+			this._doRun = true;
 
 			// Init geometry ------------------------------------------------------
 			this._tex_uScale = 1;
@@ -80,6 +81,10 @@ class Guy extends Animatable {
 			this.anim_set_animation_by_name("run");
 
 			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_PLAYER_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
+	}
+
+	setRunState(doRun) {
+		this._doRun = doRun;
 	}
 
 	// Reset guy, for example when restarting level
@@ -149,7 +154,7 @@ class Guy extends Animatable {
 		}
 
 		// Movement
-		if (this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+		if (this._doRun && this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 
 		this.check_physic_constraints();
 	}

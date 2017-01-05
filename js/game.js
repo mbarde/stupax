@@ -1,6 +1,6 @@
 class Game extends Mode {
 
-	constructor(levelString, scene, camera, assetsManager, loadLevel_function) {
+	constructor(levelString, scene, camera, assetsManager, loadLevel_function, isFirst) {
 		super(scene, camera);
 
 		this._camera.position.x = 10 * CONS_SCALE;
@@ -8,6 +8,7 @@ class Game extends Mode {
 		this._camera.rotation.y = 0.2;
 
 		this._level = new Level(levelString, this._scene, this._camera, assetsManager, loadLevel_function);
+		if (isFirst) this._level._guy.setRunState(false);
 	}
 
 	update() {
@@ -20,6 +21,10 @@ class Game extends Mode {
 
 	keyUp(ctrlCode) {
 		this._level.keyUp(ctrlCode);
+	}
+
+	startRunning() {
+		this._level._guy.setRunState(true);
 	}
 
 }
