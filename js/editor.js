@@ -1,9 +1,10 @@
 class Editor extends Mode {
 
-	constructor(scene, camera, log_function) {
+	constructor(scene, camera, log_function, assetsManager) {
 		super(scene, camera);
 
 		this._log_function = log_function;
+		this._assetsManager = assetsManager;
 
 		this._keysLeft = [CTRL_LEFT, 65, 37];
 		this._keysRight = [CTRL_RIGHT, 68, 39];
@@ -26,16 +27,23 @@ class Editor extends Mode {
 
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		material.diffuseTexture = new BABYLON.Texture("textures/cartoon_wooden_crate.jpg", this._scene);
-		material.backFaceCulling = true;
-		material.diffuseTexture.uScale = (this._levelWidth)
-		material.diffuseTexture.vScale = (this._levelHeight)
+
+		var textureTask = this._assetsManager.addTextureTask("image task", "textures/block01.png");
+		(function(levelWidth, levelHeight, material) {
+			textureTask.onSuccess = function(task) {
+				material.diffuseTexture = task.texture;
+				material.backFaceCulling = true;
+				material.diffuseTexture.uScale = (levelWidth + 9 * CONS_SCALE)
+				material.diffuseTexture.uOffset = 0.5;
+				material.diffuseTexture.vScale = (levelHeight);
+			}
+		}) (this._levelWidth, this._levelHeight, material);
 
 		// Background marks area of level
-		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth * CONS_SCALE), height: (this._levelHeight * CONS_SCALE)}, this._scene);
+		var background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
 		background.material = material;
 		background.position.x = (this._levelWidth * CONS_SCALE) / 2;
-		background.position.y = (this._levelHeight * CONS_SCALE) / 2;
+		background.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
 		background.position.z = CONS_SCALE/2;
 		background.receiveShadows = false;
 

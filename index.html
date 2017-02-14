@@ -215,7 +215,8 @@
   			log("Use 1 - 5 to switch between modes | Press TAB to save");
 
 			var scene = createScene();
-		 	mode = new Editor(scene, camera, log);
+			assetsManager = new BABYLON.AssetsManager(scene);
+		 	mode = new Editor(scene, camera, log, assetsManager);
 
 			// If URL looks like "...?editor?levelXX" load levelXX
 			var last = arr.pop();
@@ -226,7 +227,10 @@
 					mode.loadLevel(data);
 				});
 	 		}
-			doRender = true;
+			assetsManager.load();
+			assetsManager.onFinish = function(tasks) {
+				doRender = true;
+			};			
   		} else {
 			var level = "level01";
 			$('#spanFps').show();
