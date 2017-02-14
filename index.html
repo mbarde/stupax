@@ -3,7 +3,14 @@
   	<head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-      <title>Babylon.js sample code</title>
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
+
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="mstile-144x144.png">
+
+      <title>Stupax - You are not the guy, you are the level!</title>
 
 		<!-- Babylon.js -->
       <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
@@ -165,6 +172,8 @@
 		function loadLevel(name) {
 			doRender = false;
 			jQuery.get("levels/" + name + ".txt", function(data) {
+				document.title = "Stupax - " + name;
+
 			 	scene = createScene();
 				assetsManager = new BABYLON.AssetsManager(scene);
 				mode = new Game(data, scene, camera, assetsManager, loadLevel, isFirstLevel);
@@ -179,9 +188,6 @@
 
      	var createScene = function () {
          var myScene = new BABYLON.Scene(engine);
-
-         // Lights
-         //light1 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(0, 15, -10), scene);
 
          // Need a free camera for collisions
          camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
@@ -230,7 +236,7 @@
 			assetsManager.load();
 			assetsManager.onFinish = function(tasks) {
 				doRender = true;
-			};			
+			};
   		} else {
 			var level = "level01";
 			$('#spanFps').show();
