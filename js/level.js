@@ -9,6 +9,8 @@ class Level {
 		this._onFinished = onFinished; // function to execute when player reaches finish
 		this._finished = false; // will contain timestamp of win when player reaches door
 		this.loadLevel(levelString);
+
+		this._block_guy = false;
 	}
 
 	loadLevel(level) {
@@ -52,6 +54,16 @@ class Level {
 		this.initBackground();
 
 		this._levelObject = lvl;
+
+		// Init cam for cam fly from finish to movablePlatform
+		this._camera.position.x = (lvl.finish._posX + 0.5)  * CONS_SCALE;
+		this._cam_fly = new BABYLON.Vector3();
+		this._cam_fly.x = this._camera.position.x - this._movablePlatform._mesh.getAbsolutePosition().x;
+		this._cam_fly.y = 0;
+		this._cam_fly.z = 0;
+		this._cam_fly_last_dist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.getAbsolutePosition());
+		this._cam_fly.scaleInPlace(0.01);
+		this._guy.setRunState(false);
 	}
 
 	restart() {
@@ -156,7 +168,18 @@ class Level {
 		this._guy.update(guyDoRun);
 		this._movablePlatform.update();
 
-		this._camera.position.x = movPos.x;
+		if (this._cam_fly) {
+			this._camera.position.subtractInPlace(this._cam_fly);
+			var dist = BABYLON.Vector3.Distance(this._camera.position, movPos);
+			if (dist > this._cam_fly_last_dist) {
+				this._cam_fly = false;
+				if (!this._block_guy) this._guy.setRunState(true);
+			} else {
+				this._cam_fly_last_dist = dist;
+			}
+		} else {
+			this._camera.position.x = movPos.x;
+		}
 
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
 		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
@@ -197,6 +220,14 @@ class Level {
 	keyUp(ctrlCode) {
 		this._guy.keyUp(ctrlCode);
 		this._movablePlatform.keyUp(ctrlCode);
+	}
+
+	setGuyRunState(state) {
+		if (state && this._cam_fly) {
+
+		} else {
+			this._guy.setRunState(state);
+		}
 	}
 
 }

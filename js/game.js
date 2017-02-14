@@ -8,7 +8,10 @@ class Game extends Mode {
 		this._camera.rotation.y = 0.2;
 
 		this._level = new Level(levelString, this._scene, this._camera, assetsManager, loadLevel_function);
-		if (isFirst) this._level._guy.setRunState(false);
+		if (isFirst) {
+			this._level.setGuyRunState(false);
+			this._level._block_guy = true;
+		}
 	}
 
 	update() {
@@ -24,7 +27,8 @@ class Game extends Mode {
 	}
 
 	startRunning() {
-		this._level._guy.setRunState(true);
+		this._level.setGuyRunState(true);
+		this._level._block_guy = false;
 	}
 
 }
