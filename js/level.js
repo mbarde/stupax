@@ -3,6 +3,7 @@ class Level {
 	constructor(levelString, scene, camera, assetsManager, onFinished) {
 		this._platforms = [];
 		this._boxes = [];
+		this._projectiles = [];
 		this._scene = scene;
 		this._assetsManager = assetsManager;
 		this._camera = camera;
@@ -21,6 +22,16 @@ class Level {
 
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
+
+		/**
+		this._projectiles.push(
+			new Projectile(lvl.guy._posX + 2, lvl.guy._posY,
+								0, -0.1,
+								this._scene, this._assetsManager) );
+		this._projectiles.push(
+			new Projectile(lvl.guy._posX + 2, lvl.guy._posY,
+								0.1, 0.0,
+								this._scene, this._assetsManager) );**/
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -169,6 +180,21 @@ class Level {
 
 		this._guy.update(guyDoRun);
 		this._movablePlatform.update();
+
+		// Update projectiles and remove if necessary (when they hit something).
+		var projs_to_remove = [];
+		for (var i = 0; i < this._projectiles.length; i++) {
+			if ( this._projectiles[i].update() ) { // projectile.update returns true if it hit something
+				projs_to_remove.push(i);
+			}
+		}
+		var c = 0;
+		for (var i = 0; i < projs_to_remove.length; i++) {
+			var index = projs_to_remove[i] - c;
+			this._projectiles[index]._mesh.dispose();
+			this._projectiles.splice(index, 1);
+			c = c + 1;
+		}
 
 		// If we are in cam fly mode, move cam [...]
 		if (this._cam_fly) {
