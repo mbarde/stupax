@@ -29,7 +29,7 @@ class Emitter extends Platform {
 	// Allow shoot
 	update(allow_emission) {
 		var curTime = new Date().getTime();
-		if (!allow_emission) this._last_emit_time = curTime;
+		if (!allow_emission) this._last_emit_time = curTime + this._offset;
 		if (curTime - this._last_emit_time >= this._interval) {
 			for (var i = 0; i < this._emit_directions.length; i++) {
 				this._level.spawnProjectile(this._mesh.position.clone(), this._emit_directions[i], this._projectile_material);

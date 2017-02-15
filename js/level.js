@@ -103,6 +103,10 @@ class Level {
 		}
 		this._projectiles = [];
 
+		for (var i = 0; i < this._emitters.length; i++) {
+			this._emitters[i].reset();
+		}
+
 		this._firstUpdate = true;
 	}
 

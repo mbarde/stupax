@@ -6,7 +6,7 @@ class Projectile extends Entity {
 
 		this._material = material;
 
-		this._direction = direction; // movement direction
+		this._direction = new BABYLON.Vector3(direction.x, direction.y, 0); // movement direction
 
 		this.initGeometry(position);
 	}
@@ -14,7 +14,7 @@ class Projectile extends Entity {
 	initGeometry(position) {
 		this._mesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
 		this._mesh.material = this._material;
-		this._mesh.position = position;
+		this._mesh.position = new BABYLON.Vector3(position.x, position.y, 0);
 
 		this._light = new BABYLON.PointLight("Omni", this._mesh.position, this._scene);
 		this._light.diffuse = new BABYLON.Color3(0.91, 0.17, 0);
@@ -33,6 +33,14 @@ class Projectile extends Entity {
 
 		// When hitting a wall return TRUE (level can destroy projectile then).
 		// Else return FALSE.
+
+		var ray = new BABYLON.Ray(this._mesh.position, this._direction.negate(), this._direction.length());
+		var pickInfo = scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
+		if (pickInfo.hit) {
+			return true;
+		}
+
+		/**
 		var rayLength = CONS_SCALE / 3;
 
 		// Check horizontal
@@ -53,6 +61,7 @@ class Projectile extends Entity {
 		if (pickInfo.hit) {
 			return true;
 		}
+		**/
 
 		return false;
 	}
