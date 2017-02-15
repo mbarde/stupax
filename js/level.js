@@ -4,6 +4,7 @@ class Level {
 		this._platforms = [];
 		this._boxes = [];
 		this._projectiles = [];
+		this._emitters = [];
 		this._scene = scene;
 		this._assetsManager = assetsManager;
 		this._camera = camera;
@@ -12,6 +13,8 @@ class Level {
 		this.loadLevel(levelString);
 
 		this._block_guy = false;			// block guy from running
+
+		this._firstUpdate = true;
 	}
 
 	loadLevel(level) {
@@ -23,15 +26,7 @@ class Level {
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
 
-		/**
-		this._projectiles.push(
-			new Projectile(lvl.guy._posX + 2, lvl.guy._posY,
-								0, -0.1,
-								this._scene, this._assetsManager) );
-		this._projectiles.push(
-			new Projectile(lvl.guy._posX + 2, lvl.guy._posY,
-								0.1, 0.0,
-								this._scene, this._assetsManager) );**/
+		this._emitters.push( new Emitter(lvl.guy._posX + 2, lvl.guy._posY, this._guy, this._scene, this._assetsManager, this) );
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -81,13 +76,14 @@ class Level {
 
 	restart() {
 		var lvl = this._levelObject;
-		this._finished = false;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
+		this._finished = false;
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
 		}
+		this._firstUpdate = true;
 	}
 
 	initFinish(finishObject) {
@@ -181,17 +177,29 @@ class Level {
 		this._guy.update(guyDoRun);
 		this._movablePlatform.update();
 
+		// Update emitters
+		for (var i = 0; i < this._emitters.length; i++) {
+			this._emitters[i].update();
+		}
+
 		// Update projectiles and remove if necessary (when they hit something).
+		// Additionally, when projectile hits guy, kill him :)
 		var projs_to_remove = [];
 		for (var i = 0; i < this._projectiles.length; i++) {
 			if ( this._projectiles[i].update() ) { // projectile.update returns true if it hit something
 				projs_to_remove.push(i);
+			} else {
+				// If projectile hits guy he has to die
+				if (this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
+					this._guy.onDie();
+					projs_to_remove.push(i);
+				}
 			}
 		}
 		var c = 0;
 		for (var i = 0; i < projs_to_remove.length; i++) {
 			var index = projs_to_remove[i] - c;
-			this._projectiles[index]._mesh.dispose();
+			this._projectiles[index].destroy();
 			this._projectiles.splice(index, 1);
 			c = c + 1;
 		}
@@ -221,20 +229,31 @@ class Level {
 			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
 				this._onFinished(this._finish.target);
 			}
-		} else if (this._finish.intersectsMesh(this._guy._mesh)) {
+		} else if (!this._firstUpdate && !this._guy._fixAnimation && this._finish.intersectsMesh(this._guy._mesh)) { // (._fixAnimation indicates that guy is dead or already won)
 			// What happens when player reaches finish.
+			console.log("welogit");
 			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
 			this._doorMesh.material.diffuseTexture.hasAlpha = true;
 			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
 			this._light1.specular = new BABYLON.Color3(0, 1, 0);
 			this._guy.onWin();
 			this._finished = new Date().getTime();
+			console.log("weloggedit");
 		}
 
 		// If guy falls out of the level, restart it.
 		if (this._guy._mesh.getAbsolutePosition().y < (CONS_LEVEL_BOTTOM-2) * CONS_SCALE) {
 			this.restart();
 		}
+
+		this._firstUpdate = false;
+	}
+
+	spawnProjectile(position, direction, material) {
+		this._projectiles.push(
+			new Projectile(position, direction,
+								this._scene, this._assetsManager, material)
+		);
 	}
 
 	keyDown(ctrlCode) {

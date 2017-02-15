@@ -14,8 +14,8 @@ class Guy extends Animatable {
 			this._standingTimestep = false; // when guy stands for a certain time, toggle direction
 
 			this._forward = true;
-			this._stopOnWin = false; 	// true, as soon as guy reached finish
-			this._doRun = true;			// is guy allowed to run?
+			this._fixAnimation = false; 	// if true animation loop can not be changed anymore
+			this._doRun = true;				// is guy allowed to run?
 
 			// Init geometry ------------------------------------------------------
 			this._tex_uScale = 1;
@@ -68,26 +68,33 @@ class Guy extends Animatable {
 				"textures/guy/obj_Box004.png",
 				"textures/guy/obj_Box005.png"
 			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 80, "win");
+			this.anim_load_animation([
+				"textures/guy/obj_Flying001.png",
+				"textures/guy/obj_Flying000.png",
+				"textures/guy/obj_Flat000.png"
+			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "die", false);
 
 			this.anim_set_animation_by_name("run");
 	}
 
 	// Reset guy, for example when restarting level.
 	reset(posX, posY) {
-		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
-		this._forward = true;
-		this._stopOnWin = false;
-		this._standingTimestep = false;
-		this._doRun = true;
-
+		console.log("take it");
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
+
+		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
+		this._forward = true;
+		this._fixAnimation = false;
+		this._standingTimestep = false;
+		this._doRun = true;
 
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		vel.x = 0;
 		vel.y = 0;
 		this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+		console.log("take it or leave it");
 	}
 
 	update() {
@@ -152,7 +159,7 @@ class Guy extends Animatable {
 		}
 
 		// Do movement
-		if (this._doRun && this._curMode != CONS_GM_JUMP && !this._stopOnWin)
+		if (this._doRun && this._curMode != CONS_GM_JUMP && !this._fixAnimation)
 			this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 
 		this.check_physic_constraints();
@@ -188,7 +195,7 @@ class Guy extends Animatable {
 		// Check which animation loop should be active
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS * 2) {
-			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
+			if (!this._fixAnimation) this.anim_set_animation_by_name("stand");
 			this._curMode = CONS_GM_STAND;
 			if (!this._standingTimestep) {
 				this._standingTimestep = new Date().getTime();
@@ -205,13 +212,13 @@ class Guy extends Animatable {
 			if (pickInfo.hit) {
 				if (this._curMode != CONS_GM_RUN) {
 					this._standingTimestep = false;
-					if (!this._stopOnWin) this.anim_set_animation_by_name("run");
+					if (!this._fixAnimation) this.anim_set_animation_by_name("run");
 					this._curMode = CONS_GM_RUN;
 				}
 			} else {
 				if (this._curMode != CONS_GM_JUMP) {
 					this._standingTimestep = false;
-					if (!this._stopOnWin) this.anim_set_animation_by_name("jump");
+					if (!this._fixAnimation) this.anim_set_animation_by_name("jump");
 					this._curMode = CONS_GM_JUMP;
 				}
 			}
@@ -227,8 +234,13 @@ class Guy extends Animatable {
 
 	// Fired when player reaches door.
 	onWin() {
-		this._stopOnWin = true;
+		this._fixAnimation = true;
 		this.anim_set_animation_by_name("win");
+	}
+
+	onDie() {
+		this._fixAnimation = true;
+		this.anim_set_animation_by_name("die");
 	}
 
 	// Toggle direction in which guy is running.

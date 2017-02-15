@@ -13,6 +13,7 @@ class Animatable {
 		this._animations = new Array(); // arry of array of textures
 		this._anim_intervals = new Array(); // array of intervals between frames
 		this._anim_names = new Array(); // array: key is name, value is corresponding index of this._animations
+		this._anim_is_loop = new Array(); // array of boolean, for each animation loop: is it a loop or should it stop at last frame?
 
 		this.anim_reset();
 	}
@@ -37,7 +38,11 @@ class Animatable {
 		if (this._anim_cur_frame == -1) { return; }
 		this._anim_cur_frame++;
 		if (this._anim_cur_frame >= this._animations[this._anim_cur_anim].length) {
-			this._anim_cur_frame = 0;
+			if (this._anim_is_loop[this._anim_cur_anim]) {
+				this._anim_cur_frame = 0;
+			} else {
+				this._anim_cur_frame--;
+			}
 		}
 		return this.anim_get_cur_texture();
 	}
@@ -64,7 +69,7 @@ class Animatable {
 		return this._animations[this._anim_cur_anim][this._anim_cur_frame];
 	}
 
-	anim_load_animation(frames, uScale, vScale, uOffset, vOffset, interval, name) {
+	anim_load_animation(frames, uScale, vScale, uOffset, vOffset, interval, name, isLoop = true) {
 		this._animations.push( new Array() );
 		var index = this._animations.length - 1;
 		for (var i = 0; i < frames.length; i++) {
@@ -85,6 +90,7 @@ class Animatable {
 		}
 		this._anim_intervals.push( interval );
 		this._anim_names[name] = this._animations.length-1;
+		this._anim_is_loop.push( isLoop );
 	}
 
 }
