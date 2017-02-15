@@ -1,4 +1,4 @@
-# Stupax
+# Stupax ![Stupax game character](https://github.com/mbarde/stupax/blob/master/apple-touch-icon.png?raw=true)
 ###"You are not the guy, you are the level!"
 *Stupax* is a funny sidescroller (jump and run game) where you do not control the character, but the level. You control a movable platform to help the guy (namely *Stupax*) to get through the levels.
 
