@@ -9,3 +9,5 @@
 
 It is written purely in JavaScript using [BabylonJS](http://babylonjs.com/).
 So it runs in every browsers (Chrome or Chromium recommended due performance reasons).
+
+![Screenshot](https://github.com/mbarde/stupax/blob/master/docs/screen.png?raw=true)
