@@ -33,7 +33,7 @@ class Projectile extends Entity {
 
 		// When hitting a wall return TRUE (level can destroy projectile then).
 		// Else return FALSE.
-		var rayLength = this._width;
+		var rayLength = CONS_SCALE / 3;
 
 		// Check horizontal
 		var posi = this._mesh.position.clone();
@@ -45,7 +45,7 @@ class Projectile extends Entity {
 		}
 
 		// Check vertical
-		rayLength = this._height;
+		rayLength = CONS_SCALE / 3;
 		var posi = this._mesh.position.clone();
 		posi.y = posi.y - rayLength/2;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), rayLength);

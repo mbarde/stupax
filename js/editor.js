@@ -9,6 +9,11 @@ class Editor extends Mode {
 		this._levelWidth = 500;
 		this._levelHeight = 20;
 
+		this._keysLeft = [CTRL_LEFT, 65, 37];
+		this._keysRight = [CTRL_RIGHT, 68, 39];
+		this._keysUp = [CTRL_UP, 87, 38];
+		this._keysDown = [CTRL_DOWN, 83, 40];
+
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
 
@@ -55,6 +60,13 @@ class Editor extends Mode {
 					var posY = Math.floor(pickResult.pickedPoint.y / CONS_SCALE);
 
 					var marker = new Marker(posX, posY, this.editor._curMode, this);
+					if (this.editor._curMode == CONS_EM_EMITTER) {
+						marker.emitter_info = {};
+						marker.emitter_info.directions = new Array();
+					  	marker.emitter_info.directions.push( new BABYLON.Vector3(0.1, 0.0, 0) );
+					  	marker.emitter_info.interval = 2000;
+					  	marker.emitter_info.offset = 0;
+					} else
 					if (this.editor._curMode == CONS_EM_GUY) {
 						if (this.editor._guyMarker) {
 							this.editor._guyMarker._mesh.dispose();
@@ -119,6 +131,9 @@ class Editor extends Mode {
 		if (ctrlCode == 53) {
 			this.setCurMode(CONS_EM_BOX);
 		}
+		if (ctrlCode == 54) {
+			this.setCurMode(CONS_EM_EMITTER);
+		}
 		if (ctrlCode == 9) {
 			this.saveLevel();
 		}
@@ -151,6 +166,7 @@ class Editor extends Mode {
 		var pms = new Array(); // platform markers
 		var movPms = new Array(); // movable platform markers
 		var boxMs = new Array(); // box markers
+		var emMs = new Array(); // emitter markers
 		var h = 0;
 		console.log("Collecting markers ...");
 		console.log(this._scene.meshes.length);
@@ -164,8 +180,17 @@ class Editor extends Mode {
 			} else if (this._scene.meshes[h].mode == CONS_EM_BOX) {
 				var m = this._scene.meshes[h].marker;
 				boxMs.push( new PlatformMarker(m._posX, m._posY, 1, 1) );
+			} else if (this._scene.meshes[h].mode == CONS_EM_EMITTER) {
+				var m = this._scene.meshes[h].marker;
+				var em = new PlatformMarker(m._posX, m._posY, 1, 1);
+				em.directions = m.emitter_info.directions;
+				em.interval = m.emitter_info.interval;
+				em.offset = m.emitter_info.offset;
+				emMs.push( em );
 			}
 		}
+		level.emitters = emMs;
+
 		level.platforms = this.mergeMarkers(pms);
 
 		movPms = this.mergeMarkers(movPms);
@@ -223,6 +248,17 @@ class Editor extends Mode {
 		this._guyMarker = new Marker(lvl.guy._posX, lvl.guy._posY, CONS_EM_GUY, this._scene);
 		this._finishMarker = new Marker(lvl.finish._posX, lvl.finish._posY, CONS_EM_FINISH, this._scene);
 
+		if (lvl.emitters) {
+			var emitters = lvl.emitters;
+			for (var i = 0; i < emitters.length; i++) {
+				var marker = new Marker(emitters[i]._posX, emitters[i]._posY, CONS_EM_EMITTER, this._scene);
+				marker.emitter_info = {};
+				marker.emitter_info.directions = emitters[i].directions;
+				marker.emitter_info.interval = emitters[i].interval;
+				marker.emitter_info.offset = emitters[i].offset;
+			}
+		}
+
 		var movPlat = lvl.movPlatform;
 		for (var x = 0; x < movPlat._width; x++) {
 			for (var y = 0; y < movPlat._height; y++) {
@@ -236,6 +272,18 @@ class Editor extends Mode {
 			for (var x = 0; x < plat._width; x++) {
 				for (var y = 0; y < plat._height; y++) {
 					var marker = new Marker(plat._posX + x, plat._posY + y, CONS_EM_PLATFORM, this._scene);
+				}
+			}
+		}
+
+		if (lvl.boxes) {
+			var boxes = lvl.boxes;
+			for (var i = 0; i < boxes.length; i++) {
+				var box = boxes[i];
+				for (var x = 0; x < box._width; x++) {
+					for (var y = 0; y < box._height; y++) {
+						var marker = new Marker(box._posX + x, box._posY + y, CONS_EM_BOX, this._scene);
+					}
 				}
 			}
 		}
@@ -258,6 +306,9 @@ class Editor extends Mode {
 				break;
 			case CONS_EM_BOX:
 				name = "Box mode";
+				break;
+			case CONS_EM_EMITTER:
+				name = "Emitter mode";
 				break;
 		}
 		return name;

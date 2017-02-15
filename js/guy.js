@@ -79,7 +79,6 @@ class Guy extends Animatable {
 
 	// Reset guy, for example when restarting level.
 	reset(posX, posY) {
-		console.log("take it");
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 
@@ -94,7 +93,6 @@ class Guy extends Animatable {
 		vel.y = 0;
 		this._mesh.getPhysicsImpostor().setLinearVelocity(vel);
 		this._mesh.getPhysicsImpostor().setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
-		console.log("take it or leave it");
 	}
 
 	update() {

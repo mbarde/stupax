@@ -10,6 +10,7 @@ class Level {
 		this._camera = camera;
 		this._onFinished = onFinished; 	// function to execute when player reaches finish
 		this._finished = false; 			// will contain timestamp of win when player reaches door
+		this._died = false;					// will contain timestamp of death when player died
 		this.loadLevel(levelString);
 
 		this._block_guy = false;			// block guy from running
@@ -25,8 +26,6 @@ class Level {
 
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
-
-		// this._emitters.push( new Emitter(lvl.guy._posX + 2, lvl.guy._posY, this._guy, this._scene, this._assetsManager, this) );
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -49,6 +48,19 @@ class Level {
 			for (var i = 0; i < lvl.boxes.length; i++) {
 				var box = lvl.boxes[i];
 				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene, this._assetsManager));
+			}
+		}
+
+		// Set emitters
+		this._emitters = new Array();
+		if (lvl.emitters) {
+			for (var i = 0; i < lvl.emitters.length; i++) {
+				var emitter = lvl.emitters[i];
+				this._emitters.push(
+					new Emitter(emitter._posX, emitter._posY,
+						emitter.directions, emitter.interval, emitter.offset,
+						this._guy, this._scene, this._assetsManager, this)
+				);
 			}
 		}
 
@@ -80,6 +92,8 @@ class Level {
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
 		this._finished = false;
+		this._died = false;
+
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
 		}
@@ -174,18 +188,18 @@ class Level {
 		mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
 	}
 
-	update(guyDoRun) {
+	update() {
 		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var movPos = this._movablePlatform._mesh.getAbsolutePosition();
 		var movWidth = this._movablePlatform._width;
 		var movHeight = this._movablePlatform._height;
 
-		this._guy.update(guyDoRun);
+		this._guy.update();
 		this._movablePlatform.update();
 
 		// Update emitters
 		for (var i = 0; i < this._emitters.length; i++) {
-			this._emitters[i].update();
+			this._emitters[i].update(this._guy._doRun);
 		}
 
 		// Update projectiles and remove if necessary (when they hit something).
@@ -198,6 +212,7 @@ class Level {
 				// If projectile hits guy he has to die
 				if (this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
 					this._guy.onDie();
+					this._died = new Date().getTime();
 					projs_to_remove.push(i);
 				}
 			}
@@ -228,23 +243,27 @@ class Level {
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
 		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
 
-		if (this._finished) {
+		if (this._died) {
+			// If player is dead for certain amount of time, then restart level.
+			var time = new Date().getTime();
+			if (time - this._died >= CONS_DEATH_TIME_TO_RESTART) {
+				this.restart();
+			}
+		} else if (this._finished) {
 			// Check whether guy's celebration time is over.
 			// If so, fire this._onFinished event.
 			var time = new Date().getTime();
 			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
 				this._onFinished(this._finish.target);
 			}
-		} else if (!this._firstUpdate && !this._guy._fixAnimation && this._finish.intersectsMesh(this._guy._mesh)) { // (._fixAnimation indicates that guy is dead or already won)
+		} else if (!this._firstUpdate && this._finish.intersectsMesh(this._guy._mesh)) {
 			// What happens when player reaches finish.
-			console.log("welogit");
 			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
 			this._doorMesh.material.diffuseTexture.hasAlpha = true;
 			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
 			this._light1.specular = new BABYLON.Color3(0, 1, 0);
 			this._guy.onWin();
 			this._finished = new Date().getTime();
-			console.log("weloggedit");
 		}
 
 		// If guy falls out of the level, restart it.
