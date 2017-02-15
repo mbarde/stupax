@@ -1,3 +1,9 @@
+/**
+* 	This class manages animation loops.
+* 	Every loop contains amount of frames with certain intverals between them.
+* 	When animation loop is set as active it begins with it's first frame.
+*	If interval has passed next frame is set as active (and so on).
+**/
 class Animatable {
 
 	constructor(scene, assetsManager) {

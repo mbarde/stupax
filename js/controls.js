@@ -38,7 +38,6 @@ class Controls {
 			this.checkAxis(gamepad.axes, 1, 0.2, 1.0, CTRL_DOWN);
 			this.checkAxis(gamepad.axes, 1, -1.0, -0.2, CTRL_UP);
 
-
 			/**
 			for (var i = 0; i < this._gamepad_mapping.length; i++) {
 				var key = this._gamepad_mapping[i].key;
@@ -59,6 +58,9 @@ class Controls {
 		}
 	}
 
+	// Check gamepad axis with 'id' (is in array 'axes').
+	// If it has value in between 'value_from' to 'value_to', set 'ctrlCode' as pressed.
+	// if not unset 'ctrlCode' in pressed array.
 	checkAxis(axes, id, value_from, value_to, ctrlCode) {
 		if (axes[id] >= value_from && axes[id] <= value_to) {
 			this._onKeyDown(ctrlCode);
@@ -76,16 +78,16 @@ class Controls {
 	keyCodeToCTRLCode(keyCode) {
 		var ctrlCode = keyCode;
 		switch (keyCode) {
-			case 37:
+			case 37: // ARROW_LEFT
 				ctrlCode = CTRL_LEFT;
 				break;
-			case 39:
+			case 39: // ARROW_RIGHT
 				ctrlCode = CTRL_RIGHT;
 				break;
-			case 38:
+			case 38: // ARROW_UP
 				ctrlCode = CTRL_UP;
 				break;
-			case 40:
+			case 40: // ARROW_DOWN
 				ctrlCode = CTRL_DOWN;
 				break;
 			case 82: // R

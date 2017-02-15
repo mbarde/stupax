@@ -6,11 +6,6 @@ class Editor extends Mode {
 		this._log_function = log_function;
 		this._assetsManager = assetsManager;
 
-		this._keysLeft = [CTRL_LEFT, 65, 37];
-		this._keysRight = [CTRL_RIGHT, 68, 39];
-		this._keysUp = [CTRL_UP, 87, 38];
-		this._keysDown = [CTRL_DOWN, 83, 40];
-
 		this._levelWidth = 500;
 		this._levelHeight = 20;
 

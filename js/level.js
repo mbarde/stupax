@@ -6,11 +6,11 @@ class Level {
 		this._scene = scene;
 		this._assetsManager = assetsManager;
 		this._camera = camera;
-		this._onFinished = onFinished; // function to execute when player reaches finish
-		this._finished = false; // will contain timestamp of win when player reaches door
+		this._onFinished = onFinished; 	// function to execute when player reaches finish
+		this._finished = false; 			// will contain timestamp of win when player reaches door
 		this.loadLevel(levelString);
 
-		this._block_guy = false;
+		this._block_guy = false;			// block guy from running
 	}
 
 	loadLevel(level) {
@@ -49,8 +49,10 @@ class Level {
 		// Set finish
 		this.initFinish(lvl.finish);
 
+		// Set light
 		this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 
+		// Init background
 		this.initBackground();
 
 		this._levelObject = lvl;
@@ -168,6 +170,7 @@ class Level {
 		this._guy.update(guyDoRun);
 		this._movablePlatform.update();
 
+		// If we are in cam fly mode, move cam [...]
 		if (this._cam_fly) {
 			this._camera.position.subtractInPlace(this._cam_fly);
 			var dist = BABYLON.Vector3.Distance(this._camera.position, movPos);
@@ -177,19 +180,23 @@ class Level {
 			} else {
 				this._cam_fly_last_dist = dist;
 			}
-		} else {
+		} else { // [...], else clip cam to movable platform.
 			this._camera.position.x = movPos.x;
 		}
 
+		// Clip light to movable platform.
 		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
 		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
 
 		if (this._finished) {
+			// Check whether guy's celebration time is over.
+			// If so, fire this._onFinished event.
 			var time = new Date().getTime();
 			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
 				this._onFinished(this._finish.target);
 			}
-		} else if (this._finish.intersectsMesh(this._guy._mesh)) { // What happens when player reaches door
+		} else if (this._finish.intersectsMesh(this._guy._mesh)) {
+			// What happens when player reaches finish.
 			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
 			this._doorMesh.material.diffuseTexture.hasAlpha = true;
 			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
@@ -198,6 +205,7 @@ class Level {
 			this._finished = new Date().getTime();
 		}
 
+		// If guy falls out of the level, restart it.
 		if (this._guy._mesh.getAbsolutePosition().y < (CONS_LEVEL_BOTTOM-2) * CONS_SCALE) {
 			this.restart();
 		}
@@ -222,6 +230,7 @@ class Level {
 		this._movablePlatform.keyUp(ctrlCode);
 	}
 
+	// Setter to allow guy to run or not.
 	setGuyRunState(state) {
 		if (state && this._cam_fly) {
 

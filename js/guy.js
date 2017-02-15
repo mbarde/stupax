@@ -11,11 +11,11 @@ class Guy extends Animatable {
 			this._maxSpeedX = 1.0 * CONS_SCALE;
 			this._maxSpeedY = 0.1 * CONS_SCALE;
 			this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
-			this._standingTimestep = false;
+			this._standingTimestep = false; // when guy stands for a certain time, toggle direction
 
 			this._forward = true;
-			this._stopOnWin = false;
-			this._doRun = true;
+			this._stopOnWin = false; 	// true, as soon as guy reached finish
+			this._doRun = true;			// is guy allowed to run?
 
 			// Init geometry ------------------------------------------------------
 			this._tex_uScale = 1;
@@ -24,19 +24,8 @@ class Guy extends Animatable {
 			this._tex_vOffset = 0;
 
 			var material = new BABYLON.StandardMaterial("guy", this._scene);
-			//material.diffuseTexture = new BABYLON.Texture("textures/guy/obj_Idle001.png", this._scene);
-/**
-			var textureTask = assetsManager.addTextureTask("image task", "textures/guy/obj_Idle001.png");
-			textureTask.onSuccess = function(task) {
-		    	material.diffuseTexture = task.texture;
-	 			material.diffuseTexture.hasAlpha = true;
-	 			material.diffuseTexture.uScale = this._tex_uScale;
-	 			material.diffuseTexture.vScale = this._tex_vScale;
-	 			material.diffuseTexture.uOffset = this._tex_uOffset;
-	 			material.diffuseTexture.vOffset = this._tex_vOffset;
-	 			material.backFaceCulling = false;
-			}
-**/
+
+			// Texture mesh
 			this._planeMesh = BABYLON.MeshBuilder.CreatePlane("guyPlane", {height: 1.5 * CONS_SCALE, width: 1 * CONS_SCALE}, this._scene);
 			this._planeMesh.material = material;
 
@@ -48,6 +37,8 @@ class Guy extends Animatable {
 			this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 			this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
 			this._mesh.position.z = 0;
+
+			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_PLAYER_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 
 			// Init animations ----------------------------------------------------
 			this.anim_load_animation([
@@ -79,19 +70,15 @@ class Guy extends Animatable {
 			], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 80, "win");
 
 			this.anim_set_animation_by_name("run");
-
-			this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_PLAYER_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
 
-	setRunState(doRun) {
-		this._doRun = doRun;
-	}
-
-	// Reset guy, for example when restarting level
+	// Reset guy, for example when restarting level.
 	reset(posX, posY) {
 		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 		this._forward = true;
 		this._stopOnWin = false;
+		this._standingTimestep = false;
+		this._doRun = true;
 
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
@@ -107,31 +94,42 @@ class Guy extends Animatable {
 		this.check_animation();
 
 		// Check if guy hit a wall. Toggle direction if it is the case.
-		var tolerance = 0.1;
-		var corner_distance = 0.2;
+		var tolerance = 0.1;			// Guy can 'dive' this deep into (vertical) walls without toggling direction
+		var corner_distance = 0.2; // Steps can be this high without toggling direction
 
-		var posi = this._mesh.position.clone();
-		if (this._forward) {
-			posi.x = posi.x + (this._width/2 * CONS_SCALE) + tolerance;
-		} else {
-			posi.x = posi.x - (this._width/2 * CONS_SCALE) - tolerance;
-		}
-		posi.y = posi.y - (this._height/2 * CONS_SCALE) + corner_distance;
-
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), this._height/2 * CONS_SCALE - corner_distance*2 );
+		// Check if guy is stuck into the ground.
+		// This can happen when he jumps from high places.
+		// It can cause false positive toggle direction, we need to prevent this.
+		var ray = new BABYLON.Ray(this._mesh.position, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE - corner_distance );
 		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		if (pickInfo.hit) {
-			this.toggleDirection();
-		} else {
-			// If guy stands in front of a wall higher than: this._height/2 * CONS_SCALE - corner_distance*2
-			// Then the used ray is not able to detect the wall. So we additionally need a ray in x direction.
+			// Guy is diving in the ground ~~~~~~/\~~~~~~~
+		} else { // Only do wall detection when guy is NOT into ground.
 			var posi = this._mesh.position.clone();
-			var x_dir = -1;
-			if (this._forward) x_dir = 1;
-			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(x_dir, 0, 0), this._width/2 * CONS_SCALE + tolerance );
-		  	var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
-		  	if (pickInfo.hit) {
+			if (this._forward) {
+				posi.x = posi.x + (this._width/2 * CONS_SCALE) + tolerance;
+			} else {
+				posi.x = posi.x - (this._width/2 * CONS_SCALE) - tolerance;
+			}
+			posi.y = posi.y - (this._height/2 * CONS_SCALE) + corner_distance;
+
+			// Create vertical ray in front of the guy.
+			// When this ray intersects a wall, guy should turn around.
+			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), this._height/2 * CONS_SCALE - corner_distance*2 );
+			var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+			if (pickInfo.hit) {
 				this.toggleDirection();
+			} else {
+				// If guy stands in front of a wall higher than: this._height/2 * CONS_SCALE - corner_distance*2
+				// Then the used ray is not able to detect the wall. So we additionally need a ray in x direction.
+				var posi = this._mesh.position.clone();
+				var x_dir = -1;
+				if (this._forward) x_dir = 1;
+				var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(x_dir, 0, 0), this._width/2 * CONS_SCALE + tolerance );
+			  	var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+			  	if (pickInfo.hit) {
+					this.toggleDirection();
+				}
 			}
 		}
 
@@ -153,8 +151,9 @@ class Guy extends Animatable {
 			}
 		}
 
-		// Movement
-		if (this._doRun && this._curMode != CONS_GM_JUMP && !this._stopOnWin) this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
+		// Do movement
+		if (this._doRun && this._curMode != CONS_GM_JUMP && !this._stopOnWin)
+			this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 
 		this.check_physic_constraints();
 	}
@@ -180,12 +179,13 @@ class Guy extends Animatable {
 		// Always stay on the same Z coordinate
 		this._mesh.position.z = 0;
 
+		// Clip mesh containing texture of the guy to it´s physics object.
 		this._planeMesh.position = this._mesh.getAbsolutePosition();
 		this._planeMesh.position.y += 0.7;
 	}
 
 	check_animation() {
-		// Check set animation
+		// Check which animation loop should be active
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS * 2) {
 			if (!this._stopOnWin) this.anim_set_animation_by_name("stand");
@@ -217,6 +217,7 @@ class Guy extends Animatable {
 			}
 		}
 
+		// If new frame is necessary, bind it to texture mesh.
 		if (this.anim_update()) {
 			this._planeMesh.material = this.anim_get_cur_texture();
 			if (!this._forward) this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
@@ -224,12 +225,13 @@ class Guy extends Animatable {
 		}
 	}
 
-	// fired when player reaches door
+	// Fired when player reaches door.
 	onWin() {
 		this._stopOnWin = true;
 		this.anim_set_animation_by_name("win");
 	}
 
+	// Toggle direction in which guy is running.
 	toggleDirection() {
 		this._direction.x = - this._direction.x;
 		this._forward = !this._forward;
@@ -243,6 +245,10 @@ class Guy extends Animatable {
 		}
 
 		return this._forward;
+	}
+
+	setRunState(doRun) {
+		this._doRun = doRun;
 	}
 
 	keyDown(keyCode) {
