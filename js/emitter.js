@@ -3,10 +3,11 @@ class Emitter extends Platform {
 	constructor(posX, posY, guy, scene, assetsManager, level) {
 		super(1, 1, posX, posY, guy, scene, assetsManager);
 
-		this._interval = 1000;
+		this._interval = 3000;
 		this._last_emit_time = new Date().getTime();
 
 		this._emit_directions = []; // array contains all directions in which emitters emits
+
 		this._emit_directions.push( new BABYLON.Vector3(0.1, 0.0, 0) );
 
 		this._mesh.projectileStopper = false;
@@ -22,6 +23,10 @@ class Emitter extends Platform {
 		} } )(this._projectile_material);
 	}
 
+	reset() {
+		this._last_emit_time = new Date().getTime();
+	}
+
 	update() {
 		var curTime = new Date().getTime();
 		if (curTime - this._last_emit_time >= this._interval) {
@@ -33,7 +38,7 @@ class Emitter extends Platform {
 	}
 
 	getTextureName() {
-		return "textures/cartoon_wooden_crate.jpg";
+		return "textures/emitter.png";
 	}
 
 }

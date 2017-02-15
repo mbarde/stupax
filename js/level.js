@@ -26,7 +26,7 @@ class Level {
 		// Spawn guy
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
 
-		this._emitters.push( new Emitter(lvl.guy._posX + 2, lvl.guy._posY, this._guy, this._scene, this._assetsManager, this) );
+		// this._emitters.push( new Emitter(lvl.guy._posX + 2, lvl.guy._posY, this._guy, this._scene, this._assetsManager, this) );
 
 		// Set platforms
 		var ps = lvl.platforms;
@@ -83,6 +83,12 @@ class Level {
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
 		}
+
+		for (var i = 0; i < this._projectiles.length; i++) {
+			this._projectiles[i].destroy();
+		}
+		this._projectiles = [];
+
 		this._firstUpdate = true;
 	}
 
