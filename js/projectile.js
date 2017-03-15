@@ -33,35 +33,11 @@ class Projectile extends Entity {
 
 		// When hitting a wall return TRUE (level can destroy projectile then).
 		// Else return FALSE.
-
 		var ray = new BABYLON.Ray(this._mesh.position, this._direction.negate(), this._direction.length());
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
 		if (pickInfo.hit) {
 			return true;
 		}
-
-		/**
-		var rayLength = CONS_SCALE / 3;
-
-		// Check horizontal
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x - rayLength/2;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), rayLength);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
-		if (pickInfo.hit) {
-			return true;
-		}
-
-		// Check vertical
-		rayLength = CONS_SCALE / 3;
-		var posi = this._mesh.position.clone();
-		posi.y = posi.y - rayLength/2;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), rayLength);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
-		if (pickInfo.hit) {
-			return true;
-		}
-		**/
 
 		return false;
 	}
