@@ -22,7 +22,7 @@ class Game extends Mode {
 
 		if (isFirstLevel) {
 			this._level.setGuyRunState(false);
-			this._level._block_guy = true;
+			this._level._blockGuy = true;
 		}
 	}
 
@@ -31,16 +31,21 @@ class Game extends Mode {
 	}
 
 	keyDown(ctrlCode) {
-		this._level.keyDown(ctrlCode);
+		if (!this._level._camFly) this._level.keyDown(ctrlCode);
 	}
 
 	keyUp(ctrlCode) {
-		this._level.keyUp(ctrlCode);
+		if (!this._level._camFly) this._level.keyUp(ctrlCode);
 	}
 
 	startRunning() {
 		this._level.setGuyRunState(true);
-		this._level._block_guy = false;
+		this._level._blockGuy = false;
+	}
+
+	onPause() {
+		if (this._level)
+			this._level.onPause();
 	}
 
 }

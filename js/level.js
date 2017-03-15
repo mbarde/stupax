@@ -13,7 +13,7 @@ class Level {
 
 		this._finished = false; 			// will contain timestamp of win when player reaches door
 		this._died = false;					// will contain timestamp of death when player died
-		this._block_guy = false;			// block guy from running
+		this._blockGuy = false;			// block guy from running
 		this._firstUpdate = true;			//
 	}
 
@@ -211,10 +211,14 @@ class Level {
 		var dist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.position);
 		if (dist > this._camFly_lastDist) {
 			this._camFly = false;
-			if (!this._block_guy) this._guy.setRunState(true);
+			if (!this._blockGuy) this._guy.setRunState(true);
 		} else {
 			this._camFly_lastDist = dist;
 		}
+	}
+
+	onPause() {
+		this._movablePlatform.onPause();
 	}
 
 }

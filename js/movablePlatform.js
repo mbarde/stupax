@@ -172,6 +172,10 @@ class MovablePlatform extends Platform {
 		}
 	}
 
+	onPause() {
+		this._keysDown = [];
+	}
+
 	destroy() {
 		super.destroy();
 		this._light.dispose();

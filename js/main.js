@@ -3,8 +3,7 @@ requirejs([	"js/constants.js", "js/animatable.js", "js/platformMarker.js",
 	"js/level.js", "js/entity.js", "js/finish.js",
 	"js/background.js", "js/levelFactory.js", "js/platform.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/projectile.js",
-	"js/emitter.js", "js/controls.js", "js/ControllableGuy.js",
-	"js/loadingScreen.js"],
+	"js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
 
 function() {
 
@@ -24,6 +23,15 @@ function() {
 
 	function log(message) {
 		$('#spanLog').text("> " + message);
+	}
+
+	function hideOverlayAndUnpause() {
+		if (!doRender) {
+			doRender = true;
+		}
+		$('.overlay').hide();
+		showOverlay = false;
+		mode.startRunning();
 	}
 
 	function loadLevel(name) {
@@ -117,17 +125,29 @@ function() {
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
-			if (!showOverlay && mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (event.keyCode == 27) {
+				if (!showOverlay) {
+					showOverlay = true;
+					mode.onPause();
+					$('.overlay').show();
+					doRender = false;
+				} else {
+					hideOverlayAndUnpause();
+				}
+			}
+			if (!showOverlay && mode) {
+				mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+			}
 	}, false);
 
 	window.addEventListener("keyup", function(event){
-			if (!showOverlay && mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (!showOverlay && mode) {
+				mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+			}
 	}, false);
 
 	$('#btnStart').click( function() {
-		$('.overlay').hide();
-		showOverlay = false;
-		mode.startRunning();
+		hideOverlayAndUnpause();
 	});
 
 	window.addEventListener("resize", function () {
