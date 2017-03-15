@@ -13,96 +13,20 @@
       <title>Stupax - You are not the guy, you are the level!</title>
 
 		<!-- Babylon.js -->
-      <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
-      <script src="http://www.babylonjs.com/cannon.js"></script>
-      <script src="http://www.babylonjs.com/oimo.js"></script>
-      <!--<script src="http://www.babylonjs.com/babylon.js"></script>-->
+      <script src="plugins/hand.minified-1.2.js"></script>
+      <script src="plugins/oimo.js"></script>
 		<script src="plugins/babylon.custom.js"></script>
 
-		<!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) -->
+		<!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) to save lavel files -->
 		<script src="plugins/FileSaver.min.js"></script>
 
-		<!-- and jQuery to load level files -->
+		<!-- jQuery to load level files -->
 		<script src="plugins/jquery-3.1.1.min.js"></script>
 
-		<!-- Game files -->
-		<script src="js/animatable.js"></script>
-		<script src="js/platformMarker.js"></script>
-		<script src="js/marker.js"></script>
-		<script src="js/mode.js"></script>
-		<script src="js/editor.js"></script>
-		<script src="js/game.js"></script>
-		<script src="js/level.js"></script>
-		<script src="js/entity.js"></script>
-		<script src="js/finish.js"></script>
-		<script src="js/background.js"></script>
-		<script src="js/levelFactory.js"></script>
-		<script src="js/platform.js"></script>
-		<script src="js/movablePlatform.js"></script>
-		<script src="js/box.js"></script>
-		<script src="js/guy.js"></script>
-		<script src="js/projectile.js"></script>
-		<script src="js/emitter.js"></script>
-		<script src="js/controls.js"></script>
-		<script src="js/ControllableGuy.js"></script>
-		<script src="js/loadingScreen.js"></script>
+		<!-- RequireJS to load game files -->
+		<script data-main="js/main" src="plugins/require.js"></script>
 
-     	<style>
-         html, body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-         }
-
-         #renderCanvas {
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-         }
-
-			#spanFps {
-				position: absolute;
-				left: 0px;
-				top: 0px;
-				color: lime;
-				z-index: 10;
-			}
-
-			.overlay {
-		  		position: absolute;
-				color: white;
-			  	z-index: 10;
-				top: 40%;
-				width: 100%;
-				text-align: center;
-				background-color: rgba(0,0,0,0.5);
-				padding: 20px;
-			}
-			.overlay .title {
-				font-size: 32px;
-			}
-			.overlay .sub {
-				font-size: 24px;
-			}
-
-			.button {
-				font-size: 25px;
-				color: white;
-				font-family: 'Crimson Text', serif;
-				background-color: Transparent;
-			  	background-repeat:no-repeat;
-				border: 2px white solid;
-				margin-bottom: 5px;
-				border-radius: 15px;
-				cursor: pointer;
-			}
-
-			.button:hover {
-				background-color: rgba(0,0,0,0.4);
-			}
-     	</style>
+		<link rel="stylesheet" href="css\style.css" type="text/css" >
    </head>
 <body>
 	<span id="spanLog" style="display:None"></span>
@@ -114,176 +38,8 @@
 		<br>
 		<span class="sub">Press 'R' to restart level.</span><br>
 		<br>
-		<button class="button" onclick="$('.overlay').hide(); showOverlay = false; mode.startRunning();">START</button>
+		<button class="button" id="btnStart">START</button>
 	</div>
    <canvas id="renderCanvas"></canvas>
-   <script>
-	  	var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
-		var CONS_EPS = 0.2; // Epsilon value used as constant for some fine tuning (use search function)
-
-		var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
-		var CONS_DEATH_TIME_TO_RESTART = 3000; // Time in ms when level will restart after player death
-
-		var CONS_MOV_PLAT_MASS = 2;
-		var CONS_MOV_PLAT_UPLIFT = 0.15; // uplift of movable platform when no movement button is pressed, needed to fight against gravity
-
-		var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
-
-		var CONS_GUY_MASS = 1;
-		var CONS_GUY_TOLERANCE_VERTICAL_DIVE = 0.1; // Guy can 'dive' this deep into (vertical) walls without toggling direction
-		var CONS_GUY_TOLERANCE_HORIZONTAL_DIVE = 0.2; // Guy can 'dive' this deep into (horizontal) grounds without toggling direction (or: How high can be a step the player can climb without changing direction?)
-		var CONS_GUY_STAND_TOGGLE_TIME = 1000; // Time how long guy stands before he changes direction in ms, used to make sure that guy changes direction, even if 'wall-hit-detection' fails
-
-		// Restitution defines how "bumpy" the physics is. The higher the bumpier.
-		var CONS_RESTITUTION_GUY = 0.3;
-		var CONS_RESTITUTION_PLAT = 0.3;
-
-		var CONS_LEVEL_BOTTOM = 0;
-		var CONS_LEVEL_TOP = 13;
-
-		// Editor modes
-		var CONS_EM_PLATFORM = 0;
-		var CONS_EM_GUY = 1;
-		var CONS_EM_MOV_PLAT = 2;
-		var CONS_EM_FINISH = 3;
-		var CONS_EM_BOX = 4;
-		var CONS_EM_EMITTER = 5;
-
-		// Guy modes
-		var CONS_GM_STAND = 0;
-		var CONS_GM_RUN = 1;
-		var CONS_GM_JUMP = 2;
-
-		var canvas = document.getElementById("renderCanvas");
-      var engine = new BABYLON.Engine(canvas, true);
-
-		//var loadingScreen = new MyLoadingScreen("I'm loading!!");
-		//engine.loadingScreen = loadingScreen;
-
-		var mode;
-		var scene;
-		var assetsManager;
-		var doRender = false;
-		var isFirstLevel = true;
-		var showOverlay = true;
-		var controls;
-		var camera;
-		var light0;
-		var light1;
-
-		function log(message) {
-			$('#spanLog').text("> " + message);
-		}
-
-		function onKeyDown(ctrlCode) {
-		  if (mode) mode.keyDown(ctrlCode);
-		}
-
-  		function onKeyUp(ctrlCode) {
-  		  if (mode) mode.keyUp(ctrlCode);
-  		}
-
-		function loadLevel(name) {
-			doRender = false;
-			jQuery.get("levels/" + name + ".txt", function(data) {
-				document.title = "Stupax - " + name;
-
-				mode.loadLevel(data);
-
-				isFirstLevel = false;
-				assetsManager.load();
-
-				assetsManager.onFinish = function(tasks) {
-					doRender = true;
-				};
-			});
-		}
-
-     	var createScene = function () {
-         var myScene = new BABYLON.Scene(engine);
-
-         // Need a free camera for collisions
-         camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
-			var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
-			camera.rotationQuaternion = q;
-
-			myScene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
-
-         return myScene;
-       }
-
-	  	// If URL looks like "...?editor" start editor, else start game
-	  	var editor = false;
-	  	var arr = window.location.href.split('?');
-	  	if (arr.length > 2) {
-		 	if (arr[arr.length-2] == "editor") {
-				editor = true;
-		 	}
-	 	} else {
-	 		if (arr[arr.length-1] == "editor") {
-				 editor = true;
-		 	}
-	 	}
-
-		if (editor) {
-			$('#spanLog').show();
-			$('.overlay').hide();
-			showOverlay = false;
-  			log("Use 1 - 6 to switch between modes | Press TAB to save");
-
-			var scene = createScene();
-			assetsManager = new BABYLON.AssetsManager(scene);
-		 	mode = new Editor(scene, camera, log, assetsManager);
-
-			// If URL looks like "...?editor?levelXX" load levelXX
-			var last = arr.pop();
-			if (last.indexOf("level") !== -1) {
-				level = last;
-				jQuery.get("levels/" + level + ".txt", function(data) {
-					mode.loadLevel(data);
-				});
-	 		}
-			assetsManager.load();
-			assetsManager.onFinish = function(tasks) {
-				doRender = true;
-			};
-  		} else {
-		 	scene = createScene();
-			assetsManager = new BABYLON.AssetsManager(scene);
-			mode = new Game(scene, camera, assetsManager, loadLevel);
-
-			var level = "level01";
-			$('#spanFps').show();
-			var last = arr.pop();
-			if (last.indexOf("level") !== -1) {
-				level = last;
-		  	}
-			loadLevel(level);
-		}
-
-	  controls = new Controls(onKeyDown, onKeyUp);
-
-  		window.addEventListener("keydown", function(event){
-  				if (!showOverlay && mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
-  		}, false);
-  		window.addEventListener("keyup", function(event){
-  				if (!showOverlay && mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
-  		}, false);
-
-
-     	engine.runRenderLoop(function () {
-			if (doRender) {
-			  	if (mode) mode.update();
-				$('#spanFps').text( Math.round(engine.fps) );
-	         if (scene) scene.render();
-				if (controls) controls.update();
-			}
-     	});
-
-     	// Resize
-     	window.addEventListener("resize", function () {
-      	engine.resize();
-     	});
-    </script>
 </body>
 </html>

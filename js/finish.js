@@ -30,14 +30,14 @@ class Finish extends Entity {
 	initDoorMesh() {
 		// Create plane containing the finish texture
 		var material = new BABYLON.StandardMaterial("finish", this._scene);
-		var textureTask = assetsManager.addTextureTask("image task", "textures/door.png");
+		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door.png");
 		textureTask.onSuccess = function(task) {
 			material.diffuseTexture = task.texture;
 			material.diffuseTexture.hasAlpha = true;
 			material.backFaceCulling = true;
 		}
 
-		var textureTask = assetsManager.addTextureTask("image task", "textures/door_open.png");
+		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door_open.png");
 		(function(lvl) {
 			textureTask.onSuccess = function(task) {
 				lvl._tex_doorOpen = task.texture;

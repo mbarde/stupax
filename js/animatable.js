@@ -74,7 +74,7 @@ class Animatable {
 		var index = this._animations.length - 1;
 		for (var i = 0; i < frames.length; i++) {
 				var material = new BABYLON.StandardMaterial("guy", this._scene);
-				(function (arrayToPush, texName, mat) {
+				(function (arrayToPush, texName, mat, assetsManager) {
 					var textureTask = assetsManager.addTextureTask("image task", texName);
 					textureTask.onSuccess = function(task) {
 						mat.diffuseTexture = task.texture;
@@ -86,7 +86,7 @@ class Animatable {
 						mat.backFaceCulling = false;
 						arrayToPush.push(mat);
 					}
-				})(this._animations[index], frames[i], material);
+				})(this._animations[index], frames[i], material, this._assetsManager);
 		}
 		this._anim_intervals.push( interval );
 		this._anim_names[name] = this._animations.length-1;

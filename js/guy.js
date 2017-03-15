@@ -136,7 +136,7 @@ class Guy extends Animatable {
 		posi.y = posi.y - (this._height/2 * CONS_SCALE) + CONS_GUY_TOLERANCE_HORIZONTAL_DIVE;
 
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), this._height/2 * CONS_SCALE - CONS_GUY_TOLERANCE_HORIZONTAL_DIVE*2 );
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		if (pickInfo.hit) {
 			return true;
 		} else {
@@ -147,7 +147,7 @@ class Guy extends Animatable {
 			var x_dir = -1;
 			if (this._forward) x_dir = 1;
 			var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(x_dir, 0, 0), this._width/2 * CONS_SCALE + CONS_GUY_TOLERANCE_VERTICAL_DIVE );
-			var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+			var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 			if (pickInfo.hit) {
 				return true;
 			}
@@ -161,7 +161,7 @@ class Guy extends Animatable {
 		// This can happen when he jumps from high places.
 		// It can cause false positive toggle direction, we need to prevent this.
 		var ray = new BABYLON.Ray(this._mesh.position, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE - CONS_GUY_TOLERANCE_HORIZONTAL_DIVE );
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		return pickInfo.hit;
 	}
 
@@ -253,7 +253,7 @@ class Guy extends Animatable {
 		// ~ voilá
 		var posi = this._mesh.position.clone();
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height/2 * CONS_SCALE + 0.1);
-		var pickInfo = scene.pickWithRay(ray, function(item) { return item.isWalkable; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWalkable; });
 		return pickInfo.hit;
 	}
 
