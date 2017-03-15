@@ -10,7 +10,7 @@ class MovablePlatform extends Platform {
 		this._keyPressed = false;
 
 		this._speed = 3 * CONS_SCALE;
-		this._mesh.getPhysicsImpostor().setMass(CONS_MASS_MOV_PLAT);
+		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 
 		this._keysDown = [];
 		this._mesh.platform = this;
