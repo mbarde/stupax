@@ -1,14 +1,26 @@
 class Game extends Mode {
 
-	constructor(levelString, scene, camera, assetsManager, loadLevel_function, isFirst) {
+	constructor(scene, camera, assetsManager, loadLevel_function) {
 		super(scene, camera);
 
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
 		this._camera.rotation.y = 0.2;
 
-		this._level = new Level(levelString, this._scene, this._camera, assetsManager, loadLevel_function);
-		if (isFirst) {
+		this._levelFactory = new LevelFactory(this._scene, this._camera, assetsManager, loadLevel_function);
+
+		this._level = false;
+	}
+
+	loadLevel(levelString) {
+		var isFirstLevel = true;
+		if (this._level) {
+			isFirstLevel = false;
+			this._level.destroy();
+		}
+		this._level = this._levelFactory.stringToLevelObject(levelString);
+
+		if (isFirstLevel) {
 			this._level.setGuyRunState(false);
 			this._level._block_guy = true;
 		}

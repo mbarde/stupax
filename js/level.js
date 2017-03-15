@@ -1,93 +1,28 @@
 class Level {
 
-	constructor(levelString, scene, camera, assetsManager, onFinished) {
-		this._platforms = [];
-		this._boxes = [];
-		this._projectiles = [];
-		this._emitters = [];
+	constructor(scene, camera, assetsManager, onFinished) {
 		this._scene = scene;
 		this._assetsManager = assetsManager;
 		this._camera = camera;
 		this._onFinished = onFinished; 	// function to execute when player reaches finish
+
+		this.initEmptyLevel();
+
 		this._finished = false; 			// will contain timestamp of win when player reaches door
 		this._died = false;					// will contain timestamp of death when player died
-		this.loadLevel(levelString);
-
 		this._block_guy = false;			// block guy from running
-
-		this._firstUpdate = true;
+		this._firstUpdate = true;			//
 	}
 
-	loadLevel(level) {
-		var lvl = JSON.parse(level);
-
-		this._levelWidth = 500;
-		this._levelHeight = 20;
-
-		// Spawn guy
-		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._assetsManager);
-
-		// Set platforms
-		var ps = lvl.platforms;
-		this._platforms = new Array();
-		for (var i = 0; i < ps.length; i++) {
-			this._platforms.push( new Platform(ps[i]._width, ps[i]._height,
-											ps[i]._posX, ps[i]._posY,
-											this._guy, this._scene, this._assetsManager) );
-		}
-
-		// Set movable platform
-		var movPlat = lvl.movPlatform;
-		this._movablePlatform = new MovablePlatform(movPlat._width, movPlat._height,
-										movPlat._posX, movPlat._posY,
-										this._guy, this._scene, this._assetsManager);
-
-		// Set boxes
-		this._boxes = new Array();
-		if (lvl.boxes) {
-			for (var i = 0; i < lvl.boxes.length; i++) {
-				var box = lvl.boxes[i];
-				this._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, this._guy, this._scene, this._assetsManager));
-			}
-		}
-
-		// Set emitters
-		this._emitters = new Array();
-		if (lvl.emitters) {
-			for (var i = 0; i < lvl.emitters.length; i++) {
-				var emitter = lvl.emitters[i];
-				this._emitters.push(
-					new Emitter(emitter._posX, emitter._posY,
-						emitter.directions, emitter.interval, emitter.offset,
-						this._guy, this._scene, this._assetsManager, this)
-				);
-			}
-		}
-
-		// Set finish
-		this.initFinish(lvl.finish);
-
-		// Set light
-		this._light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
-
-		// Init background
-		this.initBackground();
-
-		this._levelObject = lvl;
-
-		// Init cam for cam fly from finish to movablePlatform
-		this._camera.position.x = (lvl.finish._posX + 0.5)  * CONS_SCALE;
-		this._cam_fly = new BABYLON.Vector3();
-		this._cam_fly.x = this._camera.position.x - this._movablePlatform._mesh.getAbsolutePosition().x;
-		this._cam_fly.y = 0;
-		this._cam_fly.z = 0;
-		this._cam_fly_last_dist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.getAbsolutePosition());
-		this._cam_fly.scaleInPlace(0.01);
-		this._guy.setRunState(false);
+	initEmptyLevel() {
+		this._platforms = [];
+		this._boxes = [];
+		this._projectiles = [];
+		this._emitters = [];
 	}
 
 	restart() {
-		var lvl = this._levelObject;
+		var lvl = this._levelJSON;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
@@ -108,6 +43,17 @@ class Level {
 		}
 
 		this._firstUpdate = true;
+	}
+
+	initCameraForFinishToStartFlight() {
+		this._camera.position.x = (this._levelJSON.finish._posX + 0.5)  * CONS_SCALE;
+		this._camFly = new BABYLON.Vector3();
+		this._camFly.x = this._camera.position.x - this._movablePlatform._mesh.getAbsolutePosition().x;
+		this._camFly.y = 0;
+		this._camFly.z = 0;
+		this._camFly_lastDist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.getAbsolutePosition());
+		this._camFly.scaleInPlace(0.01);
+		this._guy.setRunState(false);
 	}
 
 	initFinish(finishObject) {
@@ -149,11 +95,11 @@ class Level {
 		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
 		// -----------------------------------------------------------------------
 
-		this._light1 = new BABYLON.SpotLight("Spot0",
+		this._lightFinishDoor = new BABYLON.SpotLight("Spot0",
 							new BABYLON.Vector3((finishObject._posX + 0.5) * CONS_SCALE, (finishObject._posY + 1) * CONS_SCALE, -2 * CONS_SCALE),
 							new BABYLON.Vector3(0, 0, 1), 1.2, 30, this._scene);
-		this._light1.diffuse = new BABYLON.Color3(1, 0, 0);
-		this._light1.specular = new BABYLON.Color3(1, 0, 0);
+		this._lightFinishDoor.diffuse = new BABYLON.Color3(1, 0, 0);
+		this._lightFinishDoor.specular = new BABYLON.Color3(1, 0, 0);
 
 		this._finish.target = finishObject.target;
 	}
@@ -184,12 +130,12 @@ class Level {
 		// Init plane in front of the level
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		material.alpha = 0;
-		var mesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
-		mesh.material = material;
-		mesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
-		mesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
-		mesh.position.z = -CONS_SCALE/2;
-		mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
+		this._invisibleFrontPlaneMesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
+		this._invisibleFrontPlaneMesh.material = material;
+		this._invisibleFrontPlaneMesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
+		this._invisibleFrontPlaneMesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
+		this._invisibleFrontPlaneMesh.position.z = -CONS_SCALE/2;
+		this._invisibleFrontPlaneMesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
 	}
 
 	update() {
@@ -230,22 +176,22 @@ class Level {
 		}
 
 		// If we are in cam fly mode, move cam [...]
-		if (this._cam_fly) {
-			this._camera.position.subtractInPlace(this._cam_fly);
+		if (this._camFly) {
+			this._camera.position.subtractInPlace(this._camFly);
 			var dist = BABYLON.Vector3.Distance(this._camera.position, movPos);
-			if (dist > this._cam_fly_last_dist) {
-				this._cam_fly = false;
+			if (dist > this._camFly_lastDist) {
+				this._camFly = false;
 				if (!this._block_guy) this._guy.setRunState(true);
 			} else {
-				this._cam_fly_last_dist = dist;
+				this._camFly_lastDist = dist;
 			}
 		} else { // [...], else clip cam to movable platform.
 			this._camera.position.x = movPos.x;
 		}
 
 		// Clip light to movable platform.
-		this._light0.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
-		this._light0.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
+		this._lightMovablePlatform.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
+		this._lightMovablePlatform.position.y = this._movablePlatform._mesh.getAbsolutePosition().y //;+ (this._movablePlatform._height/2) * CONS_SCALE;
 
 		if (this._died) {
 			// If player is dead for certain amount of time, then restart level.
@@ -264,8 +210,8 @@ class Level {
 			// What happens when player reaches finish.
 			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
 			this._doorMesh.material.diffuseTexture.hasAlpha = true;
-			this._light1.diffuse = new BABYLON.Color3(0, 1, 0);
-			this._light1.specular = new BABYLON.Color3(0, 1, 0);
+			this._lightFinishDoor.diffuse = new BABYLON.Color3(0, 1, 0);
+			this._lightFinishDoor.specular = new BABYLON.Color3(0, 1, 0);
 			this._guy.onWin();
 			this._finished = new Date().getTime();
 		}
@@ -304,13 +250,42 @@ class Level {
 		this._movablePlatform.keyUp(ctrlCode);
 	}
 
-	// Setter to allow guy to run or not.
 	setGuyRunState(state) {
-		if (state && this._cam_fly) {
+		if (state && this._camFly) {
 
 		} else {
 			this._guy.setRunState(state);
 		}
+	}
+
+	destroy() {
+		for (var i = 0; i < this._platforms.length; i++) {
+			this._platforms[i].destroy();
+		}
+
+		for (var i = 0; i < this._boxes.length; i++) {
+			this._boxes[i].destroy();
+		}
+
+		for (var i = 0; i < this._projectiles.length; i++) {
+			this._projectiles[i].destroy();
+		}
+
+		for (var i = 0; i < this._emitters.length; i++) {
+			this._emitters[i].destroy();
+		}
+
+		this._background.dispose();
+		this._invisibleFrontPlaneMesh.dispose();
+		this._finish.dispose();
+		this._doorMesh.dispose();
+
+		this._lightMovablePlatform.dispose();
+		this._lightFinishDoor.dispose();
+
+		this._guy.destroy();
+
+		this._movablePlatform.destroy();
 	}
 
 }

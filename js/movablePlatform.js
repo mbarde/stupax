@@ -13,7 +13,6 @@ class MovablePlatform extends Platform {
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 
 		this._keysDown = [];
-		this._mesh.platform = this;
 	}
 
 	// Reset movable platform, for example when level restart

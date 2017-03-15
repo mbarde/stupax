@@ -296,4 +296,9 @@ class Guy extends Animatable {
 
 	}
 
+	destroy() {
+		this._planeMesh.dispose();
+		this._mesh.dispose();
+	}
+
 }

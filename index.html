@@ -33,6 +33,7 @@
 		<script src="js/editor.js"></script>
 		<script src="js/game.js"></script>
 		<script src="js/level.js"></script>
+		<script src="js/levelFactory.js"></script>
 		<script src="js/entity.js"></script>
 		<script src="js/platform.js"></script>
 		<script src="js/movablePlatform.js"></script>
@@ -185,9 +186,8 @@
 			jQuery.get("levels/" + name + ".txt", function(data) {
 				document.title = "Stupax - " + name;
 
-			 	scene = createScene();
-				assetsManager = new BABYLON.AssetsManager(scene);
-				mode = new Game(data, scene, camera, assetsManager, loadLevel, isFirstLevel);
+				mode.loadLevel(data);
+
 				isFirstLevel = false;
 				assetsManager.load();
 
@@ -204,8 +204,6 @@
          camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
 			var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
 			camera.rotationQuaternion = q;
-
-         //camera.attachControl(canvas, false);
 
 			myScene.enablePhysics(new BABYLON.Vector3(0, -10, 0), new BABYLON.OimoJSPlugin());
 
@@ -248,6 +246,10 @@
 				doRender = true;
 			};
   		} else {
+		 	scene = createScene();
+			assetsManager = new BABYLON.AssetsManager(scene);
+			mode = new Game(scene, camera, assetsManager, loadLevel);
+
 			var level = "level01";
 			$('#spanFps').show();
 			var last = arr.pop();

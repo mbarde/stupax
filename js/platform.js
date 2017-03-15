@@ -140,7 +140,11 @@ class Platform extends Entity {
           if (hit) {
 				//guy.toggleDirection();
 			 }
-		});
+		}); 
+	}
+
+	destroy() {
+		this._mesh.dispose();
 	}
 
 }

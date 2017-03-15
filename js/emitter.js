@@ -26,7 +26,6 @@ class Emitter extends Platform {
 		this._last_emit_time = new Date().getTime() + this._offset;
 	}
 
-	// Allow shoot
 	update(allow_emission) {
 		var curTime = new Date().getTime();
 		if (!allow_emission) this._last_emit_time = curTime + this._offset;
