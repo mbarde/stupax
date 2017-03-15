@@ -56,7 +56,7 @@ class LevelFactory {
 				levelObject._emitters.push(
 					new Emitter(emitter._posX, emitter._posY,
 						emitter.directions, emitter.interval, emitter.offset,
-						levelObject._guy, levelObject._scene, levelObject._assetsManager, this)
+						levelObject._guy, levelObject._scene, levelObject._assetsManager, levelObject)
 				);
 			}
 		}
