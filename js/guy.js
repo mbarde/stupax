@@ -43,7 +43,7 @@ class Guy extends Animatable {
 	}
 
 	initAnimations() {
-		this.anim_load_animation([
+		this.anim_loadAnimation([
 			"textures/guy/obj_Run000.png",
 			"textures/guy/obj_Run001.png",
 			"textures/guy/obj_Run002.png",
@@ -53,16 +53,16 @@ class Guy extends Animatable {
 			"textures/guy/obj_Run006.png",
 			"textures/guy/obj_Run007.png"
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "run");
-		this.anim_load_animation([
+		this.anim_loadAnimation([
 			"textures/guy/obj_Idle000.png",
 			"textures/guy/obj_Idle001.png",
 			"textures/guy/obj_Idle002.png",
 			"textures/guy/obj_Idle003.png"
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "stand");
-		this.anim_load_animation([
+		this.anim_loadAnimation([
 			"textures/guy/obj_JumpHigh000.png"
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "jump");
-		this.anim_load_animation([
+		this.anim_loadAnimation([
 			"textures/guy/obj_Box000.png",
 			"textures/guy/obj_Box001.png",
 			"textures/guy/obj_Box002.png",
@@ -70,13 +70,13 @@ class Guy extends Animatable {
 			"textures/guy/obj_Box004.png",
 			"textures/guy/obj_Box005.png"
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 80, "win");
-		this.anim_load_animation([
+		this.anim_loadAnimation([
 			"textures/guy/obj_Flying001.png",
 			"textures/guy/obj_Flying000.png",
 			"textures/guy/obj_Flat000.png"
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "die", false);
 
-		this.anim_set_animation_by_name("run");
+		this.anim_setAnimationByName("run");
 	}
 
 	// Reset guy, for example when restarting level.
@@ -215,7 +215,7 @@ class Guy extends Animatable {
 		// Check which animation loop (and corresponding GuyMode) should be active
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
 		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS * 2) {
-			if (!this._fixAnimation) this.anim_set_animation_by_name("stand");
+			if (!this._fixAnimation) this.anim_setAnimationByName("stand");
 			this._curMode = CONS_GM_STAND;
 			if (!this._standingTimestep) {
 				this._standingTimestep = new Date().getTime();
@@ -225,13 +225,13 @@ class Guy extends Animatable {
 			if (isOnWalkableGround) {
 				if (this._curMode != CONS_GM_RUN) {
 					this._standingTimestep = false;
-					if (!this._fixAnimation) this.anim_set_animation_by_name("run");
+					if (!this._fixAnimation) this.anim_setAnimationByName("run");
 					this._curMode = CONS_GM_RUN;
 				}
 			} else {
 				if (this._curMode != CONS_GM_JUMP) {
 					this._standingTimestep = false;
-					if (!this._fixAnimation) this.anim_set_animation_by_name("jump");
+					if (!this._fixAnimation) this.anim_setAnimationByName("jump");
 					this._curMode = CONS_GM_JUMP;
 				}
 			}
@@ -239,7 +239,7 @@ class Guy extends Animatable {
 
 		// If new frame is necessary, bind it to texture mesh.
 		if (this.anim_update()) {
-			this._planeMesh.material = this.anim_get_cur_texture();
+			this._planeMesh.material = this.anim_getCurTexture();
 			if (!this._forward) this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
 			else this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
 		}
@@ -260,12 +260,12 @@ class Guy extends Animatable {
 	// Fired when player reaches door.
 	onWin() {
 		this._fixAnimation = true;
-		this.anim_set_animation_by_name("win");
+		this.anim_setAnimationByName("win");
 	}
 
 	onDie() {
 		this._fixAnimation = true;
-		this.anim_set_animation_by_name("die");
+		this.anim_setAnimationByName("die");
 	}
 
 	// Toggle direction in which guy is running.

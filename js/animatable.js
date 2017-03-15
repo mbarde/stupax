@@ -27,14 +27,14 @@ class Animatable {
 	anim_update() {
 		var curTime = new Date().getTime();
 		if (curTime - this._anim_last_update >= this._anim_intervals[this._anim_cur_anim]) {
-			this.anim_next_frame();
+			this.anim_nextFrame();
 			this._anim_last_update = curTime;
 			return true;
 		}
 		return false;
 	}
 
-	anim_next_frame() {
+	anim_nextFrame() {
 		if (this._anim_cur_frame == -1) { return; }
 		this._anim_cur_frame++;
 		if (this._anim_cur_frame >= this._animations[this._anim_cur_anim].length) {
@@ -44,10 +44,10 @@ class Animatable {
 				this._anim_cur_frame--;
 			}
 		}
-		return this.anim_get_cur_texture();
+		return this.anim_getCurTexture();
 	}
 
-	anim_set_animation(anim_id) {
+	anim_setAnimation(anim_id) {
 		if (anim_id < 0 || anim_id >= this._animations.length) {
 			return;
 		}
@@ -57,19 +57,19 @@ class Animatable {
 		}
 	}
 
-	anim_set_animation_by_name(name) {
+	anim_setAnimationByName(name) {
 		if (!this._anim_names[name] == undefined) {
 			return;
 		}
 		var anim_id = this._anim_names[name];
-		this.anim_set_animation(anim_id);
+		this.anim_setAnimation(anim_id);
 	}
 
-	anim_get_cur_texture() {
+	anim_getCurTexture() {
 		return this._animations[this._anim_cur_anim][this._anim_cur_frame];
 	}
 
-	anim_load_animation(frames, uScale, vScale, uOffset, vOffset, interval, name, isLoop = true) {
+	anim_loadAnimation(frames, uScale, vScale, uOffset, vOffset, interval, name, isLoop = true) {
 		this._animations.push( new Array() );
 		var index = this._animations.length - 1;
 		for (var i = 0; i < frames.length; i++) {
