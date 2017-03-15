@@ -56,54 +56,6 @@ class Level {
 		this._guy.setRunState(false);
 	}
 
-	initFinish(finishObject) {
-		// Create invisible mesh for collision detection -------------------------
-		var material = new BABYLON.StandardMaterial("finish", this._scene);
-		material.alpha = 0.0;
-
-		this._finish = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
-		this._finish.material = material;
-		this._finish.position.x = (finishObject._posX + 0.5)  * CONS_SCALE;
-		this._finish.position.y = (finishObject._posY + 0.5) * CONS_SCALE;
-		this._finish.position.z = 0;
-
-		// Rotate plane to make it stand orthogonal to players plane
-		var q = BABYLON.Quaternion.RotationYawPitchRoll(90, 0, 0);
-		this._finish.rotationQuaternion = q;
-		// -----------------------------------------------------------------------
-
-		// Create plane containing the finish texture ----------------------------
-		material = new BABYLON.StandardMaterial("finish", this._scene);
-		var textureTask = assetsManager.addTextureTask("image task", "textures/door.png");
-		textureTask.onSuccess = function(task) {
-			material.diffuseTexture = task.texture;
-			material.diffuseTexture.hasAlpha = true;
-			material.backFaceCulling = true;
-		}
-
-		var textureTask = assetsManager.addTextureTask("image task", "textures/door_open.png");
-		(function(lvl) {
-			textureTask.onSuccess = function(task) {
-				lvl._tex_doorOpen = task.texture;
-			}
-		}) (this);
-
-		this._doorMesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
-		this._doorMesh.material = material;
-		this._doorMesh.position.x = (finishObject._posX + 0.5)  * CONS_SCALE;
-		this._doorMesh.position.y = (finishObject._posY + 0.5) * CONS_SCALE;
-		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
-		// -----------------------------------------------------------------------
-
-		this._lightFinishDoor = new BABYLON.SpotLight("Spot0",
-							new BABYLON.Vector3((finishObject._posX + 0.5) * CONS_SCALE, (finishObject._posY + 1) * CONS_SCALE, -2 * CONS_SCALE),
-							new BABYLON.Vector3(0, 0, 1), 1.2, 30, this._scene);
-		this._lightFinishDoor.diffuse = new BABYLON.Color3(1, 0, 0);
-		this._lightFinishDoor.specular = new BABYLON.Color3(1, 0, 0);
-
-		this._finish.target = finishObject.target;
-	}
-
 	initBackground() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
 		var textureTask = this._assetsManager.addTextureTask("image task", "textures/block01.png");
@@ -204,14 +156,10 @@ class Level {
 			// If so, fire this._onFinished event.
 			var time = new Date().getTime();
 			if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
-				this._onFinished(this._finish.target);
+				this._onFinished(this._subsequentLevel);
 			}
-		} else if (!this._firstUpdate && this._finish.intersectsMesh(this._guy._mesh)) {
-			// What happens when player reaches finish.
-			this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
-			this._doorMesh.material.diffuseTexture.hasAlpha = true;
-			this._lightFinishDoor.diffuse = new BABYLON.Color3(0, 1, 0);
-			this._lightFinishDoor.specular = new BABYLON.Color3(0, 1, 0);
+		} else if (!this._firstUpdate && this._finish.isIntersectingMesh(this._guy._mesh)) {
+			this._finish.onWin();
 			this._guy.onWin();
 			this._finished = new Date().getTime();
 		}
@@ -240,7 +188,7 @@ class Level {
 				this.restart();
 				return;
 			case CTRL_NEXT_LEVEL:
-				this._onFinished(this._finish.target);
+				this._onFinished(this._subsequentLevel);
 				return;
 		}
 	}
@@ -277,11 +225,10 @@ class Level {
 
 		this._background.dispose();
 		this._invisibleFrontPlaneMesh.dispose();
-		this._finish.dispose();
-		this._doorMesh.dispose();
 
 		this._lightMovablePlatform.dispose();
-		this._lightFinishDoor.dispose();
+
+		this._finish.destroy();
 
 		this._guy.destroy();
 

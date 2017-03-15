@@ -16,8 +16,10 @@ class LevelFactory {
 		var levelJSON = JSON.parse(levelString);
 		levelObject._levelJSON = levelJSON;
 
+		// Level values
 		levelObject._levelWidth = 500;
 		levelObject._levelHeight = 20;
+		levelObject._subsequentLevel = levelJSON.finish.target;
 
 		// Spawn guy
 		levelObject._guy = new Guy(levelJSON.guy._posX, levelJSON.guy._posY, levelObject._scene, levelObject._assetsManager);
@@ -59,8 +61,10 @@ class LevelFactory {
 			}
 		}
 
-		levelObject.initFinish(levelJSON.finish);
+		// Set finish
+		levelObject._finish = new Finish(levelJSON.finish._posX, levelJSON.finish._posY, levelObject._scene, levelObject._assetsManager);
 
+		// Set movablePlatform light
 		levelObject._lightMovablePlatform = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), levelObject._scene);
 
 		levelObject.initBackground();
