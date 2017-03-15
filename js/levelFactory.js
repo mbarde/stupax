@@ -30,21 +30,21 @@ class LevelFactory {
 		for (var i = 0; i < ps.length; i++) {
 			levelObject._platforms.push( new Platform(ps[i]._width, ps[i]._height,
 											ps[i]._posX, ps[i]._posY,
-											levelObject._guy, levelObject._scene, levelObject._assetsManager) );
+											levelObject._scene, levelObject._assetsManager) );
 		}
 
 		// Set movable platform
 		var movPlat = levelJSON.movPlatform;
 		levelObject._movablePlatform = new MovablePlatform(movPlat._width, movPlat._height,
 										movPlat._posX, movPlat._posY,
-										levelObject._guy, levelObject._scene, levelObject._assetsManager);
+										levelObject._scene, levelObject._assetsManager);
 
 		// Set boxes
 		levelObject._boxes = new Array();
 		if (levelJSON.boxes) {
 			for (var i = 0; i < levelJSON.boxes.length; i++) {
 				var box = levelJSON.boxes[i];
-				levelObject._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, levelObject._guy, levelObject._scene, levelObject._assetsManager));
+				levelObject._boxes.push( new Box(box._width, box._height, box._posX, box._posY, CONS_BOX_DEFAULT_MASS, levelObject._scene, levelObject._assetsManager));
 			}
 		}
 
@@ -56,7 +56,7 @@ class LevelFactory {
 				levelObject._emitters.push(
 					new Emitter(emitter._posX, emitter._posY,
 						emitter.directions, emitter.interval, emitter.offset,
-						levelObject._guy, levelObject._scene, levelObject._assetsManager, levelObject)
+						levelObject._scene, levelObject._assetsManager, levelObject)
 				);
 			}
 		}

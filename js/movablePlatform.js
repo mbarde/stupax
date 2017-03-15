@@ -1,9 +1,7 @@
 class MovablePlatform extends Platform {
 
-	constructor(width, height, posX, posY, guy, scene, assetsManager) {
-		super(width, height, posX, posY, guy, scene, assetsManager);
-
-		this._guy = guy;
+	constructor(width, height, posX, posY, scene, assetsManager) {
+		super(width, height, posX, posY, scene, assetsManager);
 
 		this._direction = new BABYLON.Vector3(0, 0, 0); // movement direction
 
@@ -37,7 +35,6 @@ class MovablePlatform extends Platform {
 		this._direction.x = 0;
 		this._direction.y = 0;
 
-		var guyPos = this._guy._mesh.getAbsolutePosition();
 		var thisPos = this._mesh.getAbsolutePosition();
 
 		// Check if movment to certain direction is not possible (because of static obstacles):

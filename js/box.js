@@ -1,7 +1,7 @@
 class Box extends Platform {
 
-	constructor(width, height, posX, posY, mass, guy, scene, assetsManager) {
-		super(width, height, posX, posY, guy, scene, assetsManager);
+	constructor(width, height, posX, posY, mass, scene, assetsManager) {
+		super(width, height, posX, posY, scene, assetsManager);
 		this._mesh.getPhysicsImpostor().setMass(mass);
 		this._mass = mass;
 

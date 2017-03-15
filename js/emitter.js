@@ -1,7 +1,7 @@
 class Emitter extends Platform {
 
-	constructor(posX, posY, directions, interval, offset, guy, scene, assetsManager, level) {
-		super(1, 1, posX, posY, guy, scene, assetsManager);
+	constructor(posX, posY, directions, interval, offset, scene, assetsManager, level) {
+		super(1, 1, posX, posY, scene, assetsManager);
 
 		this._interval = interval;
 		this._offset = offset;

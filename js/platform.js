@@ -1,10 +1,11 @@
 class Platform extends Entity {
 
-	constructor(width, height, posX, posY, guy, scene, assetsManager) {
+	constructor(width, height, posX, posY, scene, assetsManager) {
 		super(width, height, 1, scene, assetsManager);
 
 		this.initGeometry(posX, posY);
-		this.initPhysics(guy);
+
+		this.setPhysicsState();
 	}
 
 	initGeometry(posX, posY) {
@@ -115,32 +116,6 @@ class Platform extends Entity {
 
 	getTextureName() {
 		return "textures/block04.png";
-	}
-
-	initPhysics(guy) {
-		var platform = this._mesh;
-		this.setPhysicsState();
-		var impostor = platform.getPhysicsImpostor();
-
-		// What happens we the guy hits this platform?
-		// If he hits a "wall" he changes direction.
-		impostor.registerOnPhysicsCollide(guy._mesh.getPhysicsImpostor(), function(main, collided) {
-			 var ray = new BABYLON.Ray(guy._mesh.position, platform.position.subtract(guy._mesh.position));
-          var pickInfo = scene.pickWithRay(ray, function (item) { return item == platform });
-
-			 var hit = false;
-          if (pickInfo.hit) {
-      			var normal = pickInfo.getNormal(false, true);
-					if (guy._direction.x > 0) {
-              		hit = normal.x < 1.0 && Math.abs(normal.y) < 0.1;
-				 	} else if (guy._direction.x < 0) {
-              		hit = normal.x > 0.5 && Math.abs(normal.y) < 0.1;
-					}
-          }
-          if (hit) {
-				//guy.toggleDirection();
-			 }
-		}); 
 	}
 
 	destroy() {
