@@ -64,10 +64,11 @@ class LevelFactory {
 		// Set finish
 		levelObject._finish = new Finish(levelJSON.finish._posX, levelJSON.finish._posY, levelObject._scene, levelObject._assetsManager);
 
+		// Set background
+		levelObject._background = new Background(levelObject._levelWidth, levelObject._levelHeight, levelObject._scene, levelObject._assetsManager);
+
 		// Set movablePlatform light
 		levelObject._lightMovablePlatform = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), levelObject._scene);
-
-		levelObject.initBackground();
 
 		levelObject.initCameraForFinishToStartFlight();
 

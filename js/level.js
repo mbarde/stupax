@@ -6,21 +6,17 @@ class Level {
 		this._camera = camera;
 		this._onFinished = onFinished; 	// function to execute when player reaches finish
 
-		this.initEmptyLevel();
+		this._platforms = [];
+		this._boxes = [];
+		this._projectiles = [];
+		this._emitters = [];
 
 		this._finished = false; 			// will contain timestamp of win when player reaches door
 		this._died = false;					// will contain timestamp of death when player died
 		this._block_guy = false;			// block guy from running
 		this._firstUpdate = true;			//
 	}
-
-	initEmptyLevel() {
-		this._platforms = [];
-		this._boxes = [];
-		this._projectiles = [];
-		this._emitters = [];
-	}
-
+	
 	restart() {
 		var lvl = this._levelJSON;
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
@@ -54,40 +50,6 @@ class Level {
 		this._camFly_lastDist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.getAbsolutePosition());
 		this._camFly.scaleInPlace(0.01);
 		this._guy.setRunState(false);
-	}
-
-	initBackground() {
-		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		var textureTask = this._assetsManager.addTextureTask("image task", "textures/block01.png");
-		(function(levelWidth, levelHeight, mat) {
-			textureTask.onSuccess = function(task) {
-				mat.diffuseTexture = task.texture;
-				mat.backFaceCulling = true;
-				mat.diffuseTexture.uScale = (levelWidth + 9 * CONS_SCALE)
-				mat.diffuseTexture.uOffset = 0.5;
-				mat.diffuseTexture.vScale = (levelHeight);
-			}
-		}) (this._levelWidth, this._levelHeight, material);
-
-		// Background marks area of level
-		this._background = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
-		this._background.material = material;
-		this._background.position.x = (this._levelWidth * CONS_SCALE) / 2;
-		this._background.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
-		this._background.position.z = CONS_SCALE/2;
-		this._background.receiveShadows = false;
-
-		this._background.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
-
-		// Init plane in front of the level
-		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		material.alpha = 0;
-		this._invisibleFrontPlaneMesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
-		this._invisibleFrontPlaneMesh.material = material;
-		this._invisibleFrontPlaneMesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
-		this._invisibleFrontPlaneMesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
-		this._invisibleFrontPlaneMesh.position.z = -CONS_SCALE/2;
-		this._invisibleFrontPlaneMesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
 	}
 
 	update() {
@@ -223,16 +185,13 @@ class Level {
 			this._emitters[i].destroy();
 		}
 
-		this._background.dispose();
-		this._invisibleFrontPlaneMesh.dispose();
+		this._background.destroy();
+		this._finish.destroy();
+		this._guy.destroy();
+		this._movablePlatform.destroy();
+
 
 		this._lightMovablePlatform.dispose();
-
-		this._finish.destroy();
-
-		this._guy.destroy();
-
-		this._movablePlatform.destroy();
 	}
 
 }
