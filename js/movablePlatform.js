@@ -13,6 +13,8 @@ class MovablePlatform extends Platform {
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 
 		this._keysDown = [];
+
+		this._light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 	}
 
 	// Reset movable platform, for example when level restart
@@ -145,6 +147,10 @@ class MovablePlatform extends Platform {
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;
 		this._mesh.position.z = 0;
+
+		// Clip light to movable platform.
+		this._light.position.x = this._mesh.getAbsolutePosition().x;
+		this._light.position.y = this._mesh.getAbsolutePosition().y;
 	}
 
 	setPhysicsState() {
@@ -167,6 +173,11 @@ class MovablePlatform extends Platform {
 		if (index > -1) {
 			this._keysDown.splice(index, 1);
 		}
+	}
+
+	destroy() {
+		super.destroy();
+		this._light.dispose();
 	}
 
 }

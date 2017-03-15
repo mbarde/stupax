@@ -49,7 +49,6 @@ class Level {
 		this.updateEmitters();
 		this.updateProjectiles();
 		this.updateCamera();
-		this.updateLight();
 
 		if (this._died && this.isGuyDeadLongEnough()) {
 			this.restart();
@@ -114,12 +113,6 @@ class Level {
 		} else { // else clip cam to movable platform.
 			this._camera.position.x = this._movablePlatform._mesh.position.x;
 		}
-	}
-
-	updateLight() {
-		// Clip light to movable platform.
-		this._lightMovablePlatform.position.x = this._movablePlatform._mesh.getAbsolutePosition().x;
-		this._lightMovablePlatform.position.y = this._movablePlatform._mesh.getAbsolutePosition().y;
 	}
 
 	isGuyDeadLongEnough() {
@@ -200,9 +193,6 @@ class Level {
 		this._finish.destroy();
 		this._guy.destroy();
 		this._movablePlatform.destroy();
-
-
-		this._lightMovablePlatform.dispose();
 	}
 
 	initCameraForFinishToStartFlight() {
