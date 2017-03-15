@@ -3,7 +3,8 @@ requirejs([	"js/constants.js", "js/animatable.js", "js/platformMarker.js",
 	"js/level.js", "js/entity.js", "js/finish.js",
 	"js/background.js", "js/levelFactory.js", "js/platform.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/projectile.js",
-	"js/emitter.js", "js/controls.js", "js/ControllableGuy.js", "js/loadingScreen.js"],
+	"js/emitter.js", "js/controls.js", "js/ControllableGuy.js",
+	"js/loadingScreen.js"],
 
 function() {
 
@@ -17,23 +18,12 @@ function() {
 	var scene;
 	var assetsManager;
 	var doRender = false;
-	var isFirstLevel = true;
 	var showOverlay = true;
 	var controls;
 	var camera;
-	var light0;
-	var light1;
 
 	function log(message) {
 		$('#spanLog').text("> " + message);
-	}
-
-	function onKeyDown(ctrlCode) {
-	  if (mode) mode.keyDown(ctrlCode);
-	}
-
-	function onKeyUp(ctrlCode) {
-	  if (mode) mode.keyUp(ctrlCode);
 	}
 
 	function loadLevel(name) {
@@ -43,7 +33,6 @@ function() {
 
 			mode.loadLevel(data);
 
-			isFirstLevel = false;
 			assetsManager.load();
 
 			assetsManager.onFinish = function(tasks) {
@@ -65,7 +54,7 @@ function() {
 		return myScene;
 	}
 
-	// If URL looks like "...?editor" start editor, else start game
+	// If URL looks like "...?editor" start editor, else start game -------------
 	var editor = false;
 	var arr = window.location.href.split('?');
 	if (arr.length > 2) {
@@ -84,7 +73,7 @@ function() {
 		showOverlay = false;
 		log("Use 1 - 6 to switch between modes | Press TAB to save");
 
-		var scene = createScene();
+		scene = createScene();
 		assetsManager = new BABYLON.AssetsManager(scene);
 		mode = new Editor(scene, camera, log, assetsManager);
 
@@ -96,6 +85,7 @@ function() {
 				mode.loadLevel(data);
 			});
 		}
+
 		assetsManager.load();
 		assetsManager.onFinish = function(tasks) {
 			doRender = true;
@@ -113,16 +103,39 @@ function() {
 		}
 		loadLevel(level);
 	}
+	// --------------------------------------------------------------------------
+
+	// Setup controls -----------------------------------------------------------
+	function onKeyDown(ctrlCode) {
+	  if (mode) mode.keyDown(ctrlCode);
+	}
+
+	function onKeyUp(ctrlCode) {
+	  if (mode) mode.keyUp(ctrlCode);
+	}
 
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
 			if (!showOverlay && mode) mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
 	}, false);
+
 	window.addEventListener("keyup", function(event){
 			if (!showOverlay && mode) mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
 	}, false);
 
+	$('#btnStart').click( function() {
+		$('.overlay').hide();
+		showOverlay = false;
+		mode.startRunning();
+	});
+
+	window.addEventListener("resize", function () {
+		engine.resize();
+	});
+	// --------------------------------------------------------------------------
+
+	// Render loop --------------------------------------------------------------
 	engine.runRenderLoop(function () {
 		if (doRender) {
 			if (mode) mode.update();
@@ -131,15 +144,6 @@ function() {
 			if (controls) controls.update();
 		}
 	});
-
-	window.addEventListener("resize", function () {
-		engine.resize();
-	});
-
-	$('#btnStart').click( function() {
-		$('.overlay').hide();
-		showOverlay = false;
-		mode.startRunning();
-	})
+	// --------------------------------------------------------------------------
 
 });
