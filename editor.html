@@ -10,7 +10,7 @@
 		<meta name="msapplication-TileColor" content="#ffffff">
 		<meta name="msapplication-TileImage" content="mstile-144x144.png">
 
-      <title>Stupax - You are not the guy, you are the level!</title>
+      <title>Stupax - Level editor</title>
 
 		<!-- Babylon.js -->
       <script src="plugins/hand.minified-1.2.js"></script>
@@ -24,23 +24,14 @@
 		<script src="plugins/jquery-3.1.1.min.js"></script>
 
 		<!-- RequireJS to load game files -->
-		<script data-main="js/mainGame" src="plugins/require.js"></script>
+		<script data-main="js/mainEditor" src="plugins/require.js"></script>
 
 		<link rel="stylesheet" href="css\style.css" type="text/css" >
    </head>
 <body>
-	<span id="spanFps"></span>
-	<div class="overlay">
-		<span class="title">Help <i>Stupax</i> to reach the door!</span><br>
-		<br>
-		<span class="sub">Move the platform using the arrow keys (or your gamepad).</span><br>
-		<br>
-		<span class="sub"><span class="keyboard-key">R</span> - restart level</span><br>
-		<br>
-		<span class="sub"><span class="keyboard-key">ESC</span> - pause game</span><br>
-		<br>
-		<button class="button" id="btnStart">START</button>
-	</div>
+	<span id="spanLog"></span>
+	<span id="spanFps" style="display:None"></span>
+	<input type="file" id="inputFile" accept=".txt" style="display:none">
    <canvas id="renderCanvas"></canvas>
 </body>
 </html>

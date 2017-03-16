@@ -46,6 +46,7 @@ class Editor extends Mode {
 		background.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
 		background.position.z = CONS_SCALE/2;
 		background.receiveShadows = false;
+		background.mode = -1;
 
 		var light0 = new BABYLON.HemisphericLight("Hemi0", new BABYLON.Vector3(0, 1000, -1000), this._scene);
 		light0.diffuse = new BABYLON.Color3(1, 1, 1);
@@ -96,7 +97,7 @@ class Editor extends Mode {
 
 	setCurMode(newMode) {
 		this._curMode = newMode;
-		log("Changed to " + this.modeIDtoName(newMode));
+		this._log_function("Changed to " + this.modeIDtoName(newMode));
 	}
 
 	update() {
@@ -135,19 +136,19 @@ class Editor extends Mode {
 			this.setCurMode(CONS_EM_EMITTER);
 		}
 		if (ctrlCode == 9) {
-			this.saveLevel();
+			this.saveLevelToFile();
 		}
 	}
 
 	keyUp(keyCode) {
 	}
 
-	saveLevel() {
+	levelToString(withTarget = true) {
 		var level = {};
 
 		if (!this._guyMarker) {
 			alert("No guy marker!");
-			return;
+			return false;
 		}
 		level.guy = {};
 		level.guy._posX = this._guyMarker._posX;
@@ -155,12 +156,16 @@ class Editor extends Mode {
 
 		if (!this._finishMarker) {
 			alert("No guy marker!");
-			return;
+			return false;
 		}
 		level.finish = {};
 		level.finish._posX = this._finishMarker._posX;
 		level.finish._posY = this._finishMarker._posY;
-		var target = prompt("Please enter target", "level01");
+
+		var target = "";
+		if (withTarget) {
+			target = prompt("Please enter target", "level01");
+		}
 		level.finish.target = target;
 
 		var pms = new Array(); // platform markers
@@ -196,7 +201,7 @@ class Editor extends Mode {
 		movPms = this.mergeMarkers(movPms);
 		if (movPms.length < 1) {
 			alert("No movable platform!");
-			return;
+			return false;
 		}
 		if (movPms.length > 1) {
 			alert("Multiple movable platforms detected! Only one of them will be saved!");
@@ -205,8 +210,32 @@ class Editor extends Mode {
 
 		level.boxes = this.mergeMarkers(boxMs);
 
-		var blob = new Blob([JSON.stringify(level)], {type: "text/plain;charset=utf-8"});
+		return JSON.stringify(level);
+	}
+
+	saveLevelToFile() {
+		var str = this.levelToString();
+		var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
 		saveAs(blob, "level.txt");
+	}
+
+	clearAll() {
+		var i = 0;
+		while (i < this._scene.meshes.length) {
+			if (this._scene.meshes[i].mode > -1) { // only remove markers
+				this._scene.meshes[i].dispose();
+			} else {
+				i++;
+			}
+		}
+
+		this._camera.position.x = 10 * CONS_SCALE;
+		this._camera.position.y = 10 * CONS_SCALE;
+
+		this.setCurMode( CONS_EM_PLATFORM );
+
+		this._guyMarker = false;
+		this._finishMarker = false;
 	}
 
 	/**
@@ -244,6 +273,8 @@ class Editor extends Mode {
 	}
 
 	loadLevel(level) {
+		this.clearAll();
+
 		var lvl = JSON.parse(level);
 		this._guyMarker = new Marker(lvl.guy._posX, lvl.guy._posY, CONS_EM_GUY, this._scene);
 		this._finishMarker = new Marker(lvl.finish._posX, lvl.finish._posY, CONS_EM_FINISH, this._scene);

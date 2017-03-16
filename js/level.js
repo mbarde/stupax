@@ -55,7 +55,11 @@ class Level {
 		}
 
 	 	if (!this._died && this._finished && this.isGuyCelebratingLongEnough()) {
-			this._onFinished(this._subsequentLevel);
+			if (this._subsequentLevel.length > 0) {
+				this._onFinished(this._subsequentLevel);
+			} else {
+				this.restart(); // if no subsequent level is defined, just restart level
+			}
 		}
 
 		if (	!this._died &&
