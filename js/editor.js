@@ -155,7 +155,7 @@ class Editor extends Mode {
 		level.guy._posY = this._guyMarker._posY;
 
 		if (!this._finishMarker) {
-			alert("No guy marker!");
+			alert("No finish marker!");
 			return false;
 		}
 		level.finish = {};
