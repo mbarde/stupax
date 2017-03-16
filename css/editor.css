@@ -1,0 +1,20 @@
+.btn-mode {
+	width: 64px;
+	height: 64px;
+	float: left;
+	margin: 8px;
+}
+
+.btn-mode img {
+	max-width: 40px;
+	max-height: 40px;
+}
+
+.active {
+	border-color: lime;
+}
+
+.btn-action {
+	height: 32px;
+	margin: 8px;
+}

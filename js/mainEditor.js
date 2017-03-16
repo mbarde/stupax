@@ -10,7 +10,7 @@ function() {
 	//var loadingScreen = new MyLoadingScreen("I'm loading!!");
 	//engine.loadingScreen = loadingScreen;
 
-	var mode;
+	var editor;
 	var scene;
 	var assetsManager;
 	var doRender = false;
@@ -18,7 +18,24 @@ function() {
 	var camera;
 
 	function log(message) {
+		updateActiveModeBtn();
 		$('#spanLog').text("> " + message);
+	}
+
+	function startLevelTest() {
+		var lvlStr = editor.levelToString(false);
+		if (lvlStr) {
+			document.cookie="tempLevel=" + lvlStr;
+			window.open("/stupax",'_blank');
+		}
+	}
+
+	function updateActiveModeBtn() {
+		if (editor)  {
+			$('.btn-mode').removeClass('active');
+			var curMode = editor._curMode;
+			$('.btn-mode[mode=' + curMode + ']').addClass('active');
+		}
 	}
 
 	var createScene = function () {
@@ -38,7 +55,7 @@ function() {
 
 	scene = createScene();
 	assetsManager = new BABYLON.AssetsManager(scene);
-	mode = new Editor(scene, camera, log, assetsManager);
+	editor = new Editor(scene, camera, log, assetsManager);
 
 	assetsManager.load();
 	assetsManager.onFinish = function(tasks) {
@@ -48,34 +65,30 @@ function() {
 
 	// Setup controls -----------------------------------------------------------
 	function onKeyDown(ctrlCode) {
-	  if (mode) mode.keyDown(ctrlCode);
+	  if (editor) editor.keyDown(ctrlCode);
 	}
 
 	function onKeyUp(ctrlCode) {
-	  if (mode) mode.keyUp(ctrlCode);
+	  if (editor) editor.keyUp(ctrlCode);
 	}
 
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
-			if (event.keyCode == 76) {
+			if (event.keyCode == 76) { // L
 				loadLevelFile();
 			}
-			if (event.keyCode == 84) {
-				var lvlStr = mode.levelToString(false);
-				if (lvlStr) {
-					document.cookie="tempLevel=" + lvlStr;
-					window.open("/stupax",'_blank');
-				}
+			if (event.keyCode == 84) { // T
+				startLevelTest();
 			}
-			if (mode) {
-				mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (editor) {
+				editor.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
 	}, false);
 
 	window.addEventListener("keyup", function(event){
-			if (mode) {
-				mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (editor) {
+				editor.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
 	}, false);
 
@@ -87,12 +100,23 @@ function() {
 	// Render loop --------------------------------------------------------------
 	engine.runRenderLoop(function () {
 		if (doRender) {
-			if (mode) mode.update();
+			if (editor) editor.update();
 			$('#spanFps').text( Math.round(engine.fps) );
 			if (scene) scene.render();
 			if (controls) controls.update();
 		}
 	});
+	// --------------------------------------------------------------------------
+
+	// Buttons ------------------------------------------------------------------
+	$('.btn-mode').click( function() {
+		editor.setCurMode( parseInt($(this).attr('mode')) );
+	});
+
+	$('#btn-load').click( loadLevelFile );
+	$('#btn-save').click( function() { editor.saveLevelToFile(); } );
+	$('#btn-clear').click( function() { if (confirm("All changes will be lost!")) { editor.clearAll(); } } );
+	$('#btn-test').click( startLevelTest );
 	// --------------------------------------------------------------------------
 
 	// Loading ------------------------------------------------------------------
@@ -111,10 +135,11 @@ function() {
 		   var reader = new FileReader();
 		   reader.onload = function(fileLoadedEvent) {
 		   	var textFromFileLoaded = fileLoadedEvent.target.result;
-		      mode.loadLevel(textFromFileLoaded);
+		      editor.loadLevel(textFromFileLoaded);
 		   };
 	   	reader.readAsText(fileToLoad, 'UTF-8');
 	  	}
 	};
+	// --------------------------------------------------------------------------
 
 }); // requireJS
