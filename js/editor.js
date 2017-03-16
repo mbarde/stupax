@@ -143,7 +143,7 @@ class Editor extends Mode {
 	keyUp(keyCode) {
 	}
 
-	levelToString(withTarget = true) {
+	levelToString(withName = true) {
 		var level = {};
 
 		if (!this._guyMarker) {
@@ -162,11 +162,16 @@ class Editor extends Mode {
 		level.finish._posX = this._finishMarker._posX;
 		level.finish._posY = this._finishMarker._posY;
 
-		var target = "";
-		if (withTarget) {
-			target = prompt("Please enter target", "level01");
+		level.finish.target = "";
+
+		var name = "Test level";
+		if (withName) {
+			name = prompt("Please enter level name", "MyLevel");
+			if (!name) {
+				return false;
+			}
 		}
-		level.finish.target = target;
+		level.name = name;
 
 		var pms = new Array(); // platform markers
 		var movPms = new Array(); // movable platform markers
@@ -215,6 +220,9 @@ class Editor extends Mode {
 
 	saveLevelToFile() {
 		var str = this.levelToString();
+		if (!str) {
+			return;
+		}
 		var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
 		saveAs(blob, "level.txt");
 	}
