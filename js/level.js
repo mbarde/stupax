@@ -1,10 +1,10 @@
 class Level {
 
-	constructor(scene, camera, assetsManager, onFinished) {
+	constructor(scene, camera, assetsManager, game) {
 		this._scene = scene;
 		this._assetsManager = assetsManager;
 		this._camera = camera;
-		this._onFinished = onFinished; 	// function to execute when player reaches finish
+		this._game = game; 	// function to execute when player reaches finish
 
 		this._platforms = [];
 		this._boxes = [];
@@ -22,6 +22,8 @@ class Level {
 
 		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
+
+		this._finish.reset();
 
 		this._finished = false;
 		this._died = false;
@@ -55,11 +57,7 @@ class Level {
 		}
 
 	 	if (!this._died && this._finished && this.isGuyCelebratingLongEnough()) {
-			if (this._subsequentLevel.length > 0) {
-				this._onFinished(this._subsequentLevel);
-			} else {
-				this.restart(); // if no subsequent level is defined, just restart level
-			}
+			this._game.loadNextLevel();
 		}
 
 		if (	!this._died &&
@@ -158,7 +156,7 @@ class Level {
 				this.restart();
 				return;
 			case CTRL_NEXT_LEVEL:
-				this._onFinished(this._subsequentLevel);
+				this._game.loadNextLevel();
 				return;
 		}
 	}

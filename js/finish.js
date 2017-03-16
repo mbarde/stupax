@@ -31,11 +31,14 @@ class Finish extends Entity {
 		// Create plane containing the finish texture
 		var material = new BABYLON.StandardMaterial("finish", this._scene);
 		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door.png");
-		textureTask.onSuccess = function(task) {
-			material.diffuseTexture = task.texture;
-			material.diffuseTexture.hasAlpha = true;
-			material.backFaceCulling = true;
-		}
+		(function(lvl) {
+			textureTask.onSuccess = function(task) {
+				material.diffuseTexture = task.texture;
+				material.diffuseTexture.hasAlpha = true;
+				material.backFaceCulling = true;
+				lvl._tex_doorClosed = task.texture;
+			}
+		}) (this);
 
 		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door_open.png");
 		(function(lvl) {
@@ -72,6 +75,13 @@ class Finish extends Entity {
 
 	getSubsequentLevel() {
 		return this._subsequentLevel;
+	}
+
+	reset() { // reverts all effects done by onWin() [needed for level restart after win]
+		this._doorMesh.material.diffuseTexture = this._tex_doorClosed;
+		this._doorMesh.material.diffuseTexture.hasAlpha = true;
+		this._light.diffuse = new BABYLON.Color3(1, 0, 0);
+		this._light.specular = new BABYLON.Color3(1, 0, 0);
 	}
 
 	destroy() {

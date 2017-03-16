@@ -1,6 +1,6 @@
-requirejs([	"js/constants.js", "js/animatable.js",
-	"js/mode.js", "js/game.js", "js/level.js", "js/entity.js", "js/finish.js",
-	"js/background.js", "js/levelFactory.js", "js/platform.js",
+requirejs([	"js/constants.js", "js/animatable.js", "js/entity.js", "js/platform.js",
+	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/LevelFileLoader.js",
+	"js/background.js", "js/levelFactory.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/projectile.js",
 	"js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
 
@@ -19,6 +19,7 @@ function() {
 	var showOverlay = true;
 	var controls;
 	var camera;
+	var loo="hoo";
 
 	function hideOverlayAndUnpause() {
 		if (!doRender) {
@@ -29,20 +30,8 @@ function() {
 		mode.startRunning();
 	}
 
-	function loadLevel(data) {
-		mode.loadLevel(data);
-		assetsManager.load();
-		assetsManager.onFinish = function(tasks) {
-			doRender = true;
-		};
-	}
-
-	function loadLevelFromServer(name) {
+	function onBeforeLoadingNextLevel() {
 		doRender = false;
-		jQuery.get("levels/" + name + ".txt", function(data) {
-			document.title = "Stupax - " + name;
-			loadLevel(data);
-		});
 	}
 
 	var createScene = function () {
@@ -60,7 +49,9 @@ function() {
 
 	scene = createScene();
 	assetsManager = new BABYLON.AssetsManager(scene);
-	mode = new Game(scene, camera, assetsManager, loadLevel);
+	assetsManager.onFinish = function(tasks) {
+		doRender = true;
+	};
 
 	var workWithCookie = false;
 	var tmpLevelCookie = getCookie("tempLevel");
@@ -69,15 +60,20 @@ function() {
 	}
 
 	if (workWithCookie) {
-		loadLevel(tmpLevelCookie);
+		mode = new Game(scene, camera, assetsManager, [], onBeforeLoadingNextLevel);
+		mode.loadLevelFromString(tmpLevelCookie);
+		assetsManager.load();
 	} else {
-		var level = "level01";
-		var arr = window.location.href.split('?');
-		var last = arr.pop();
-		if (last.indexOf("level") !== -1) {
-			level = last;
-		}
-		loadLevelFromServer(level);
+
+		var levelFileLoader = new LevelFileLoader();
+		levelFileLoader.loadLevelFilesIntoArray(
+			function(arrLevelStrings) {
+				mode = new Game(scene, camera, assetsManager, arrLevelStrings, onBeforeLoadingNextLevel);
+				mode.loadFirstLevel();
+				assetsManager.load();
+			}
+		);
+
 	}
 	// --------------------------------------------------------------------------
 
