@@ -1,10 +1,11 @@
 class Game extends Mode {
 
-	constructor(scene, camera, assetsManager, levelStrings, onBeforeLoadingNextLevel) {
+	constructor(scene, camera, assetsManager, levelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel) {
 		super(scene, camera);
 
 		this._assetsManager = assetsManager;
 		this._onBeforeLoadingNextLevel = onBeforeLoadingNextLevel;
+		this._onAfterLoadingNextLevel = onAfterLoadingNextLevel;
 
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
@@ -34,6 +35,7 @@ class Game extends Mode {
 			}
 			this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
 			this._assetsManager.load();
+			this._onAfterLoadingNextLevel();
 		}
 	}
 

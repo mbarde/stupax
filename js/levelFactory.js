@@ -17,6 +17,11 @@ class LevelFactory {
 		levelObject._levelJSON = levelJSON;
 
 		// Level values
+		if (levelJSON.name) {
+			levelObject._levelName = levelJSON.name;
+		} else {
+			levelObject._levelName = "level";
+		}
 		levelObject._levelWidth = 500;
 		levelObject._levelHeight = 20;
 		levelObject._subsequentLevel = levelJSON.finish.target;

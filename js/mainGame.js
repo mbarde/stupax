@@ -34,6 +34,10 @@ function() {
 		doRender = false;
 	}
 
+	function onAfterLoadingNextLevel() {
+		document.title = "Stupax - " + mode._level._levelName;
+	}
+
 	var createScene = function () {
 		var myScene = new BABYLON.Scene(engine);
 
@@ -68,8 +72,9 @@ function() {
 		var levelFileLoader = new LevelFileLoader();
 		levelFileLoader.loadLevelFilesIntoArray(
 			function(arrLevelStrings) {
-				mode = new Game(scene, camera, assetsManager, arrLevelStrings, onBeforeLoadingNextLevel);
+				mode = new Game(scene, camera, assetsManager, arrLevelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel);
 				mode.loadFirstLevel();
+				onAfterLoadingNextLevel();
 				assetsManager.load();
 			}
 		);
