@@ -1,5 +1,5 @@
 requirejs([	"js/constants.js", "js/animatable.js", "js/entity.js", "js/platform.js",
-	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/LevelFileLoader.js",
+	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/levelFileLoader.js",
 	"js/background.js", "js/levelFactory.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/projectile.js",
 	"js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
