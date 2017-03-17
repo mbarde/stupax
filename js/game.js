@@ -39,6 +39,14 @@ class Game extends Mode {
 		}
 	}
 
+	loadRandomLevel() {
+		this._onBeforeLoadingNextLevel();
+		this._currentLevelID = Math.floor(Math.random()*this._levelStrings.length);
+		this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
+		this._assetsManager.load();
+		this._onAfterLoadingNextLevel();
+	}
+
 	loadLevelFromString(levelString) {
 		var isFirstLevel = true;
 		if (this._level) {
@@ -58,6 +66,10 @@ class Game extends Mode {
 	}
 
 	keyDown(ctrlCode) {
+		if (ctrlCode == CTRL_RANDOM_LEVEL) {
+			this.loadRandomLevel();
+			return;
+		}
 		if (!this._level._camFly) this._level.keyDown(ctrlCode);
 	}
 

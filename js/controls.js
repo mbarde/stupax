@@ -7,6 +7,7 @@ var CTRL_NEXT_LEVEL = 5;
 var CTRL_GUY_LEFT = 6;
 var CTRL_GUY_RIGHT = 7;
 var CTRL_GUY_JUMP = 8;
+var CTRL_RANDOM_LEVEL = 9;
 
 /**
 * Class to abstract from input device.
@@ -92,6 +93,9 @@ class Controls {
 				break;
 			case 82: // R
 				ctrlCode = CTRL_RESTART;
+				break;
+			case 77: // M
+				ctrlCode = CTRL_RANDOM_LEVEL;
 				break;
 			case 78: // N
 				ctrlCode = CTRL_NEXT_LEVEL;
