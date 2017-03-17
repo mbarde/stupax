@@ -3,15 +3,10 @@ class MovablePlatform extends Platform {
 	constructor(width, height, posX, posY, scene, assetsManager) {
 		super(width, height, posX, posY, scene, assetsManager);
 
-		this._direction = new BABYLON.Vector3(0, 0, 0); // movement direction
-
-		this._keyPressed = false;
+		this.reset(posX, posY);
 
 		this._speed = 3 * CONS_SCALE;
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
-
-		this._keysDown = [];
-
 		this._light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 	}
 
@@ -20,6 +15,12 @@ class MovablePlatform extends Platform {
 		this._keyPressed = false;
 		this._keysDown = [];
 		this._direction = new BABYLON.Vector3(0, 0, 0);
+
+		this._blockStatus = {};
+		this._blockStatus.blocked_bottom = false;
+		this._blockStatus.blocked_top = false;
+		this._blockStatus.blocked_right = false;
+		this._blockStatus.blocked_left = false;
 
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
@@ -32,74 +33,29 @@ class MovablePlatform extends Platform {
 	}
 
 	update() {
+		this.updateBlockStatus();
+
+		this.executeMovement();
+
+		this.checkForGuyHitAndApplyPenalties();
+
+		this.checkPhysicConstraints();
+	}
+
+	executeMovement() {
 		this._direction.x = 0;
 		this._direction.y = 0;
 
-		var thisPos = this._mesh.getAbsolutePosition();
-
-		// Check if movment to certain direction is not possible (because of static obstacles):
-		var ray_distance = 0.1; // distance of check ray from platform
-		var corner_distance = 0.2; //
-
-		var blocked_bottom = false;
-		var blocked_top = false;
-		var blocked_right = false;
-		var blocked_left = false;
-
-		// Bottom:
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x - (this._width/2 * CONS_SCALE) + corner_distance;
-		posi.y = posi.y - (this._height/2 * CONS_SCALE) - ray_distance;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall || item.isGuy; });
-		if (pickInfo.hit) {
-			blocked_bottom = true;
-		}
-
-		// Top:
-		posi.y = posi.y + (this._height * CONS_SCALE) + ray_distance*2;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall });
-		if (pickInfo.hit) {
-			blocked_top = true;
-		}
-
-		// Left:
-		posi.x = posi.x - corner_distance - ray_distance;
-		posi.y = posi.y - corner_distance - ray_distance;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
-		if (pickInfo.hit) {
-			blocked_left = true;
-		}
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
-		if (pickInfo.hit) {
-			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
-		}
-
-		// Right:
-		posi.x = posi.x + (this._width * CONS_SCALE) + ray_distance*2;
-		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
-		if (pickInfo.hit) {
-			blocked_right = true;
-		}
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
-		if (pickInfo.hit) {
-			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
-		}
-		// END OF Block check ----------------------------------------------------
-
-		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !blocked_left) { // left
+		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !this._blockStatus.blocked_left) { // left
 				this._direction.x = -this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !blocked_right) { // right
+		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !this._blockStatus.blocked_right) { // right
 				this._direction.x =  this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_UP) > -1 && !blocked_top) {
+		if (this._keysDown.indexOf(CTRL_UP) > -1 && !this._blockStatus.blocked_top) {
 				this._direction.y = this._speed; // up
 		}
-		if (this._keysDown.indexOf(CTRL_DOWN) > -1 && !blocked_bottom) {
+		if (this._keysDown.indexOf(CTRL_DOWN) > -1 && !this._blockStatus.blocked_bottom) {
 				this._direction.y = -this._speed; // down
 		}
 
@@ -108,23 +64,15 @@ class MovablePlatform extends Platform {
 			this._direction.y = CONS_MOV_PLAT_UPLIFT; // avoid gravity
 			this._mesh.getPhysicsImpostor().setLinearVelocity(this._direction);
 		} else {
-			// Apply impulse at every corner of every 1-unit-block of the platform
-			/**
-			var imp = this._direction;
-			imp.x = imp.x / (this._width+1) * (this._height+1);
-			imp.y = imp.y / (this._width+1) * (this._height+1);
-			for (var x = 0; x <= this._width; x++) {
-				for (var y = 0; y <= this._height; y++) {
-					var pos = this._mesh.getAbsolutePosition().clone();
-					pos.x = pos.x + ( (-this._width/2 + x) * CONS_SCALE );
-					pos.y = pos.y + ( (-this._height/2 + y) * CONS_SCALE );
-					console.log(pos);
-					this._mesh.getPhysicsImpostor().applyImpulse(imp, pos);
-				}
-			}**/
 			this._mesh.getPhysicsImpostor().applyImpulse(this._direction, this._mesh.getAbsolutePosition());
 		}
 
+		// Clip light to movable platform.
+		this._light.position.x = this._mesh.getAbsolutePosition().x;
+		this._light.position.y = this._mesh.getAbsolutePosition().y;
+	}
+
+	checkPhysicConstraints() {
 		// Constrain speed to _maxSpeed property
 		if (this._mesh.getPhysicsImpostor().getLinearVelocity().x > this._speed) {
 			var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
@@ -152,10 +100,80 @@ class MovablePlatform extends Platform {
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
 		this._mesh.rotationQuaternion = q;
 		this._mesh.position.z = 0;
+	}
 
-		// Clip light to movable platform.
-		this._light.position.x = this._mesh.getAbsolutePosition().x;
-		this._light.position.y = this._mesh.getAbsolutePosition().y;
+	// Returns object containing information if which of the four sides of the platform are blocked
+	updateBlockStatus() {
+		this._blockStatus.blocked_bottom = false;
+		this._blockStatus.blocked_top = false;
+		this._blockStatus.blocked_right = false;
+		this._blockStatus.blocked_left = false;
+
+		var ray = this.getCollisionRayBottom();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall || item.isGuy; });
+		if (pickInfo.hit) {
+			this._blockStatus.blocked_bottom = true;
+		}
+
+		var ray = this.getCollisionRayTop();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
+		if (pickInfo.hit) {
+			this._blockStatus.blocked_top = true;
+		}
+
+		var ray = this.getCollisionRayLeft();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
+		if (pickInfo.hit) {
+			this._blockStatus.blocked_left = true;
+		}
+
+		var ray = this.getCollisionRayRight();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
+		if (pickInfo.hit) {
+			this._blockStatus.blocked_right = true;
+		}
+	}
+
+	checkForGuyHitAndApplyPenalties() {
+		var ray = this.getCollisionRayLeft();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
+		if (pickInfo.hit) {
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
+		}
+
+		var ray = this.getCollisionRayRight();
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
+		if (pickInfo.hit) {
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
+		}
+	}
+
+	getCollisionRayLeft() {
+		var posi = this._mesh.position.clone();
+		posi.x = posi.x - (this._width/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
+		posi.y = posi.y + (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_CORNER;
+		return new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
+	}
+
+	getCollisionRayRight() {
+		var posi = this._mesh.position.clone();
+		posi.x = posi.x + (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_DIVE;
+		posi.y = posi.y + (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
+		return new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
+	}
+
+	getCollisionRayTop() {
+		var posi = this._mesh.position.clone();
+		posi.x = posi.x - (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_CORNER;
+		posi.y = posi.y + (this._height/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_DIVE;
+		return new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
+	}
+
+	getCollisionRayBottom() {
+		var posi = this._mesh.position.clone();
+		posi.x = posi.x - (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_CORNER;
+		posi.y = posi.y - (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
+		return new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
 	}
 
 	setPhysicsState() {
