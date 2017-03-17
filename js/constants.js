@@ -1,13 +1,15 @@
 var CONS_SCALE = 3.0; // Defines how big in real WebGL one unit of the game measurement is
 var CONS_EPS = 0.2; // Epsilon value used as constant for some fine tuning (use search function)
 
+var CONS_LEVEL_LEFT_BOUNDARY = -13; // x coordinate of left boundary of levels
+
 var CONS_FINISH_CELEB_TIME = 3000; // Time in ms when new level loads after door is reached
 var CONS_DEATH_TIME_TO_RESTART = 3000; // Time in ms when level will restart after player death
 
 var CONS_MOV_PLAT_MASS = 2;
 var CONS_MOV_PLAT_UPLIFT = 0.15; // uplift of movable platform when no movement button is pressed, needed to fight against gravity
 var CONS_MOV_PLAT_TOLERANCE_DIVE = 0.1; // Movable platform can 'dive' this deep into blocks before movement is blocked
-var CONS_MOV_PLAT_TOLERANCE_CORNER = 0.2; // Movable platform 
+var CONS_MOV_PLAT_TOLERANCE_CORNER = 0.2; // Movable platform
 
 var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
 

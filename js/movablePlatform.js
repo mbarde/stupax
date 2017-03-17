@@ -53,7 +53,7 @@ class MovablePlatform extends Platform {
 
 		var blockStatus = this._collisionHelper.getBlockStatus();
 
-		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !blockStatus.blocked_left) { // left
+		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !blockStatus.blocked_left && this._mesh.position.x > CONS_LEVEL_LEFT_BOUNDARY * CONS_SCALE) { // left
 				this._direction.x = -this._speed;
 		}
 		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !blockStatus.blocked_right) { // right

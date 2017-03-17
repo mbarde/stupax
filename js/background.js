@@ -23,7 +23,7 @@ class Background extends Entity {
 			}
 		}) (this._levelWidth, this._levelHeight, material);
 
-		this._backgroundMesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 9 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
+		this._backgroundMesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 20 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
 		this._backgroundMesh.material = material;
 		this._backgroundMesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
 		this._backgroundMesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
