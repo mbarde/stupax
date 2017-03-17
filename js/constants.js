@@ -18,6 +18,11 @@ var CONS_GUY_STAND_TOGGLE_TIME = 1000; // Time how long guy stands before he cha
 var CONS_RESTITUTION_GUY = 0.3;
 var CONS_RESTITUTION_PLAT = 0.3;
 
+// defines how much movable platform "pushes" guy to the right or left to avoid that it is possible to glitch guy through level at one vertical(!) side of the movable platform
+// this constant does not go in the Oimo Physics Engine, is handled by the game itself
+// the higher this value is the more bumpy it looks like when pushing the guy, but the less glitchy it gets :)
+var CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT = 8;
+
 var CONS_LEVEL_BOTTOM = 0;
 var CONS_LEVEL_TOP = 13;
 

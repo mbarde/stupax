@@ -51,7 +51,7 @@ class MovablePlatform extends Platform {
 		posi.x = posi.x - (this._width/2 * CONS_SCALE) + corner_distance;
 		posi.y = posi.y - (this._height/2 * CONS_SCALE) - ray_distance;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall || item.isGuy; });
 		if (pickInfo.hit) {
 			blocked_bottom = true;
 		}
@@ -59,7 +59,7 @@ class MovablePlatform extends Platform {
 		// Top:
 		posi.y = posi.y + (this._height * CONS_SCALE) + ray_distance*2;
 		var ray = new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - corner_distance*2);
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall });
 		if (pickInfo.hit) {
 			blocked_top = true;
 		}
@@ -72,6 +72,10 @@ class MovablePlatform extends Platform {
 		if (pickInfo.hit) {
 			blocked_left = true;
 		}
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
+		if (pickInfo.hit) {
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
+		}
 
 		// Right:
 		posi.x = posi.x + (this._width * CONS_SCALE) + ray_distance*2;
@@ -79,6 +83,10 @@ class MovablePlatform extends Platform {
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
 		if (pickInfo.hit) {
 			blocked_right = true;
+		}
+		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
+		if (pickInfo.hit) {
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
 		}
 		// END OF Block check ----------------------------------------------------
 

@@ -38,6 +38,7 @@ class Guy extends Animatable {
 		material.alpha = 0.0;
 		this._mesh = BABYLON.MeshBuilder.CreateBox("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 		this._mesh.material = material;
+		this._mesh.isGuy = true;
 
 		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_GUY_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
