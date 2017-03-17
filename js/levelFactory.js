@@ -42,7 +42,7 @@ class LevelFactory {
 		var movPlat = levelJSON.movPlatform;
 		levelObject._movablePlatform = new MovablePlatform(movPlat._width, movPlat._height,
 										movPlat._posX, movPlat._posY,
-										levelObject._scene, levelObject._assetsManager);
+										levelObject._scene, levelObject, levelObject._assetsManager);
 
 		// Set boxes
 		levelObject._boxes = new Array();

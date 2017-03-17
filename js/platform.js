@@ -107,6 +107,7 @@ class Platform extends Entity {
 
 		this._mesh.isWalkable = true;
 		this._mesh.isWall = true;
+		this._mesh.isWallAndNotMovable = true;
 		this._mesh.projectileStopper = true;
 	}
 

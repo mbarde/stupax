@@ -1,15 +1,19 @@
 class MovablePlatform extends Platform {
 
-	constructor(width, height, posX, posY, scene, assetsManager) {
+	constructor(width, height, posX, posY, scene, level, assetsManager) {
 		super(width, height, posX, posY, scene, assetsManager);
+
+		this._level = level;
 
 		this._collisionHelper = new CollisionHelper(
 					this._scene, this._width, this._height, this._mesh,
 					CONS_MOV_PLAT_TOLERANCE_DIVE, CONS_MOV_PLAT_TOLERANCE_CORNER);
 
+
 		this.reset(posX, posY);
 
 		this._speed = 3 * CONS_SCALE;
+		this._mesh.isWall = false;
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 		this._light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
 	}
@@ -34,6 +38,7 @@ class MovablePlatform extends Platform {
 
 	update() {
 		this._collisionHelper.updateBlockStatus();
+		this._collisionHelper.updateBlockStatusRegardingGuy(this._level._guy._mesh.blockStatus);
 
 		this.executeMovement();
 
@@ -105,13 +110,13 @@ class MovablePlatform extends Platform {
 	}
 
 	checkForGuyHitAndApplyPenalties() {
-		var ray = this._collisionHelper.getCollisionRayLeft();
+		var ray = this._collisionHelper.getCollisionRayLeftVertical();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
 			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
 		}
 
-		var ray = this._collisionHelper.getCollisionRayRight();
+		var ray = this._collisionHelper.getCollisionRayRightVertical();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
 			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
@@ -130,6 +135,9 @@ class MovablePlatform extends Platform {
 		var index = this._keysDown.indexOf(ctrlCode);
 		if (index === -1) {
 			this._keysDown.push(ctrlCode);
+		}
+		if (ctrlCode == CTRL_GUY_JUMP) {
+			console.log(this._collisionHelper.getBlockStatus()); // this._level._guy._mesh.blockStatus);
 		}
 	}
 

@@ -9,6 +9,10 @@ class Guy extends Animatable {
 
 			this.initAnimations();
 
+			this._collisionHelper = new CollisionHelper(
+						this._scene, this._width, this._height, this._mesh,
+						0.4, 0.2);
+
 			this.reset(posX, posY);
 	}
 
@@ -88,6 +92,8 @@ class Guy extends Animatable {
 
 		this._direction = new BABYLON.Vector3(this._accelerationX, 0, 0); // movement direction
 
+		this._collisionHelper.resetBlockStatus();
+
 		this._forward = true;
 		this._standingTimestep = false; 	// time since guy is standing (not moving)
 		this._fixAnimation = false; 		// if true animation loop can not be changed anymore
@@ -116,6 +122,8 @@ class Guy extends Animatable {
 		this.executeMovement();
 
 		this.checkPhysicConstraints();
+
+		this._collisionHelper.updateBlockStatus();
 	}
 
 	executeMovement() {
@@ -290,7 +298,9 @@ class Guy extends Animatable {
 	}
 
 	keyDown(keyCode) {
-
+		if (keyCode == CTRL_GUY_JUMP) {
+			console.log(this._mesh.blockStatus);
+		}
 	}
 
 	keyUp(keyCode) {
