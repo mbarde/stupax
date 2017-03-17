@@ -3,6 +3,10 @@ class MovablePlatform extends Platform {
 	constructor(width, height, posX, posY, scene, assetsManager) {
 		super(width, height, posX, posY, scene, assetsManager);
 
+		this._collisionHelper = new CollisionHelper(
+					this._scene, this._width, this._height, this._mesh,
+					CONS_MOV_PLAT_TOLERANCE_DIVE, CONS_MOV_PLAT_TOLERANCE_CORNER);
+
 		this.reset(posX, posY);
 
 		this._speed = 3 * CONS_SCALE;
@@ -16,11 +20,7 @@ class MovablePlatform extends Platform {
 		this._keysDown = [];
 		this._direction = new BABYLON.Vector3(0, 0, 0);
 
-		this._blockStatus = {};
-		this._blockStatus.blocked_bottom = false;
-		this._blockStatus.blocked_top = false;
-		this._blockStatus.blocked_right = false;
-		this._blockStatus.blocked_left = false;
+		this._collisionHelper.resetBlockStatus();
 
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
 		this._mesh.position.y = (posY + this._height/2) * CONS_SCALE;
@@ -33,7 +33,7 @@ class MovablePlatform extends Platform {
 	}
 
 	update() {
-		this.updateBlockStatus();
+		this._collisionHelper.updateBlockStatus();
 
 		this.executeMovement();
 
@@ -46,16 +46,18 @@ class MovablePlatform extends Platform {
 		this._direction.x = 0;
 		this._direction.y = 0;
 
-		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !this._blockStatus.blocked_left) { // left
+		var blockStatus = this._collisionHelper.getBlockStatus();
+
+		if (this._keysDown.indexOf(CTRL_LEFT) > -1 && !blockStatus.blocked_left) { // left
 				this._direction.x = -this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !this._blockStatus.blocked_right) { // right
+		if (this._keysDown.indexOf(CTRL_RIGHT) > -1 && !blockStatus.blocked_right) { // right
 				this._direction.x =  this._speed;
 		}
-		if (this._keysDown.indexOf(CTRL_UP) > -1 && !this._blockStatus.blocked_top) {
+		if (this._keysDown.indexOf(CTRL_UP) > -1 && !blockStatus.blocked_top) {
 				this._direction.y = this._speed; // up
 		}
-		if (this._keysDown.indexOf(CTRL_DOWN) > -1 && !this._blockStatus.blocked_bottom) {
+		if (this._keysDown.indexOf(CTRL_DOWN) > -1 && !blockStatus.blocked_bottom) {
 				this._direction.y = -this._speed; // down
 		}
 
@@ -102,78 +104,18 @@ class MovablePlatform extends Platform {
 		this._mesh.position.z = 0;
 	}
 
-	// Returns object containing information if which of the four sides of the platform are blocked
-	updateBlockStatus() {
-		this._blockStatus.blocked_bottom = false;
-		this._blockStatus.blocked_top = false;
-		this._blockStatus.blocked_right = false;
-		this._blockStatus.blocked_left = false;
-
-		var ray = this.getCollisionRayBottom();
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall || item.isGuy; });
-		if (pickInfo.hit) {
-			this._blockStatus.blocked_bottom = true;
-		}
-
-		var ray = this.getCollisionRayTop();
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
-		if (pickInfo.hit) {
-			this._blockStatus.blocked_top = true;
-		}
-
-		var ray = this.getCollisionRayLeft();
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
-		if (pickInfo.hit) {
-			this._blockStatus.blocked_left = true;
-		}
-
-		var ray = this.getCollisionRayRight();
-		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isWall; });
-		if (pickInfo.hit) {
-			this._blockStatus.blocked_right = true;
-		}
-	}
-
 	checkForGuyHitAndApplyPenalties() {
-		var ray = this.getCollisionRayLeft();
+		var ray = this._collisionHelper.getCollisionRayLeft();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
 			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
 		}
 
-		var ray = this.getCollisionRayRight();
+		var ray = this._collisionHelper.getCollisionRayRight();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
 			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
 		}
-	}
-
-	getCollisionRayLeft() {
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x - (this._width/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
-		posi.y = posi.y + (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_CORNER;
-		return new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
-	}
-
-	getCollisionRayRight() {
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x + (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_DIVE;
-		posi.y = posi.y + (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
-		return new BABYLON.Ray(posi, new BABYLON.Vector3(0, -1, 0), this._height * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
-	}
-
-	getCollisionRayTop() {
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x - (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_CORNER;
-		posi.y = posi.y + (this._height/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_DIVE;
-		return new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
-	}
-
-	getCollisionRayBottom() {
-		var posi = this._mesh.position.clone();
-		posi.x = posi.x - (this._width/2 * CONS_SCALE) + CONS_MOV_PLAT_TOLERANCE_CORNER;
-		posi.y = posi.y - (this._height/2 * CONS_SCALE) - CONS_MOV_PLAT_TOLERANCE_DIVE;
-		return new BABYLON.Ray(posi, new BABYLON.Vector3(1, 0, 0), this._width * CONS_SCALE - CONS_MOV_PLAT_TOLERANCE_CORNER*2);
 	}
 
 	setPhysicsState() {
