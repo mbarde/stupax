@@ -1,8 +1,8 @@
 # Stupax
-##"You are not the guy, you are the level!"
+### "You are not the guy, you are the level!"
 *Stupax* is a funny sidescroller (jump and run game) where you do not control the character, but the level. You control a movable platform to help the guy (namely *Stupax*) to get through the levels.
 
-##Features
+### Features
 - Physics engine
 - Gamepad controls (using the [Gamepad API](https://www.smashingmagazine.com/2015/11/gamepad-api-in-web-games/))
 - Level editor
