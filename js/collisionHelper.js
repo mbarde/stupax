@@ -1,3 +1,13 @@
+/*
+* This class is able to update the blocking status of an (rectangeled) mesh,
+* to answer the question whether the mesh is blocked by something to one of the four directions: top, bottom, left, right
+*
+* Adds following object to mesh object:
+* 	blockStatus.blocked_bottom: bool;
+*	blockStatus.blocked_top: bool;
+*	blockStatus.blocked_right: bool;
+*	blockStatus.blocked_left: bool;
+*/
 class CollisionHelper {
 
 	constructor(scene, width, height, mesh, toleranceDive, toleranceCorner) {
