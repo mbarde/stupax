@@ -13,6 +13,8 @@ var CONS_MOV_PLAT_TOLERANCE_CORNER = 0.2; // Movable platform
 
 var CONS_BOX_DEFAULT_MASS = 2; // default mass of a box
 
+var CONS_PROJECTILE_SIZE = 0.2; // size (width and height) of a projectile
+
 var CONS_GUY_MASS = 1;
 var CONS_GUY_TOLERANCE_VERTICAL_DIVE = 0.1; // Guy can 'dive' this deep into (vertical) walls without toggling direction
 var CONS_GUY_TOLERANCE_HORIZONTAL_DIVE = 0.2; // Guy can 'dive' this deep into (horizontal) grounds without toggling direction (or: How high can be a step the player can climb without changing direction?)

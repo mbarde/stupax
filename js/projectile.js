@@ -2,7 +2,7 @@ class Projectile extends Entity {
 
 	// ATTENTION: here position is in absolute coordinates !!!
 	constructor(position, direction, scene, assetsManager, material) {
-		super(0.2, 0.2, 0, scene, assetsManager);
+		super(CONS_PROJECTILE_SIZE, CONS_PROJECTILE_SIZE, 0, scene, assetsManager);
 
 		this._material = material;
 
@@ -31,14 +31,30 @@ class Projectile extends Entity {
 		// Rotation
 		this._mesh.rotation.z -= 0.1;
 
-		// When hitting a wall return TRUE (level can destroy projectile then).
-		// Else return FALSE.
-		var ray = new BABYLON.Ray(this._mesh.position, this._direction.negate(), this._direction.length());
+		// return if projectile hit a wall as information for the level (projectile has to be destroyed then)
+		return this.checkForWallHit();
+	}
+
+	checkForWallHit() {
+		return this.performCollisionWithRay( this.getCollisionRayInverseToMovement() )
+			||  this.performCollisionWithRay( this.getCollisionRayOrthogonalToMovement() );
+	}
+
+	getCollisionRayOrthogonalToMovement() {
+		var posi = this._mesh.position.clone();
+		posi.y = posi.y - (CONS_PROJECTILE_SIZE / 2);
+		return new BABYLON.Ray(posi, new BABYLON.Vector3(0, 1, 0), CONS_PROJECTILE_SIZE);
+	}
+
+	getCollisionRayInverseToMovement() {
+		return new BABYLON.Ray(this._mesh.position, this._direction.negate(), this._direction.length() + 0.1);
+	}
+
+	performCollisionWithRay(ray) {
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.projectileStopper; });
 		if (pickInfo.hit) {
 			return true;
 		}
-
 		return false;
 	}
 
