@@ -17,6 +17,36 @@ function() {
 	var controls;
 	var camera;
 
+	function showContextMenu(name, contextData) {
+		jQuery.get("partials/context." + name + ".html", function(data) {
+			$('#div-context-menu').html( data );
+			$('#div-context-menu').show();
+
+			if (name === "emitter") {
+				$('#input-interval').val( contextData.interval );
+				$('#input-interval').change( function() { contextData.interval = $(this).val(); });
+
+				$('#input-offset').val( contextData.offset );
+				$('#input-offset').change( function() { contextData.offset = $(this).val(); });
+
+				$('#input-directions').val( JSON.stringify(contextData.directions) );
+				$('#input-directions').change( function() {
+					try {
+						contextData.directions = JSON.parse( $(this).val());
+					} catch(e) {
+						alert('Directions string has wrong format!');
+					}
+				});
+
+				$('#button-delete-emitter').click( function() { contextData.mesh.dispose(); });
+			}
+		});
+	}
+
+	function hideContextMenu() {
+		$('#div-context-menu').hide();
+	}
+
 	function log(message) {
 		updateActiveModeBtn();
 		$('#spanLog').text("> " + message);
@@ -55,7 +85,7 @@ function() {
 
 	scene = createScene();
 	assetsManager = new BABYLON.AssetsManager(scene);
-	editor = new Editor(scene, camera, log, assetsManager);
+	editor = new Editor(scene, camera, log, showContextMenu, hideContextMenu, assetsManager);
 
 	assetsManager.load();
 	assetsManager.onFinish = function(tasks) {
@@ -75,6 +105,8 @@ function() {
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
+		var focused = $(':focus');
+		if (!focused.hasClass("input-element")) {
 			if (event.keyCode == 76) { // L
 				loadLevelFile();
 			}
@@ -84,12 +116,16 @@ function() {
 			if (editor) {
 				editor.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
+		}
 	}, false);
 
 	window.addEventListener("keyup", function(event){
+		var focused = $(':focus');
+		if (!focused.hasClass("input-element")) {
 			if (editor) {
 				editor.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
+		}
 	}, false);
 
 	window.addEventListener("resize", function () {

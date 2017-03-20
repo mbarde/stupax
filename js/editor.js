@@ -1,9 +1,11 @@
 class Editor extends Mode {
 
-	constructor(scene, camera, log_function, assetsManager) {
+	constructor(scene, camera, logFunction, showContextMenuFunction, hideContextMenuFunction, assetsManager) {
 		super(scene, camera);
 
-		this._log_function = log_function;
+		this._logFunction = logFunction;
+		this._showContextMenuFunction = showContextMenuFunction;
+		this._hideContextMenuFunction = hideContextMenuFunction;
 		this._assetsManager = assetsManager;
 
 		this._levelWidth = 500;
@@ -55,6 +57,7 @@ class Editor extends Mode {
 
 		this._scene.editor = this;
 		this._scene.onPointerDown = function (evt, pickResult) {
+			var hideContextMenu = true;
         	if (pickResult.hit) {
 				if (pickResult.pickedMesh == background) {
 					var posX = Math.floor(pickResult.pickedPoint.x / CONS_SCALE);
@@ -67,6 +70,9 @@ class Editor extends Mode {
 					  	marker.emitter_info.directions.push( new BABYLON.Vector3(0.1, 0.0, 0) );
 					  	marker.emitter_info.interval = 2000;
 					  	marker.emitter_info.offset = 0;
+						marker.emitter_info.mesh = marker._mesh;
+						this.editor._showContextMenuFunction("emitter", marker.emitter_info);
+						hideContextMenu = false;
 					} else
 					if (this.editor._curMode == CONS_EM_GUY) {
 						if (this.editor._guyMarker) {
@@ -82,7 +88,12 @@ class Editor extends Mode {
 					}
 				} else {
 					if (pickResult.pickedMesh.mode == this.editor._curMode) {
-						pickResult.pickedMesh.dispose();
+						if (this.editor._curMode == CONS_EM_EMITTER) {
+							this.editor._showContextMenuFunction("emitter", pickResult.pickedMesh.marker.emitter_info);
+							hideContextMenu = false;
+						} else {
+							pickResult.pickedMesh.dispose();
+						}
 						if (this.editor._curMode == CONS_EM_GUY) {
 							this.editor._guyMarker = false;
 						} else
@@ -92,12 +103,15 @@ class Editor extends Mode {
 					}
 				}
         	}
+			if (hideContextMenu) {
+				this.editor._hideContextMenuFunction();
+			}
     	};
 	}
 
 	setCurMode(newMode) {
 		this._curMode = newMode;
-		this._log_function("Changed to " + this.modeIDtoName(newMode));
+		this._logFunction("Changed to " + this.modeIDtoName(newMode));
 	}
 
 	update() {
@@ -295,6 +309,7 @@ class Editor extends Mode {
 				marker.emitter_info.directions = emitters[i].directions;
 				marker.emitter_info.interval = emitters[i].interval;
 				marker.emitter_info.offset = emitters[i].offset;
+				marker.emitter_info.mesh = marker._mesh;
 			}
 		}
 

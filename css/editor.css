@@ -1,8 +1,14 @@
+.div-tool-box {
+	width: 600px;
+	float: left;
+	height: 68px;
+}
+
 .btn-mode {
 	width: 64px;
 	height: 64px;
 	float: left;
-	margin: 8px;
+	margin: 2px;
 }
 
 .btn-mode img {
@@ -15,6 +21,16 @@
 }
 
 .btn-action {
-	height: 32px;
-	margin: 8px;
+	height: 26px;
+	margin: 4px;
+}
+
+#div-context-menu {
+	padding: 5px;
+	height: 68px;
+	overflow-y: scroll;
+}
+
+#spanLog {
+	display: none;
 }
