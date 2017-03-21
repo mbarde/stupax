@@ -28,7 +28,7 @@ class MovablePlatform extends Platform {
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/engine.ogg");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
-			   thisObject._soundMove = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.02, loop: true });
+			   thisObject._soundMove = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.1, loop: true });
 				thisObject._soundMove.attachToMesh(thisObject._mesh);
 			}
 		}) (this);
@@ -174,7 +174,9 @@ class MovablePlatform extends Platform {
 
 	onPause() {
 		this._keysDown = [];
-		if (this._soundMove.isPlaying) this._soundMove.pause();
+		if (this._soundMove) {
+			if (this._soundMove.isPlaying) this._soundMove.pause();
+		}
 	}
 
 	destroy() {

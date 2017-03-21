@@ -17,6 +17,22 @@ class Game extends Mode {
 		this._levelFactory = new LevelFactory(this._scene, this._camera, assetsManager, this);
 
 		this._level = false;
+
+		this.initBackgroundMusic();
+	}
+
+	initBackgroundMusic() {
+		var soundName = "SoundBackground";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/through_space.ogg");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+				if (!thisObject._soundBackground) {
+				   thisObject._soundBackground = new BABYLON.Sound(soundName, task.data, thisObject._scene,
+						function() { thisObject._soundBackground.play(); },
+						{ loop: true, volume: 0.3 });
+				}
+			}
+		}) (this);
 	}
 
 	loadFirstLevel() {
@@ -70,6 +86,10 @@ class Game extends Mode {
 			this.loadRandomLevel();
 			return;
 		}
+		if (ctrlCode == CTRL_NEXT_LEVEL) {
+			this.loadNextLevel();
+			return;
+		}
 		if (!this._level._camFly) this._level.keyDown(ctrlCode);
 	}
 
@@ -83,8 +103,22 @@ class Game extends Mode {
 	}
 
 	onPause() {
-		if (this._level)
+		if (this._level) {
 			this._level.onPause();
+		}
+		if (this._soundBackground) {
+			if (this._soundBackground.isPlaying) {
+				this._soundBackground.pause();
+			}
+		}
+	}
+
+	onResume() {
+		if (this._soundBackground) {
+			if (!this._soundBackground.isPlaying) {
+				this._soundBackground.play();
+			}
+		}
 	}
 
 }

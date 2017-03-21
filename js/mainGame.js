@@ -104,6 +104,7 @@ function() {
 					doRender = false;
 				} else {
 					hideOverlayAndUnpause();
+					mode.onResume();
 				}
 			}
 			if (!showOverlay && mode) {

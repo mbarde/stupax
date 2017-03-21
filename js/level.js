@@ -155,9 +155,6 @@ class Level {
 			case CTRL_RESTART:
 				this.restart();
 				return;
-			case CTRL_NEXT_LEVEL:
-				this._game.loadNextLevel();
-				return;
 		}
 	}
 

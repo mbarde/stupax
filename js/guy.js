@@ -91,7 +91,7 @@ class Guy extends Animatable {
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/steps.ogg");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
-			   thisObject._soundRun = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.1, playbackRate: 0.8, loop: true });
+			   thisObject._soundRun = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.8, playbackRate: 0.8, loop: true });
 				thisObject._soundRun.attachToMesh(thisObject._mesh);
 			}
 		}) (this);
@@ -349,7 +349,9 @@ class Guy extends Animatable {
 	}
 
 	onPause() {
-		if (this._soundRun.isPlaying) this._soundRun.pause();
+		if (this._soundRun) {
+			if (this._soundRun.isPlaying) this._soundRun.pause();
+		}
 	}
 
 }
