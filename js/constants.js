@@ -19,6 +19,7 @@ var CONS_GUY_MASS = 1;
 var CONS_GUY_TOLERANCE_VERTICAL_DIVE = 0.1; // Guy can 'dive' this deep into (vertical) walls without toggling direction
 var CONS_GUY_TOLERANCE_HORIZONTAL_DIVE = 0.2; // Guy can 'dive' this deep into (horizontal) grounds without toggling direction (or: How high can be a step the player can climb without changing direction?)
 var CONS_GUY_STAND_TOGGLE_TIME = 1000; // Time how long guy stands before he changes direction in ms, used to make sure that guy changes direction, even if 'wall-hit-detection' fails
+var CONS_GUY_MIN_TIME_BETWEEN_DIR_TOGGLES = 1000; // After a direction toggle happend this time has to elapse before another direction toggle is allowed (prevents crazy twitching of guy)
 
 // Restitution defines how "bumpy" the physics is. The higher the bumpier.
 var CONS_RESTITUTION_GUY = 0.3;

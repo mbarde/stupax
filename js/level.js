@@ -221,6 +221,7 @@ class Level {
 
 	onPause() {
 		this._movablePlatform.onPause();
+		this._guy.onPause();
 	}
 
 }

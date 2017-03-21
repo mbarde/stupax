@@ -1,4 +1,4 @@
-class Guy extends Animatable {
+class Guy extends AnimatableAndSoundable {
 
 	constructor(posX, posY, scene, assetsManager) {
 			super(scene, assetsManager);
@@ -8,6 +8,8 @@ class Guy extends Animatable {
 			this.initGeometry();
 
 			this.initAnimations();
+
+			this.initSounds();
 
 			this._collisionHelper = new CollisionHelper(
 						this._scene, this._width, this._height, this._mesh,
@@ -84,6 +86,18 @@ class Guy extends Animatable {
 		this.anim_setAnimationByName("run");
 	}
 
+	initSounds() {
+		this.loadSound(this._soundRun, "", "SoundGuyRun", true);
+		var soundName = "SoundGuyRun";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/steps_chain.ogg");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject._soundRun = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.1, playbackRate: 0.8, loop: true });
+				thisObject._soundRun.attachToMesh(thisObject._mesh);
+			}
+		}) (this);
+	}
+
 	// Reset guy, for example when restarting level.
 	reset(posX, posY) {
 		this._mesh.position.x = (posX + this._width/2) * CONS_SCALE;
@@ -95,7 +109,8 @@ class Guy extends Animatable {
 		this._collisionHelper.resetBlockStatus();
 
 		this._forward = true;
-		this._standingTimestep = false; 	// time since guy is standing (not moving)
+		this._standingTimestamp = false; 	// time since guy is standing (not moving)
+		this._lastDirectionToggleTimestamp = false;
 		this._fixAnimation = false; 		// if true animation loop can not be changed anymore
 		this._doRun = true;					// is guy allowed to run?
 
@@ -105,6 +120,8 @@ class Guy extends Animatable {
 
 	update() {
 		this.updateAnimationAndGuyMode();
+
+		this.updateSounds();
 
 		var isDiving = this.isDivingIntoGround();
 		if (!isDiving) {
@@ -175,10 +192,10 @@ class Guy extends Animatable {
 	}
 
 	isStandingTooLong() {
-		if (this._standingTimestep) {
+		if (this._standingTimestamp) {
 			var time = new Date().getTime();
-			if (time - this._standingTimestep >= CONS_GUY_STAND_TOGGLE_TIME) {
-				this._standingTimestep = false;
+			if (time - this._standingTimestamp >= CONS_GUY_STAND_TOGGLE_TIME) {
+				this._standingTimestamp = false;
 				return true;
 			}
 		}
@@ -223,23 +240,25 @@ class Guy extends Animatable {
 	updateAnimationAndGuyMode() {
 		// Check which animation loop (and corresponding GuyMode) should be active
 		var vel = this._mesh.getPhysicsImpostor().getLinearVelocity();
-		if (this._curMode != CONS_GM_STAND && vel.length() <= CONS_EPS * 2) {
-			if (!this._fixAnimation) this.anim_setAnimationByName("stand");
-			this._curMode = CONS_GM_STAND;
-			if (!this._standingTimestep) {
-				this._standingTimestep = new Date().getTime();
+		if (vel.length() <= 2) {
+			if (this._curMode != CONS_GM_STAND) {
+				if (!this._fixAnimation) this.anim_setAnimationByName("stand");
+				this._curMode = CONS_GM_STAND;
+				if (!this._standing && this._doRun) {
+					this._standingTimestamp = new Date().getTime();
+				}
 			}
 		} else {
 			var isOnWalkableGround = this.isOnWalkableGround();
 			if (isOnWalkableGround) {
 				if (this._curMode != CONS_GM_RUN) {
-					this._standingTimestep = false;
+					this._standingTimestamp = false;
 					if (!this._fixAnimation) this.anim_setAnimationByName("run");
 					this._curMode = CONS_GM_RUN;
 				}
 			} else {
 				if (this._curMode != CONS_GM_JUMP) {
-					this._standingTimestep = false;
+					this._standingTimestamp = false;
 					if (!this._fixAnimation) this.anim_setAnimationByName("jump");
 					this._curMode = CONS_GM_JUMP;
 				}
@@ -251,6 +270,17 @@ class Guy extends Animatable {
 			this._planeMesh.material = this.anim_getCurTexture();
 			if (!this._forward) this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
 			else this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
+		}
+	}
+
+	updateSounds() {
+		if (this._soundRun) {
+			if (this._curMode == CONS_GM_RUN && !this._soundRun.isPlaying) {
+				this._soundRun.play();
+			}
+			if (this._curMode != CONS_GM_RUN && this._soundRun.isPlaying) {
+				this._soundRun.stop();
+			}
 		}
 	}
 
@@ -279,15 +309,21 @@ class Guy extends Animatable {
 
 	// Toggle direction in which guy is running.
 	toggleDirection() {
-		this._direction.x = - this._direction.x;
-		this._forward = !this._forward;
+		var time = new Date().getTime();
+		if (!this._lastDirectionToggleTimestamp
+			|| time - this._lastDirectionToggleTimestamp >= CONS_GUY_MIN_TIME_BETWEEN_DIR_TOGGLES) {
+			this._direction.x = - this._direction.x;
+			this._forward = !this._forward;
 
-		if (!this._forward) {
-			this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
-			this._planeMesh.material.diffuseTexture.uOffset = -this._tex_uOffset;
-		} else {
-			this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
-			this._planeMesh.material.diffuseTexture.uOffset = this._tex_uOffset;
+			if (!this._forward) {
+				this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
+				this._planeMesh.material.diffuseTexture.uOffset = -this._tex_uOffset;
+			} else {
+				this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
+				this._planeMesh.material.diffuseTexture.uOffset = this._tex_uOffset;
+			}
+
+			this._lastDirectionToggleTimestamp = time;
 		}
 
 		return this._forward;
@@ -310,6 +346,11 @@ class Guy extends Animatable {
 	destroy() {
 		this._planeMesh.dispose();
 		this._mesh.dispose();
+		this._soundRun.dispose();
+	}
+
+	onPause() {
+		if (this._soundRun.isPlaying) this._soundRun.pause();
 	}
 
 }

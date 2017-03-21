@@ -103,19 +103,15 @@ class CollisionHelper {
 
 		if (helper.blocked_bottom && guyBlockStatus.blocked_bottom) {
 			this._mesh.blockStatus.blocked_bottom = true;
-			console.log("its guy love bottom");
 		}
 		if (helper.blocked_top && guyBlockStatus.blocked_top) {
 			this._mesh.blockStatus.blocked_top = true;
-			console.log("its guy love top");
 		}
 		if (helper.blocked_left && guyBlockStatus.blocked_left) {
 			this._mesh.blockStatus.blocked_left = true;
-			console.log("its guy love left");
 		}
 		if (helper.blocked_right && guyBlockStatus.blocked_right) {
 			this._mesh.blockStatus.blocked_right = true;
-			console.log("its guy love right");
 		}
 	}
 
