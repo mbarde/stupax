@@ -8,6 +8,7 @@ class Finish extends Entity {
 
 		this.initCollisionMesh();
 		this.initDoorMesh();
+		this.initSound();
 		this.initLight();
 	}
 
@@ -31,19 +32,19 @@ class Finish extends Entity {
 		// Create plane containing the finish texture
 		var material = new BABYLON.StandardMaterial("finish", this._scene);
 		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door.png");
-		(function(lvl) {
+		(function(thisObject) {
 			textureTask.onSuccess = function(task) {
 				material.diffuseTexture = task.texture;
 				material.diffuseTexture.hasAlpha = true;
 				material.backFaceCulling = true;
-				lvl._tex_doorClosed = task.texture;
+				thisObject._tex_doorClosed = task.texture;
 			}
 		}) (this);
 
 		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door_open.png");
-		(function(lvl) {
+		(function(thisObject) {
 			textureTask.onSuccess = function(task) {
-				lvl._tex_doorOpen = task.texture;
+				thisObject._tex_doorOpen = task.texture;
 			}
 		}) (this);
 
@@ -52,6 +53,15 @@ class Finish extends Entity {
 		this._doorMesh.position.x = (this._posX + 0.5)  * CONS_SCALE;
 		this._doorMesh.position.y = (this._posY + 0.5) * CONS_SCALE;
 		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
+	}
+
+	initSound() {
+		var binaryTask = this._assetsManager.addBinaryFileTask("SoundDoorOpen task", "sounds/boxopen.wav");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject._soundDoorOpen = new BABYLON.Sound("SoundDoorOpen", task.data, thisObject._scene, null, { loop: false });
+			}
+		}) (this);
 	}
 
 	initLight() {
@@ -71,6 +81,7 @@ class Finish extends Entity {
 		this._doorMesh.material.diffuseTexture.hasAlpha = true;
 		this._light.diffuse = new BABYLON.Color3(0, 1, 0);
 		this._light.specular = new BABYLON.Color3(0, 1, 0);
+		this._soundDoorOpen.play();
 	}
 
 	getSubsequentLevel() {
