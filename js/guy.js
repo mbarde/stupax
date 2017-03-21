@@ -1,4 +1,4 @@
-class Guy extends AnimatableAndSoundable {
+class Guy extends Animatable {
 
 	constructor(posX, posY, scene, assetsManager) {
 			super(scene, assetsManager);
@@ -87,9 +87,8 @@ class Guy extends AnimatableAndSoundable {
 	}
 
 	initSounds() {
-		this.loadSound(this._soundRun, "", "SoundGuyRun", true);
 		var soundName = "SoundGuyRun";
-		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/steps_chain.ogg");
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/steps.ogg");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
 			   thisObject._soundRun = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.1, playbackRate: 0.8, loop: true });

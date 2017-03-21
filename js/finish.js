@@ -56,7 +56,7 @@ class Finish extends Entity {
 	}
 
 	initSound() {
-		var binaryTask = this._assetsManager.addBinaryFileTask("SoundDoorOpen task", "sounds/boxopen.wav");
+		var binaryTask = this._assetsManager.addBinaryFileTask("SoundDoorOpen task", "sounds/door.ogg");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
 			   thisObject._soundDoorOpen = new BABYLON.Sound("SoundDoorOpen", task.data, thisObject._scene, null, { loop: false });

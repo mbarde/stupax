@@ -12,10 +12,26 @@ class MovablePlatform extends Platform {
 
 		this.reset(posX, posY);
 
+		this.initConstantsAndGeometry();
+		this.initSounds();
+	}
+
+	initConstantsAndGeometry() {
 		this._speed = 3 * CONS_SCALE;
 		this._mesh.isWall = false;
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 		this._light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
+	}
+
+	initSounds() {
+		var soundName = "SoundMovPlatEngine";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/engine.ogg");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject._soundMove = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.02, loop: true });
+				thisObject._soundMove.attachToMesh(thisObject._mesh);
+			}
+		}) (this);
 	}
 
 	// Reset movable platform, for example when level restart
@@ -41,6 +57,8 @@ class MovablePlatform extends Platform {
 		this._collisionHelper.updateBlockStatusRegardingGuy(this._level._guy._mesh.blockStatus);
 
 		this.executeMovement();
+
+		this.updateSounds();
 
 		this.checkForGuyHitAndApplyPenalties();
 
@@ -77,6 +95,12 @@ class MovablePlatform extends Platform {
 		// Clip light to movable platform.
 		this._light.position.x = this._mesh.getAbsolutePosition().x;
 		this._light.position.y = this._mesh.getAbsolutePosition().y;
+	}
+
+	updateSounds() {
+		var isMoving = (this._direction.length() >= 1);
+		if (isMoving && !this._soundMove.isPlaying) this._soundMove.play();
+		if (!isMoving && this._soundMove.isPlaying) this._soundMove.pause();
 	}
 
 	checkPhysicConstraints() {
@@ -150,11 +174,13 @@ class MovablePlatform extends Platform {
 
 	onPause() {
 		this._keysDown = [];
+		if (this._soundMove.isPlaying) this._soundMove.pause();
 	}
 
 	destroy() {
 		super.destroy();
 		this._light.dispose();
+		this._soundMove.dispose();
 	}
 
 }

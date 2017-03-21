@@ -1,4 +1,4 @@
-requirejs([	"js/constants.js", "js/animatable.js", "js/animatableAndSoundable.js",
+requirejs([	"js/constants.js", "js/animatable.js",
 	"js/entity.js", "js/platform.js",
 	"js/collisionHelper.js",
 	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/levelFileLoader.js",
