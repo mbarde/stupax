@@ -37,6 +37,8 @@ class Finish extends Entity {
 		this._doorMesh.position.x = (this._posX + 0.5)  * CONS_SCALE;
 		this._doorMesh.position.y = (this._posY + 0.5) * CONS_SCALE;
 		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
+
+		this._resourceHandler.soundDoorOpen.attachToMesh( this._doorMesh );
 	}
 
 	initLight() {

@@ -46,6 +46,7 @@ class Guy extends Animatable {
 		this._mesh.material = material;
 		this._mesh.isGuy = true;
 		this._resourceHandler.soundGuyRun.attachToMesh(this._mesh);
+		this._resourceHandler.soundGuyDie.attachToMesh(this._mesh);
 
 		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_GUY_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 	}

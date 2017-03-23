@@ -11,6 +11,8 @@ class Emitter extends Platform {
 
 		this._mesh.projectileStopper = false;
 
+		this._resourceHandler.soundEmitterShot.attachToMesh( this._mesh );
+
 		this._level = level;
 
 		this._projectile_material = new BABYLON.StandardMaterial("projectile", this._scene);

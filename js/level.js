@@ -158,6 +158,8 @@ class Level {
 	}
 
 	keyDown(ctrlCode) {
+		if (this._camFly) return;
+
 		this._guy.keyDown(ctrlCode);
 		this._movablePlatform.keyDown(ctrlCode);
 

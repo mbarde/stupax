@@ -60,7 +60,7 @@ class ResourceHandler {
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/shoot.mp3");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
-			   thisObject.soundEmitterShot = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.4, loop: false });
+			   thisObject.soundEmitterShot = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.7, loop: false });
 			}
 		}) (this);
 

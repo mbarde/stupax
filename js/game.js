@@ -53,7 +53,7 @@ class Game extends Mode {
 		}
 		this._level = this._levelFactory.stringToLevelObject(levelString);
 		if (isFirstLevel) {
-			this._level._camFlyEndCallsOnResume = false;
+			this._level._camFlyEndCallsOnResume = false; // since in the first level we also wait for first user input before guy starts to run
 		}
 	}
 

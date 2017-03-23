@@ -40,6 +40,7 @@ class Projectile extends Entity {
 
 		// return if projectile hit a wall as information for the level (projectile has to be destroyed then)
 		if (this.checkForWallHit()) {
+			this._resourceHandler.soundProjectileHit.attachToMesh( this._mesh );
 			this._resourceHandler.soundProjectileHit.play();
 			return true;
 		}
