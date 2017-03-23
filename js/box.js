@@ -1,7 +1,7 @@
 class Box extends Platform {
 
-	constructor(width, height, posX, posY, mass, scene, assetsManager) {
-		super(width, height, posX, posY, scene, assetsManager);
+	constructor(width, height, posX, posY, mass, scene, resourceHandler) {
+		super(width, height, posX, posY, scene, resourceHandler);
 		this._mesh.getPhysicsImpostor().setMass(mass);
 		this._mass = mass;
 
@@ -31,8 +31,8 @@ class Box extends Platform {
 		this._mesh.rotationQuaternion = q;
 	}
 
-	getTextureName() {
-		return "textures/block02.png";
+	getTexture() {
+		return this._resourceHandler.texBox;
 	}
 
 	setPhysicsState() {

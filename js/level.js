@@ -1,8 +1,8 @@
 class Level {
 
-	constructor(scene, camera, assetsManager, game) {
+	constructor(scene, camera, resourceHandler, game) {
 		this._scene = scene;
-		this._assetsManager = assetsManager;
+		this._resourceHandler = resourceHandler;
 		this._camera = camera;
 		this._game = game; 	// function to execute when player reaches finish
 
@@ -143,7 +143,7 @@ class Level {
 	spawnProjectile(position, direction, material) {
 		this._projectiles.push(
 			new Projectile(position, direction,
-								this._scene, this._assetsManager, material)
+								this._scene, this._resourceHandler, material)
 		);
 	}
 

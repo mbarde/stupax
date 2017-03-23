@@ -1,9 +1,9 @@
 class Game extends Mode {
 
-	constructor(scene, camera, assetsManager, levelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel) {
+	constructor(scene, camera, resourceHandler, levelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel) {
 		super(scene, camera);
 
-		this._assetsManager = assetsManager;
+		this._resourceHandler = resourceHandler;
 		this._onBeforeLoadingNextLevel = onBeforeLoadingNextLevel;
 		this._onAfterLoadingNextLevel = onAfterLoadingNextLevel;
 
@@ -14,25 +14,9 @@ class Game extends Mode {
 		this._levelStrings = levelStrings;
 		this._currentLevelID = 0;
 
-		this._levelFactory = new LevelFactory(this._scene, this._camera, assetsManager, this);
+		this._levelFactory = new LevelFactory(this._scene, this._camera, resourceHandler, this);
 
 		this._level = false;
-
-		this.initBackgroundMusic();
-	}
-
-	initBackgroundMusic() {
-		var soundName = "SoundBackground";
-		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/through_space.ogg");
-		(function(thisObject) {
-			binaryTask.onSuccess = function (task) {
-				if (!thisObject._soundBackground) {
-				   thisObject._soundBackground = new BABYLON.Sound(soundName, task.data, thisObject._scene,
-						function() { thisObject._soundBackground.play(); },
-						{ loop: true, volume: 0.3 });
-				}
-			}
-		}) (this);
 	}
 
 	loadFirstLevel() {
@@ -50,7 +34,6 @@ class Game extends Mode {
 				this._currentLevelID = 0;
 			}
 			this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
-			this._assetsManager.load();
 			this._onAfterLoadingNextLevel();
 		}
 	}
@@ -59,7 +42,6 @@ class Game extends Mode {
 		this._onBeforeLoadingNextLevel();
 		this._currentLevelID = Math.floor(Math.random()*this._levelStrings.length);
 		this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
-		this._assetsManager.load();
 		this._onAfterLoadingNextLevel();
 	}
 
@@ -106,18 +88,14 @@ class Game extends Mode {
 		if (this._level) {
 			this._level.onPause();
 		}
-		if (this._soundBackground) {
-			if (this._soundBackground.isPlaying) {
-				this._soundBackground.pause();
-			}
+		if (this._resourceHandler.soundBackgroundMusic.isPlaying) {
+			this._resourceHandler.soundBackgroundMusic.pause();
 		}
 	}
 
 	onResume() {
-		if (this._soundBackground) {
-			if (!this._soundBackground.isPlaying) {
-				this._soundBackground.play();
-			}
+		if (!this._resourceHandler.soundBackgroundMusic.isPlaying) {
+			this._resourceHandler.soundBackgroundMusic.play();
 		}
 	}
 

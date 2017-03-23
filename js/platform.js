@@ -1,7 +1,7 @@
 class Platform extends Entity {
 
-	constructor(width, height, posX, posY, scene, assetsManager) {
-		super(width, height, 1, scene, assetsManager);
+	constructor(width, height, posX, posY, scene, resourceHandler) {
+		super(width, height, 1, scene, resourceHandler);
 
 		this.initGeometry(posX, posY);
 
@@ -11,7 +11,7 @@ class Platform extends Entity {
 	initGeometry(posX, posY) {
 		this._mesh = BABYLON.MeshBuilder.CreateBox("platform", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 
-		var texture = this.getTextureName();
+		var texture = this.getTexture();
 
 		var alpha = 1.0;
 
@@ -23,65 +23,35 @@ class Platform extends Entity {
 		var TopMaterial = new BABYLON.StandardMaterial("cubeTop", this._scene);
 		var BottomMaterial = new BABYLON.StandardMaterial("cubeBottom", this._scene);
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				FrontMaterial.diffuseTexture = task.texture;
-				FrontMaterial.diffuseTexture.uScale = thisWidth;
-				FrontMaterial.diffuseTexture.vScale = thisHeight;
-				FrontMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		FrontMaterial.diffuseTexture = this.getTexture().clone();
+		FrontMaterial.diffuseTexture.uScale = this._width;
+		FrontMaterial.diffuseTexture.vScale = this._height;
+		FrontMaterial.alpha = alpha;
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				BackMaterial.diffuseTexture = task.texture;
-				BackMaterial.diffuseTexture.uScale = thisWidth;
-				BackMaterial.diffuseTexture.vScale = thisHeight;
-				BackMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		BackMaterial.diffuseTexture = this.getTexture().clone();
+		BackMaterial.diffuseTexture.uScale = this._width;
+		BackMaterial.diffuseTexture.vScale = this._height;
+		BackMaterial.alpha = alpha;
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				LeftMaterial.diffuseTexture = task.texture;
-				LeftMaterial.diffuseTexture.uScale = thisHeight;
-				LeftMaterial.diffuseTexture.vScale = thisDepth;
-				LeftMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		LeftMaterial.diffuseTexture = this.getTexture().clone();
+		LeftMaterial.diffuseTexture.uScale = this._height;
+		LeftMaterial.diffuseTexture.vScale = this._depth;
+		LeftMaterial.alpha = alpha;
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				RightMaterial.diffuseTexture = task.texture;
-				RightMaterial.diffuseTexture.uScale = thisHeight;
-				RightMaterial.diffuseTexture.vScale = thisDepth;
-				RightMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		RightMaterial.diffuseTexture = this.getTexture().clone();
+		RightMaterial.diffuseTexture.uScale = this._height;
+		RightMaterial.diffuseTexture.vScale = this._depth;
+		RightMaterial.alpha = alpha;
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				TopMaterial.diffuseTexture = task.texture;
-				TopMaterial.diffuseTexture.uScale = thisDepth;
-				TopMaterial.diffuseTexture.vScale = thisWidth;
-				TopMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		TopMaterial.diffuseTexture = this.getTexture().clone();
+		TopMaterial.diffuseTexture.uScale = this._depth;
+		TopMaterial.diffuseTexture.vScale = this._width;
+		TopMaterial.alpha = alpha;
 
-		var textureTask = this._assetsManager.addTextureTask("image task", texture);
-		(function(thisWidth, thisHeight, thisDepth) {
-			textureTask.onSuccess = function(task) {
-				BottomMaterial.diffuseTexture = task.texture;
-				BottomMaterial.diffuseTexture.uScale = thisDepth;
-				BottomMaterial.diffuseTexture.vScale = thisWidth;
-				BottomMaterial.alpha = alpha;
-			}
-		}) (this._width, this._height, this._depth);
+		BottomMaterial.diffuseTexture = this.getTexture().clone();
+		BottomMaterial.diffuseTexture.uScale = this._depth;
+		BottomMaterial.diffuseTexture.vScale = this._width;
+		BottomMaterial.alpha = alpha;
 
 		var cubeMultiMat = new BABYLON.MultiMaterial("cubeMulti", this._scene);
 		cubeMultiMat.subMaterials.push(BackMaterial);
@@ -115,8 +85,8 @@ class Platform extends Entity {
 		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false });
 	}
 
-	getTextureName() {
-		return "textures/block04.png";
+	getTexture() {
+		return this._resourceHandler.texPlatform;
 	}
 
 	destroy() {

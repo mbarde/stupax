@@ -1,4 +1,4 @@
-requirejs([	"js/constants.js", "js/animatable.js",
+requirejs([	"js/constants.js", "js/animatable.js", "js/resourceHandler.js",
 	"js/entity.js", "js/platform.js",
 	"js/collisionHelper.js",
 	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/levelFileLoader.js",
@@ -17,6 +17,7 @@ function() {
 	var mode;
 	var scene;
 	var assetsManager;
+	var resourceHandler;
 	var doRender = false;
 	var showOverlay = true;
 	var controls;
@@ -33,7 +34,7 @@ function() {
 	}
 
 	function onBeforeLoadingNextLevel() {
-		doRender = false;
+		//doRender = false;
 	}
 
 	function onAfterLoadingNextLevel() {
@@ -55,33 +56,32 @@ function() {
 
 	scene = createScene();
 	assetsManager = new BABYLON.AssetsManager(scene);
+	resourceHandler = new ResourceHandler(scene, assetsManager);
 	assetsManager.onFinish = function(tasks) {
-		doRender = true;
+		var workWithCookie = false;
+		var tmpLevelCookie = getCookie("tempLevel");
+		if (tmpLevelCookie.length > 10) {
+			workWithCookie = true; // confirm("Found Stupax level in cookies. Do you want to load? Only confirm this if you just started the testing mode from editor.");
+		}
+
+		if (workWithCookie) {
+			mode = new Game(scene, camera, resourceHandler, [], onBeforeLoadingNextLevel);
+			mode.loadLevelFromString(tmpLevelCookie);
+			doRender = true;
+		} else {
+			var levelFileLoader = new LevelFileLoader();
+			levelFileLoader.loadLevelFilesIntoArray(
+				function(arrLevelStrings) {
+					mode = new Game(scene, camera, resourceHandler, arrLevelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel);
+					mode.loadFirstLevel();
+					onAfterLoadingNextLevel();
+					doRender = true;
+				}
+			);
+		}
 	};
 
-	var workWithCookie = false;
-	var tmpLevelCookie = getCookie("tempLevel");
-	if (tmpLevelCookie.length > 10) {
-		workWithCookie = true; // confirm("Found Stupax level in cookies. Do you want to load? Only confirm this if you just started the testing mode from editor.");
-	}
-
-	if (workWithCookie) {
-		mode = new Game(scene, camera, assetsManager, [], onBeforeLoadingNextLevel);
-		mode.loadLevelFromString(tmpLevelCookie);
-		assetsManager.load();
-	} else {
-
-		var levelFileLoader = new LevelFileLoader();
-		levelFileLoader.loadLevelFilesIntoArray(
-			function(arrLevelStrings) {
-				mode = new Game(scene, camera, assetsManager, arrLevelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel);
-				mode.loadFirstLevel();
-				onAfterLoadingNextLevel();
-				assetsManager.load();
-			}
-		);
-
-	}
+	assetsManager.load();
 	// --------------------------------------------------------------------------
 
 	// Setup controls -----------------------------------------------------------

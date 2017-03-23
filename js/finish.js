@@ -1,14 +1,13 @@
 class Finish extends Entity {
 
-	constructor(posX, posY, scene, assetsManager) {
-		super(1, 1, 0, scene, assetsManager);
+	constructor(posX, posY, scene, resourceHandler) {
+		super(1, 1, 0, scene, resourceHandler);
 
 		this._posX = posX;
 		this._posY = posY;
 
 		this.initCollisionMesh();
 		this.initDoorMesh();
-		this.initSound();
 		this.initLight();
 	}
 
@@ -31,37 +30,13 @@ class Finish extends Entity {
 	initDoorMesh() {
 		// Create plane containing the finish texture
 		var material = new BABYLON.StandardMaterial("finish", this._scene);
-		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door.png");
-		(function(thisObject) {
-			textureTask.onSuccess = function(task) {
-				material.diffuseTexture = task.texture;
-				material.diffuseTexture.hasAlpha = true;
-				material.backFaceCulling = true;
-				thisObject._tex_doorClosed = task.texture;
-			}
-		}) (this);
-
-		var textureTask = this._assetsManager.addTextureTask("image task", "textures/door_open.png");
-		(function(thisObject) {
-			textureTask.onSuccess = function(task) {
-				thisObject._tex_doorOpen = task.texture;
-			}
-		}) (this);
 
 		this._doorMesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: CONS_SCALE, width: CONS_SCALE}, this._scene);
 		this._doorMesh.material = material;
+		this._doorMesh.material.diffuseTexture = this._resourceHandler.texDoorClosed;
 		this._doorMesh.position.x = (this._posX + 0.5)  * CONS_SCALE;
 		this._doorMesh.position.y = (this._posY + 0.5) * CONS_SCALE;
 		this._doorMesh.position.z = CONS_SCALE/2 - 0.001;
-	}
-
-	initSound() {
-		var binaryTask = this._assetsManager.addBinaryFileTask("SoundDoorOpen task", "sounds/door.ogg");
-		(function(thisObject) {
-			binaryTask.onSuccess = function (task) {
-			   thisObject._soundDoorOpen = new BABYLON.Sound("SoundDoorOpen", task.data, thisObject._scene, null, { loop: false });
-			}
-		}) (this);
 	}
 
 	initLight() {
@@ -77,11 +52,10 @@ class Finish extends Entity {
 	}
 
 	onWin() {
-		this._doorMesh.material.diffuseTexture = this._tex_doorOpen;
-		this._doorMesh.material.diffuseTexture.hasAlpha = true;
+		this._doorMesh.material.diffuseTexture = this._resourceHandler.texDoorOpen;
 		this._light.diffuse = new BABYLON.Color3(0, 1, 0);
 		this._light.specular = new BABYLON.Color3(0, 1, 0);
-		this._soundDoorOpen.play();
+		this._resourceHandler.soundDoorOpen.play();
 	}
 
 	getSubsequentLevel() {
@@ -89,8 +63,7 @@ class Finish extends Entity {
 	}
 
 	reset() { // reverts all effects done by onWin() [needed for level restart after win]
-		this._doorMesh.material.diffuseTexture = this._tex_doorClosed;
-		this._doorMesh.material.diffuseTexture.hasAlpha = true;
+		this._doorMesh.material.diffuseTexture = this._resourceHandler.texDoorClosed;
 		this._light.diffuse = new BABYLON.Color3(1, 0, 0);
 		this._light.specular = new BABYLON.Color3(1, 0, 0);
 	}

@@ -1,7 +1,7 @@
 class MovablePlatform extends Platform {
 
-	constructor(width, height, posX, posY, scene, level, assetsManager) {
-		super(width, height, posX, posY, scene, assetsManager);
+	constructor(width, height, posX, posY, scene, level, resourceHandler) {
+		super(width, height, posX, posY, scene, resourceHandler);
 
 		this._level = level;
 
@@ -13,7 +13,6 @@ class MovablePlatform extends Platform {
 		this.reset(posX, posY);
 
 		this.initConstantsAndGeometry();
-		this.initSounds();
 	}
 
 	initConstantsAndGeometry() {
@@ -21,17 +20,7 @@ class MovablePlatform extends Platform {
 		this._mesh.isWall = false;
 		this._mesh.getPhysicsImpostor().setMass(CONS_MOV_PLAT_MASS);
 		this._light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 15, -3), this._scene);
-	}
-
-	initSounds() {
-		var soundName = "SoundMovPlatEngine";
-		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/engine.ogg");
-		(function(thisObject) {
-			binaryTask.onSuccess = function (task) {
-			   thisObject._soundMove = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.1, loop: true });
-				thisObject._soundMove.attachToMesh(thisObject._mesh);
-			}
-		}) (this);
+		this._resourceHandler.soundMovablePlatform.attachToMesh(this._mesh);
 	}
 
 	// Reset movable platform, for example when level restart
@@ -99,8 +88,8 @@ class MovablePlatform extends Platform {
 
 	updateSounds() {
 		var isMoving = (this._direction.length() >= 1);
-		if (isMoving && !this._soundMove.isPlaying) this._soundMove.play();
-		if (!isMoving && this._soundMove.isPlaying) this._soundMove.pause();
+		if (isMoving && !this._resourceHandler.soundMovablePlatform.isPlaying) this._resourceHandler.soundMovablePlatform.play();
+		if (!isMoving && this._resourceHandler.soundMovablePlatform.isPlaying) this._resourceHandler.soundMovablePlatform.pause();
 	}
 
 	checkPhysicConstraints() {
@@ -151,8 +140,8 @@ class MovablePlatform extends Platform {
 		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: true });
 	}
 
-	getTextureName() {
-		return "textures/block03.png";
+	getTexture() {
+		return this._resourceHandler.texMovablePlatform;
 	}
 
 	keyDown(ctrlCode) {
@@ -174,15 +163,13 @@ class MovablePlatform extends Platform {
 
 	onPause() {
 		this._keysDown = [];
-		if (this._soundMove) {
-			if (this._soundMove.isPlaying) this._soundMove.pause();
-		}
+		if (this._resourceHandler.soundMovablePlatform.isPlaying) this._resourceHandler.soundMovablePlatform.pause();
 	}
 
 	destroy() {
 		super.destroy();
 		this._light.dispose();
-		this._soundMove.dispose();
+		this._resourceHandler.soundMovablePlatform.stop();
 	}
 
 }

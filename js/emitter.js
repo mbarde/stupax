@@ -1,7 +1,7 @@
 class Emitter extends Platform {
 
-	constructor(posX, posY, directions, interval, offset, scene, assetsManager, level) {
-		super(1, 1, posX, posY, scene, assetsManager);
+	constructor(posX, posY, directions, interval, offset, scene, resourceHandler, level) {
+		super(1, 1, posX, posY, scene, resourceHandler);
 
 		this._interval = interval;
 		this._offset = offset;
@@ -14,12 +14,9 @@ class Emitter extends Platform {
 		this._level = level;
 
 		this._projectile_material = new BABYLON.StandardMaterial("projectile", this._scene);
-		var textureTask = this._assetsManager.addTextureTask("image task", "textures/fireball.png");
-		(function(material) { textureTask.onSuccess = function(task) {
-			material.diffuseTexture = task.texture;
-			material.diffuseTexture.hasAlpha = true;
-			material.backFaceCulling = true;
-		} } )(this._projectile_material);
+		this._projectile_material.diffuseTexture = this._resourceHandler.texFireball;
+		this._projectile_material.diffuseTexture.hasAlpha = true;
+		this._projectile_material.backFaceCulling = true;
 	}
 
 	reset() {
@@ -37,8 +34,8 @@ class Emitter extends Platform {
 		}
 	}
 
-	getTextureName() {
-		return "textures/emitter.png";
+	getTexture() {
+		return this._resourceHandler.texEmitter;
 	}
 
 }

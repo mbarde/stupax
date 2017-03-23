@@ -1,15 +1,15 @@
 class Guy extends Animatable {
 
-	constructor(posX, posY, scene, assetsManager) {
-			super(scene, assetsManager);
+	constructor(posX, posY, scene, resourceHandler) {
+			super(scene);
+
+			this._resourceHandler = resourceHandler;
 
 			this.initConstants();
 
 			this.initGeometry();
 
 			this.initAnimations();
-
-			this.initSounds();
 
 			this._collisionHelper = new CollisionHelper(
 						this._scene, this._width, this._height, this._mesh,
@@ -45,56 +45,46 @@ class Guy extends Animatable {
 		this._mesh = BABYLON.MeshBuilder.CreateBox("guy", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE, depth: CONS_SCALE}, this._scene);
 		this._mesh.material = material;
 		this._mesh.isGuy = true;
+		this._resourceHandler.soundGuyRun.attachToMesh(this._mesh);
 
 		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_GUY_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
 	}
 
 	initAnimations() {
 		this.anim_loadAnimation([
-			"textures/guy/obj_Run000.png",
-			"textures/guy/obj_Run001.png",
-			"textures/guy/obj_Run002.png",
-			"textures/guy/obj_Run003.png",
-			"textures/guy/obj_Run004.png",
-			"textures/guy/obj_Run005.png",
-			"textures/guy/obj_Run006.png",
-			"textures/guy/obj_Run007.png"
+			this._resourceHandler.texGuyRun00,
+			this._resourceHandler.texGuyRun01,
+			this._resourceHandler.texGuyRun02,
+			this._resourceHandler.texGuyRun03,
+			this._resourceHandler.texGuyRun04,
+			this._resourceHandler.texGuyRun05,
+			this._resourceHandler.texGuyRun06,
+			this._resourceHandler.texGuyRun07
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "run");
 		this.anim_loadAnimation([
-			"textures/guy/obj_Idle000.png",
-			"textures/guy/obj_Idle001.png",
-			"textures/guy/obj_Idle002.png",
-			"textures/guy/obj_Idle003.png"
+			this._resourceHandler.texGuyIdle00,
+			this._resourceHandler.texGuyIdle01,
+			this._resourceHandler.texGuyIdle02,
+			this._resourceHandler.texGuyIdle03
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "stand");
 		this.anim_loadAnimation([
-			"textures/guy/obj_JumpHigh000.png"
+			this._resourceHandler.texGuyJump
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "jump");
 		this.anim_loadAnimation([
-			"textures/guy/obj_Box000.png",
-			"textures/guy/obj_Box001.png",
-			"textures/guy/obj_Box002.png",
-			"textures/guy/obj_Box003.png",
-			"textures/guy/obj_Box004.png",
-			"textures/guy/obj_Box005.png"
+			this._resourceHandler.texGuyWin00,
+			this._resourceHandler.texGuyWin01,
+			this._resourceHandler.texGuyWin02,
+			this._resourceHandler.texGuyWin03,
+			this._resourceHandler.texGuyWin04,
+			this._resourceHandler.texGuyWin04
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 80, "win");
 		this.anim_loadAnimation([
-			"textures/guy/obj_Flying001.png",
-			"textures/guy/obj_Flying000.png",
-			"textures/guy/obj_Flat000.png"
+			this._resourceHandler.texGuyDie00,
+			this._resourceHandler.texGuyDie01,
+			this._resourceHandler.texGuyDie02
 		], this._tex_uScale, this._tex_vScale, this._tex_uOffset, this._tex_vOffset, 120, "die", false);
 
 		this.anim_setAnimationByName("run");
-	}
-
-	initSounds() {
-		var soundName = "SoundGuyRun";
-		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/steps.ogg");
-		(function(thisObject) {
-			binaryTask.onSuccess = function (task) {
-			   thisObject._soundRun = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.8, playbackRate: 0.8, loop: true });
-				thisObject._soundRun.attachToMesh(thisObject._mesh);
-			}
-		}) (this);
 	}
 
 	// Reset guy, for example when restarting level.
@@ -266,19 +256,19 @@ class Guy extends Animatable {
 
 		// If new frame is necessary, bind it to texture mesh.
 		if (this.anim_update()) {
-			this._planeMesh.material = this.anim_getCurTexture();
+			this._planeMesh.material.diffuseTexture = this.anim_getCurTexture();
 			if (!this._forward) this._planeMesh.material.diffuseTexture.uScale = -this._tex_uScale;
 			else this._planeMesh.material.diffuseTexture.uScale = this._tex_uScale;
 		}
 	}
 
 	updateSounds() {
-		if (this._soundRun) {
-			if (this._curMode == CONS_GM_RUN && !this._soundRun.isPlaying) {
-				this._soundRun.play();
+		if (this._resourceHandler.soundGuyRun) {
+			if (this._curMode == CONS_GM_RUN && !this._resourceHandler.soundGuyRun.isPlaying) {
+				this._resourceHandler.soundGuyRun.play();
 			}
-			if (this._curMode != CONS_GM_RUN && this._soundRun.isPlaying) {
-				this._soundRun.stop();
+			if (this._curMode != CONS_GM_RUN && this._resourceHandler.soundGuyRun.isPlaying) {
+				this._resourceHandler.soundGuyRun.stop();
 			}
 		}
 	}
@@ -345,12 +335,12 @@ class Guy extends Animatable {
 	destroy() {
 		this._planeMesh.dispose();
 		this._mesh.dispose();
-		this._soundRun.dispose();
+		this._resourceHandler.soundGuyRun.stop();
 	}
 
 	onPause() {
-		if (this._soundRun) {
-			if (this._soundRun.isPlaying) this._soundRun.pause();
+		if (this._resourceHandler.soundGuyRun) {
+			if (this._resourceHandler.soundGuyRun.isPlaying) this._resourceHandler.soundGuyRun.pause();
 		}
 	}
 

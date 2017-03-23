@@ -1,7 +1,7 @@
 class Background extends Entity {
 
-	constructor(width, height, scene, assetsManager) {
-		super(width, height, 0, scene, assetsManager);
+	constructor(width, height, scene, resourceHandler) {
+		super(width, height, 0, scene, resourceHandler);
 
 		this._levelWidth = width;
 		this._levelHeight = height;
@@ -12,16 +12,11 @@ class Background extends Entity {
 
 	initBackgroundPlane() {
 		var material = new BABYLON.StandardMaterial("Mat", this._scene);
-		var textureTask = this._assetsManager.addTextureTask("image task", "textures/block01.png");
-		(function(levelWidth, levelHeight, mat) {
-			textureTask.onSuccess = function(task) {
-				mat.diffuseTexture = task.texture;
-				mat.backFaceCulling = true;
-				mat.diffuseTexture.uScale = (levelWidth + 9 * CONS_SCALE)
-				mat.diffuseTexture.uOffset = 0.5;
-				mat.diffuseTexture.vScale = (levelHeight);
-			}
-		}) (this._levelWidth, this._levelHeight, material);
+		material.backFaceCulling = true;
+		material.diffuseTexture = this._resourceHandler.texBackground;
+		material.diffuseTexture.uScale = (this._levelWidth + 9 * CONS_SCALE)
+		material.diffuseTexture.uOffset = 0.5;
+		material.diffuseTexture.vScale = this._levelHeight;
 
 		this._backgroundMesh = BABYLON.MeshBuilder.CreatePlane("plane", {width: (this._levelWidth + 20 * CONS_SCALE) * CONS_SCALE, height: (this._levelHeight * CONS_SCALE)}, this._scene);
 		this._backgroundMesh.material = material;

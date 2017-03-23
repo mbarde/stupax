@@ -1,8 +1,8 @@
 class Projectile extends Entity {
 
 	// ATTENTION: here position is in absolute coordinates !!!
-	constructor(position, direction, scene, assetsManager, material) {
-		super(CONS_PROJECTILE_SIZE, CONS_PROJECTILE_SIZE, 0, scene, assetsManager);
+	constructor(position, direction, scene, resourceHandler, material) {
+		super(CONS_PROJECTILE_SIZE, CONS_PROJECTILE_SIZE, 0, scene, resourceHandler);
 
 		this._material = material;
 
