@@ -166,6 +166,10 @@ class MovablePlatform extends Platform {
 		if (this._resourceHandler.soundMovablePlatform.isPlaying) this._resourceHandler.soundMovablePlatform.pause();
 	}
 
+	onResume() {
+		
+	}
+
 	destroy() {
 		super.destroy();
 		this._light.dispose();

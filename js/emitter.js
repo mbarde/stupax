@@ -5,7 +5,7 @@ class Emitter extends Platform {
 
 		this._interval = interval;
 		this._offset = offset;
-		this._last_emit_time = new Date().getTime() + this._offset;
+		this._countdown = new Countdown(this._offset + this._interval);
 
 		this._emit_directions = directions; // array contains all directions in which emitters emits
 
@@ -20,23 +20,29 @@ class Emitter extends Platform {
 	}
 
 	reset() {
-		this._last_emit_time = new Date().getTime() + this._offset;
+		this._countdown = new Countdown(this._offset + this._interval);
 	}
 
-	update(allow_emission) {
-		var curTime = new Date().getTime();
-		if (!allow_emission) this._last_emit_time = curTime + this._offset;
-		if (curTime - this._last_emit_time >= this._interval) {
+	update() {
+		if (this._countdown.update()) {
 			for (var i = 0; i < this._emit_directions.length; i++) {
 				this._level.spawnProjectile(this._mesh.position.clone(), this._emit_directions[i], this._projectile_material);
 				this._resourceHandler.soundEmitterShot.play();
+				this._countdown = new Countdown(this._interval);
 			}
-			this._last_emit_time = curTime;
 		}
 	}
 
 	getTexture() {
 		return this._resourceHandler.texEmitter;
+	}
+
+	onPause() {
+		this._countdown.onPause();
+	}
+
+	onResume() {
+		this._countdown.onResume();
 	}
 
 }

@@ -13,8 +13,8 @@ class Level {
 
 		this._finished = false; 			// will contain timestamp of win when player reaches door
 		this._died = false;					// will contain timestamp of death when player died
-		this._blockGuy = false;			// block guy from running
 		this._firstUpdate = true;			//
+		this._camFlyEndCallsOnResume = true;
 	}
 
 	restart() {
@@ -42,6 +42,7 @@ class Level {
 		}
 
 		this._firstUpdate = true;
+		this._camFlyEndCallsOnResume = true;
 	}
 
 	update() {
@@ -80,18 +81,25 @@ class Level {
 
 	updateEmitters() {
 		for (var i = 0; i < this._emitters.length; i++) {
-			this._emitters[i].update(this._guy._doRun);
+			this._emitters[i].update();
 		}
 	}
 
 	updateProjectiles() {
-		// Update projectiles and remove if necessary (when they hit something).
+		// Update projectiles and remove if necessary (when they hit something or are out of level bounds).
 		// Additionally, when projectile hits guy, kill him :)
 		var projs_to_remove = [];
 		for (var i = 0; i < this._projectiles.length; i++) {
 			if ( this._projectiles[i].update() ) { // projectile.update returns true if it hit something
 				projs_to_remove.push(i);
 			} else {
+				// If projectile is out of level bounds it has to be removed
+				if (this._projectiles[i]._mesh.getAbsolutePosition().y < (CONS_LEVEL_BOTTOM-2) * CONS_SCALE) {
+					projs_to_remove.push(i);
+				} else if (this._projectiles[i]._mesh.getAbsolutePosition().y > (CONS_LEVEL_TOP+2) * CONS_SCALE) {
+					projs_to_remove.push(i);
+				}
+
 				// If projectile hits guy he has to die
 				if (!this._died && this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
 					this._guy.onDie();
@@ -100,6 +108,7 @@ class Level {
 				}
 			}
 		}
+
 		var c = 0;
 		for (var i = 0; i < projs_to_remove.length; i++) {
 			var index = projs_to_remove[i] - c;
@@ -164,14 +173,6 @@ class Level {
 		this._movablePlatform.keyUp(ctrlCode);
 	}
 
-	setGuyRunState(state) {
-		if (state && this._camFly) {
-
-		} else {
-			this._guy.setRunState(state);
-		}
-	}
-
 	destroy() {
 		for (var i = 0; i < this._platforms.length; i++) {
 			this._platforms[i].destroy();
@@ -203,7 +204,7 @@ class Level {
 		this._camFly.z = 0;
 		this._camFly_lastDist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.getAbsolutePosition());
 		this._camFly.scaleInPlace(0.01);
-		this._guy.setRunState(false);
+		this.onPause();
 	}
 
 	cameraFlightStep() {
@@ -211,7 +212,9 @@ class Level {
 		var dist = BABYLON.Vector3.Distance(this._camera.position, this._movablePlatform._mesh.position);
 		if (dist > this._camFly_lastDist) {
 			this._camFly = false;
-			if (!this._blockGuy) this._guy.setRunState(true);
+			if (this._camFlyEndCallsOnResume) {
+				this.onResume();
+			}
 		} else {
 			this._camFly_lastDist = dist;
 		}
@@ -220,6 +223,27 @@ class Level {
 	onPause() {
 		this._movablePlatform.onPause();
 		this._guy.onPause();
+		for (var i = 0; i < this._emitters.length; i++) {
+			this._emitters[i].onPause();
+		}
+		for (var i = 0; i < this._projectiles.length; i++) {
+			this._projectiles[i].onPause();
+		}
+	}
+
+	onResume() {
+		if (this._camFly) {
+			this._camFlyEndCallsOnResume = true;
+			return;
+		}
+		this._movablePlatform.onResume();
+		this._guy.onResume();
+		for (var i = 0; i < this._emitters.length; i++) {
+			this._emitters[i].onResume();
+		}
+		for (var i = 0; i < this._projectiles.length; i++) {
+			this._projectiles[i].onResume();
+		}
 	}
 
 }

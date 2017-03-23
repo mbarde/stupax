@@ -319,10 +319,6 @@ class Guy extends Animatable {
 		return this._forward;
 	}
 
-	setRunState(doRun) {
-		this._doRun = doRun;
-	}
-
 	keyDown(keyCode) {
 		if (keyCode == CTRL_GUY_JUMP) {
 			console.log(this._mesh.blockStatus);
@@ -343,6 +339,11 @@ class Guy extends Animatable {
 		if (this._resourceHandler.soundGuyRun) {
 			if (this._resourceHandler.soundGuyRun.isPlaying) this._resourceHandler.soundGuyRun.pause();
 		}
+		this._doRun = false;
+	}
+
+	onResume() {
+		this._doRun = true;
 	}
 
 }

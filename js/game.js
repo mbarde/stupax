@@ -52,10 +52,8 @@ class Game extends Mode {
 			this._level.destroy();
 		}
 		this._level = this._levelFactory.stringToLevelObject(levelString);
-
 		if (isFirstLevel) {
-			this._level.setGuyRunState(false);
-			this._level._blockGuy = true;
+			this._level._camFlyEndCallsOnResume = false;
 		}
 	}
 
@@ -79,11 +77,6 @@ class Game extends Mode {
 		if (!this._level._camFly) this._level.keyUp(ctrlCode);
 	}
 
-	startRunning() {
-		this._level.setGuyRunState(true);
-		this._level._blockGuy = false;
-	}
-
 	onPause() {
 		if (this._level) {
 			this._level.onPause();
@@ -94,6 +87,9 @@ class Game extends Mode {
 	}
 
 	onResume() {
+		if (this._level) {
+			this._level.onResume();
+		}
 		if (!this._resourceHandler.soundBackgroundMusic.isPlaying) {
 			this._resourceHandler.soundBackgroundMusic.play();
 		}

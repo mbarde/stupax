@@ -9,6 +9,8 @@ class Projectile extends Entity {
 		this._direction = new BABYLON.Vector3(direction.x, direction.y, 0); // movement direction
 
 		this.initGeometry(position);
+
+		this._countdown = new Countdown(CONS_PROJECTILE_LIFETIME);
 	}
 
 	initGeometry(position) {
@@ -21,7 +23,12 @@ class Projectile extends Entity {
 		this._light.specular = new BABYLON.Color3(0.91, 0.17, 0);
 	}
 
+	// if it returns TRUE the level removes this projectile
 	update() {
+		if( this._countdown.update() ) {
+			return true;
+		}
+
 		// Movement
 		this._mesh.position.addInPlace( this._direction );
 		this._light.position = this._mesh.position;
@@ -65,6 +72,14 @@ class Projectile extends Entity {
 	destroy() {
 		this._mesh.dispose();
 		this._light.dispose();
+	}
+
+	onPause() {
+		this._countdown.onPause();
+	}
+
+	onResume() {
+		this._countdown.onResume();
 	}
 
 }

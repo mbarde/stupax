@@ -1,4 +1,5 @@
-requirejs([	"js/constants.js", "js/animatable.js", "js/resourceHandler.js",
+requirejs([	"js/constants.js", "js/animatable.js",
+	"js/resourceHandler.js", "js/countdown.js",
 	"js/entity.js", "js/platform.js",
 	"js/collisionHelper.js",
 	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/levelFileLoader.js",
@@ -22,7 +23,6 @@ function() {
 	var showOverlay = true;
 	var controls;
 	var camera;
-	var loo="hoo";
 
 	function hideOverlayAndUnpause() {
 		if (!doRender) {
@@ -30,7 +30,7 @@ function() {
 		}
 		$('.overlay').hide();
 		showOverlay = false;
-		mode.startRunning();
+		mode.onResume();
 	}
 
 	function onBeforeLoadingNextLevel() {
@@ -99,12 +99,11 @@ function() {
 			if (event.keyCode == 27) {
 				if (!showOverlay) {
 					showOverlay = true;
-					mode.onPause();
 					$('.overlay').show();
+					mode.onPause();
 					doRender = false;
 				} else {
 					hideOverlayAndUnpause();
-					mode.onResume();
 				}
 			}
 			if (!showOverlay && mode) {
