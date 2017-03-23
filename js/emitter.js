@@ -29,6 +29,7 @@ class Emitter extends Platform {
 		if (curTime - this._last_emit_time >= this._interval) {
 			for (var i = 0; i < this._emit_directions.length; i++) {
 				this._level.spawnProjectile(this._mesh.position.clone(), this._emit_directions[i], this._projectile_material);
+				this._resourceHandler.soundEmitterShot.play();
 			}
 			this._last_emit_time = curTime;
 		}

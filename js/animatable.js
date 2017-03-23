@@ -73,10 +73,10 @@ class Animatable {
 		var index = this._animations.length - 1;
 
 		for (var i = 0; i < frames.length; i++) {
-			//frames[i].uScale = uScale;
-			//frames[i].vScale = vScale;
-			//frames[i].uOffset = uOffset;
-			//frames[i].vOffset = vOffset;
+			frames[i].uScale = uScale;
+			frames[i].vScale = vScale;
+			frames[i].uOffset = uOffset;
+			frames[i].vOffset = vOffset;
 			this._animations[index].push( frames[i] );
 		}
 		this._anim_intervals.push( interval );

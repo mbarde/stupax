@@ -294,6 +294,7 @@ class Guy extends Animatable {
 	onDie() {
 		this._fixAnimation = true;
 		this.anim_setAnimationByName("die");
+		this._resourceHandler.soundGuyDie.play();
 	}
 
 	// Toggle direction in which guy is running.

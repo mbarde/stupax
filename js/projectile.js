@@ -32,7 +32,11 @@ class Projectile extends Entity {
 		this._mesh.rotation.z -= 0.1;
 
 		// return if projectile hit a wall as information for the level (projectile has to be destroyed then)
-		return this.checkForWallHit();
+		if (this.checkForWallHit()) {
+			this._resourceHandler.soundProjectileHit.play();
+			return true;
+		}
+		return false;
 	}
 
 	checkForWallHit() {

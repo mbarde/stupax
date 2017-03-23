@@ -37,6 +37,42 @@ class ResourceHandler {
 			}
 		}) (this);
 
+		// Guy below ground
+		var soundName = "SoundGuyBelowGround";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/spaceTrash4.mp3");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject.soundGuyBelowGround = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { loop: false });
+			}
+		}) (this);
+
+		// Guy die
+		var soundName = "SoundGuyDie";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/die.ogg");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject.soundGuyDie = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { loop: false });
+			}
+		}) (this);
+
+		// Emitter shot
+		var soundName = "SoundEmitterShot";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/shoot.mp3");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject.soundEmitterShot = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.4, loop: false });
+			}
+		}) (this);
+
+		// Projectile hit
+		var soundName = "SoundProjectileHit";
+		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/explode.ogg");
+		(function(thisObject) {
+			binaryTask.onSuccess = function (task) {
+			   thisObject.soundProjectileHit = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.2, loop: false });
+			}
+		}) (this);
+
 		// Background music
 		var soundName = "SoundBackground";
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/through_space.ogg");

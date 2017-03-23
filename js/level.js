@@ -71,6 +71,7 @@ class Level {
 		}
 
 		if (this.isGuyOutOfLevelBounds()) {
+			this._resourceHandler.soundGuyBelowGround.play();
 			this.restart();
 		}
 
@@ -92,7 +93,7 @@ class Level {
 				projs_to_remove.push(i);
 			} else {
 				// If projectile hits guy he has to die
-				if (this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
+				if (!this._died && this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
 					this._guy.onDie();
 					this._died = new Date().getTime();
 					projs_to_remove.push(i);
