@@ -12,3 +12,4 @@ So it runs in every browsers (Chrome or Chromium recommended due performance rea
 
 ![Screenshot](https://github.com/mbarde/stupax/blob/master/docs/screen.png?raw=true)
 ![Screenshot](https://github.com/mbarde/stupax/blob/master/docs/screen02.png?raw=true)
+![Screenshot](https://github.com/mbarde/stupax/blob/master/docs/screen03.png?raw=true)
