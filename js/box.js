@@ -36,7 +36,7 @@ class Box extends Platform {
 	}
 
 	setPhysicsState() {
-		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: true });
+		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 1.0, move: true });
 	}
 
 }
