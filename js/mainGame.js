@@ -1,8 +1,10 @@
-requirejs(["js/constants.js", "js/animatable.js", "js/resourceHandler.js", "js/countdown.js",
-	"js/entity.js", "js/platform.js", "js/collisionHelper.js", "js/mode.js", "js/game.js",
+requirejs(["js/entity.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
+	"js/countdown.js",
+	"js/platform.js", "js/collisionHelper.js", "js/mode.js", "js/game.js",
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
-	"js/levelFactory.js", "js/movablePlatform.js", "js/box.js", "js/guy.js",
-	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
+	"js/movablePlatform.js", "js/box.js", "js/guy.js",
+	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js",
+	"js/levelFactory.js"],
 
 function() {
 
@@ -73,6 +75,8 @@ function() {
 				}
 			);
 		}
+
+		$('#btnStart').show();
 	};
 	assetsManager.onTaskSuccess = function(task) {
 		$('#spanFps').text("Loading: " + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%");
