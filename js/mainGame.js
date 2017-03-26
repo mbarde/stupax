@@ -9,6 +9,7 @@ function() {
 	var game;
 	var scene;
 	var resourceHandler;
+	var countOfAllAssetsManagerTasks = 0;
 
 	var doRender = false;
 	var showOverlay = true;
@@ -45,6 +46,9 @@ function() {
 	var canvas = document.getElementById("renderCanvas");
 	var engine = new BABYLON.Engine(canvas, true);
 
+	//var loadingScreen = new MyLoadingScreen("che mf im loading");
+	//engine.loadingScreen = loadingScreen;
+
 	scene = createScene();
 	var assetsManager = new BABYLON.AssetsManager(scene);
 	resourceHandler = new ResourceHandler(scene, assetsManager);
@@ -70,7 +74,11 @@ function() {
 			);
 		}
 	};
+	assetsManager.onTaskSuccess = function(task) {
+		$('#spanFps').text("Loading: " + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%");
+	}
 	assetsManager.load();
+	countOfAllAssetsManagerTasks = assetsManager.waitingTasksCount;
 
 	engine.runRenderLoop(function () {
 		if (doRender) {
