@@ -113,7 +113,7 @@ function() {
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
-			if (event.keyCode == 27) { // ESC
+			if (game && event.keyCode == 27) { // ESC
 				if (!showOverlay) {
 					showOverlayAndPause();
 				} else {
