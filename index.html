@@ -17,9 +17,6 @@
       <script src="plugins/oimo.js"></script>
 		<script src="plugins/babylon.custom.js"></script>
 
-		<!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) to save lavel files -->
-		<script src="plugins/FileSaver.min.js"></script>
-
 		<!-- jQuery to load level files -->
 		<script src="plugins/jquery-3.1.1.min.js"></script>
 
@@ -30,16 +27,8 @@
    </head>
 <body>
 	<span id="spanFps"></span>
-	<div class="overlay">
-		<span class="title">Help <i>Stupax</i> to reach the door!</span><br>
-		<br>
-		<span class="sub">Move the platform using the arrow keys (or your gamepad).</span><br>
-		<br>
-		<span class="sub"><span class="keyboard-key">R</span> - restart level</span><br>
-		<br>
-		<span class="sub"><span class="keyboard-key">ESC</span> - pause game</span><br>
-		<br>
-		<button class="button" id="btnStart" style="display:none">START</button>
+	<div id="divMenuOverlay" class="overlay">
+		STUPAX
 	</div>
    <canvas id="renderCanvas"></canvas>
 </body>

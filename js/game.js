@@ -39,14 +39,21 @@ class Game extends Mode {
 		this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
 	}
 
-	loadLevelFromString(levelString) {
+	loadLevelByID(levelID) {
+		if (levelID < 0 || levelID  >= this._levelStrings.length) { return; }
+
+		this._currentLevelID = levelID;
+		this.loadLevelFromString( this._levelStrings[this._currentLevelID], true);
+	}
+
+	loadLevelFromString(levelString, waitForUserInputBeforeStart = false) {
 		var isFirstLevel = true;
 		if (this._level) {
 			isFirstLevel = false;
 			this._level.destroy();
 		}
 		this._level = this._levelFactory.stringToLevelObject(levelString);
-		if (isFirstLevel) {
+		if (isFirstLevel || waitForUserInputBeforeStart) {
 			this._level._camFlyEndCallsOnResume = false; // since in the first level we also wait for first user input before guy starts to run
 		}
 	}
@@ -87,6 +94,10 @@ class Game extends Mode {
 		if (!this._resourceHandler.soundBackgroundMusic.isPlaying) {
 			this._resourceHandler.soundBackgroundMusic.play();
 		}
+	}
+
+	getLevelCount() {
+		return this._levelStrings.length;
 	}
 
 }

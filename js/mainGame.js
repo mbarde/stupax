@@ -4,7 +4,7 @@ requirejs(["js/entity.js", "js/constants.js", "js/animatable.js", "js/resourceHa
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js",
 	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js",
-	"js/levelFactory.js"],
+	"js/levelFactory.js", "js/menuManager.js"],
 
 function() {
 
@@ -19,15 +19,19 @@ function() {
 	var controls;
 	var camera;
 
+	function activateRendering() {
+		doRender = true;
+	}
+
 	function hideOverlayAndUnpause() {
-		$('.overlay').hide();
+		menuManager.hideMenuOverlay();
 		showOverlay = false;
 		doRender = true;
 		game.onResume();
 	}
 
 	function showOverlayAndPause() {
-		$('.overlay').show();
+		menuManager.showMenuOverlay();
 		showOverlay = true;
 		doRender = false;
 		game.onPause();
@@ -44,6 +48,8 @@ function() {
 
 		return myScene;
 	}
+
+	var menuManager = new MenuManager( $('#divMenuOverlay'), hideOverlayAndUnpause, activateRendering );
 
 	var canvas = document.getElementById("renderCanvas");
 	var engine = new BABYLON.Engine(canvas, true);
@@ -72,11 +78,13 @@ function() {
 					game = new Game(scene, camera, resourceHandler, arrLevelStrings);
 					game.loadFirstLevel();
 					doRender = true;
+
+					menuManager.setGame( game );
+					menuManager.loadMenuMain();
 				}
 			);
 		}
 
-		$('#btnStart').show();
 	};
 	assetsManager.onTaskSuccess = function(task) {
 		$('#spanFps').text("Loading: " + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%");
