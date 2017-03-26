@@ -13,7 +13,7 @@ class Level {
 
 		this._finishedCountdown = false; 			// will contain timestamp of win when player reaches door
 		this._diedCountdown = false;					// will contain timestamp of death when player died
-		this._firstUpdate = true;			//
+		this._firstUpdate = true;
 		this._camFlyEndCallsOnResume = true;
 	}
 
@@ -55,14 +55,12 @@ class Level {
 
 		if (this._diedCountdown) {
 			if (this._diedCountdown.update()) {
-				this._diedCountdown = false;
 				this.restart();
 			}
 		}
 
 		if (this._finishedCountdown) {
 		 	if (!this._diedCountdown && this._finishedCountdown.update()) {
-				this._finishedCountdown = false;
 				this._game.loadNextLevel();
 			}
 		}

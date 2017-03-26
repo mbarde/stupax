@@ -59,7 +59,7 @@ class Game extends Mode {
 	}
 
 	update() {
-		this._level.update();
+		if (this._level) this._level.update();
 	}
 
 	keyDown(ctrlCode) {

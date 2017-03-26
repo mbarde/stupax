@@ -15,6 +15,7 @@ class LevelFactory {
 
 		var levelJSON = JSON.parse(levelString);
 		levelObject._levelJSON = levelJSON;
+		levelObject.readyForAction = false;
 
 		// Level values
 		if (levelJSON.name) {
@@ -73,6 +74,8 @@ class LevelFactory {
 		levelObject._background = new Background(levelObject._levelWidth, levelObject._levelHeight, levelObject._scene, levelObject._resourceHandler);
 
 		levelObject.initCameraForFinishToStartFlight();
+
+		levelObject.readyForAction = true;
 
 		return levelObject;
 	}
