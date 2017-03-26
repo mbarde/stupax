@@ -58,6 +58,7 @@ class Finish extends Entity {
 		this._light.diffuse = new BABYLON.Color3(0, 1, 0);
 		this._light.specular = new BABYLON.Color3(0, 1, 0);
 		this._resourceHandler.soundDoorOpen.play();
+		console.log("im the best");
 	}
 
 	getSubsequentLevel() {

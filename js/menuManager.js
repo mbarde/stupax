@@ -13,7 +13,7 @@ class MenuManager {
 			function(thisObject) {
 				$('#btnStart').click( function() { thisObject._startFunction(); } );
 				$('#btnChooseLevel').click( function() { thisObject.loadMenuChooseLevel(); } );
-				$('#btnSettings').click( function() { thisObject.loadMenuSettings(); } );
+				//$('#btnSettings').click( function() { thisObject.loadMenuSettings(); } );
 				$('#btnHelp').click( function() { thisObject.loadMenuHelp(); } );
 			}
 		);

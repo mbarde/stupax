@@ -11,7 +11,7 @@ class Level {
 		this._projectiles = [];
 		this._emitters = [];
 
-		this._finished = false; 			// will contain timestamp of win when player reaches door
+		this._finishedCountdown = false; 			// will contain timestamp of win when player reaches door
 		this._died = false;					// will contain timestamp of death when player died
 		this._firstUpdate = true;			//
 		this._camFlyEndCallsOnResume = true;
@@ -25,7 +25,7 @@ class Level {
 
 		this._finish.reset();
 
-		this._finished = false;
+		this._finishedCountdown = false;
 		this._died = false;
 
 		for (var i = 0; i < this._boxes.length; i++) {
@@ -57,18 +57,21 @@ class Level {
 			this.restart();
 		}
 
-	 	if (!this._died && this._finished && this.isGuyCelebratingLongEnough()) {
-			this._game.loadNextLevel();
+		if (this._finishedCountdown) {
+		 	if (!this._died && this._finishedCountdown.update()) {
+				this._finishedCountdown = false;
+				this._game.loadNextLevel();
+			}
 		}
 
 		if (	!this._died &&
-				!this._finished &&
+				!this._finishedCountdown &&
 				!this._firstUpdate &&
 				this._finish.isIntersectingMesh(this._guy._mesh)
 		) {
 			this._finish.onWin();
 			this._guy.onWin();
-			this._finished = new Date().getTime();
+			this._finishedCountdown = new Countdown( CONS_FINISH_CELEB_TIME );
 		}
 
 		if (this.isGuyOutOfLevelBounds()) {
@@ -137,7 +140,7 @@ class Level {
 
 	isGuyCelebratingLongEnough() {
 		var time = new Date().getTime();
-		if (time - this._finished >= CONS_FINISH_CELEB_TIME) {
+		if (time - this._finishedCountdown >= CONS_FINISH_CELEB_TIME) {
 			return true;
 		}
 		return false;
@@ -223,6 +226,8 @@ class Level {
 	}
 
 	onPause() {
+		if (this._finishedCountdown) this._finishedCountdown.onPause();
+
 		this._movablePlatform.onPause();
 		this._guy.onPause();
 		for (var i = 0; i < this._emitters.length; i++) {
@@ -234,6 +239,8 @@ class Level {
 	}
 
 	onResume() {
+		if (this._finishedCountdown) this._finishedCountdown.onResume();
+
 		if (this._camFly) {
 			this._camFlyEndCallsOnResume = true;
 			return;
