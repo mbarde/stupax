@@ -12,7 +12,7 @@ class Level {
 		this._emitters = [];
 
 		this._finishedCountdown = false; 			// will contain timestamp of win when player reaches door
-		this._died = false;					// will contain timestamp of death when player died
+		this._diedCountdown = false;					// will contain timestamp of death when player died
 		this._firstUpdate = true;			//
 		this._camFlyEndCallsOnResume = true;
 	}
@@ -26,7 +26,7 @@ class Level {
 		this._finish.reset();
 
 		this._finishedCountdown = false;
-		this._died = false;
+		this._diedCountdown = false;
 
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
@@ -53,18 +53,21 @@ class Level {
 		this.updateProjectiles();
 		this.updateCamera();
 
-		if (this._died && this.isGuyDeadLongEnough()) {
-			this.restart();
+		if (this._diedCountdown) {
+			if (this._diedCountdown.update()) {
+				this._diedCountdown = false;
+				this.restart();
+			}
 		}
 
 		if (this._finishedCountdown) {
-		 	if (!this._died && this._finishedCountdown.update()) {
+		 	if (!this._diedCountdown && this._finishedCountdown.update()) {
 				this._finishedCountdown = false;
 				this._game.loadNextLevel();
 			}
 		}
 
-		if (	!this._died &&
+		if (	!this._diedCountdown &&
 				!this._finishedCountdown &&
 				!this._firstUpdate &&
 				this._finish.isIntersectingMesh(this._guy._mesh)
@@ -104,9 +107,9 @@ class Level {
 				}
 
 				// If projectile hits guy he has to die
-				if (!this._died && this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
+				if (!this._diedCountdown && this._projectiles[i]._mesh.intersectsMesh(this._guy._mesh)) {
 					this._guy.onDie();
-					this._died = new Date().getTime();
+					this._diedCountdown = new Countdown( CONS_DEATH_TIME_TO_RESTART );
 					projs_to_remove.push(i);
 				}
 			}
@@ -128,22 +131,6 @@ class Level {
 		} else { // else clip cam to movable platform.
 			this._camera.position.x = this._movablePlatform._mesh.position.x;
 		}
-	}
-
-	isGuyDeadLongEnough() {
-		var time = new Date().getTime();
-		if (time - this._died >= CONS_DEATH_TIME_TO_RESTART) {
-			return true;
-		}
-		return false;
-	}
-
-	isGuyCelebratingLongEnough() {
-		var time = new Date().getTime();
-		if (time - this._finishedCountdown >= CONS_FINISH_CELEB_TIME) {
-			return true;
-		}
-		return false;
 	}
 
 	isGuyOutOfLevelBounds() {
@@ -227,6 +214,7 @@ class Level {
 
 	onPause() {
 		if (this._finishedCountdown) this._finishedCountdown.onPause();
+		if (this._diedCountdown) this._diedCountdown.onPause();
 
 		this._movablePlatform.onPause();
 		this._guy.onPause();
@@ -240,6 +228,7 @@ class Level {
 
 	onResume() {
 		if (this._finishedCountdown) this._finishedCountdown.onResume();
+		if (this._diedCountdown) this._diedCountdown.onResume();
 
 		if (this._camFly) {
 			this._camFlyEndCallsOnResume = true;
