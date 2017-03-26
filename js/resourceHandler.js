@@ -60,7 +60,7 @@ class ResourceHandler {
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/shoot.mp3");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
-			   thisObject.soundEmitterShot = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.7, loop: false });
+			   thisObject.soundEmitterShot = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.9, loop: false });
 			}
 		}) (this);
 
@@ -69,7 +69,7 @@ class ResourceHandler {
 		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/explode.ogg");
 		(function(thisObject) {
 			binaryTask.onSuccess = function (task) {
-			   thisObject.soundProjectileHit = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.2, loop: false });
+			   thisObject.soundProjectileHit = new BABYLON.Sound(soundName, task.data, thisObject._scene, null, { volume: 0.3, loop: false });
 			}
 		}) (this);
 
