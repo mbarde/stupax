@@ -1,11 +1,9 @@
 class Game extends Mode {
 
-	constructor(scene, camera, resourceHandler, levelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel) {
+	constructor(scene, camera, resourceHandler, levelStrings) {
 		super(scene, camera);
 
 		this._resourceHandler = resourceHandler;
-		this._onBeforeLoadingNextLevel = onBeforeLoadingNextLevel;
-		this._onAfterLoadingNextLevel = onAfterLoadingNextLevel;
 
 		this._camera.position.x = 10 * CONS_SCALE;
 		this._camera.position.y = 10 * CONS_SCALE;
@@ -28,21 +26,17 @@ class Game extends Mode {
 		if (this._levelStrings.length == 0) {
 			this._level.restart();
 		} else {
-			this._onBeforeLoadingNextLevel();
 			this._currentLevelID++;
 			if (this._currentLevelID >= this._levelStrings.length) {
 				this._currentLevelID = 0;
 			}
 			this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
-			this._onAfterLoadingNextLevel();
 		}
 	}
 
 	loadRandomLevel() {
-		this._onBeforeLoadingNextLevel();
 		this._currentLevelID = Math.floor(Math.random()*this._levelStrings.length);
 		this.loadLevelFromString( this._levelStrings[this._currentLevelID] );
-		this._onAfterLoadingNextLevel();
 	}
 
 	loadLevelFromString(levelString) {

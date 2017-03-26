@@ -1,50 +1,38 @@
-requirejs([	"js/constants.js", "js/animatable.js",
-	"js/resourceHandler.js", "js/countdown.js",
-	"js/entity.js", "js/platform.js",
-	"js/collisionHelper.js",
-	"js/mode.js", "js/game.js", "js/level.js", "js/finish.js", "js/levelFileLoader.js",
-	"js/background.js", "js/levelFactory.js",
-	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/projectile.js",
-	"js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
+requirejs(["js/constants.js", "js/animatable.js", "js/resourceHandler.js", "js/countdown.js",
+	"js/entity.js", "js/platform.js", "js/collisionHelper.js", "js/mode.js", "js/game.js",
+	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
+	"js/levelFactory.js", "js/movablePlatform.js", "js/box.js", "js/guy.js",
+	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js"],
 
 function() {
 
-	var canvas = document.getElementById("renderCanvas");
-	var engine = new BABYLON.Engine(canvas, true);
-
-	//var loadingScreen = new MyLoadingScreen("I'm loading!!");
-	//engine.loadingScreen = loadingScreen;
-
-	var mode;
+	var game;
 	var scene;
-	var assetsManager;
 	var resourceHandler;
+
 	var doRender = false;
 	var showOverlay = true;
+
 	var controls;
 	var camera;
 
 	function hideOverlayAndUnpause() {
-		if (!doRender) {
-			doRender = true;
-		}
 		$('.overlay').hide();
 		showOverlay = false;
-		mode.onResume();
+		doRender = true;
+		game.onResume();
 	}
 
-	function onBeforeLoadingNextLevel() {
-		//doRender = false;
-	}
-
-	function onAfterLoadingNextLevel() {
-		document.title = "Stupax - " + mode._level._levelName;
+	function showOverlayAndPause() {
+		$('.overlay').show();
+		showOverlay = true;
+		doRender = false;
+		game.onPause();
 	}
 
 	var createScene = function () {
 		var myScene = new BABYLON.Scene(engine);
 
-		// Need a free camera for collisions
 		camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 0, -50), myScene);
 		var q = BABYLON.Quaternion.RotationYawPitchRoll(0, 0.2, 0);
 		camera.rotationQuaternion = q;
@@ -54,66 +42,72 @@ function() {
 		return myScene;
 	}
 
+	var canvas = document.getElementById("renderCanvas");
+	var engine = new BABYLON.Engine(canvas, true);
+
 	scene = createScene();
-	assetsManager = new BABYLON.AssetsManager(scene);
+	var assetsManager = new BABYLON.AssetsManager(scene);
 	resourceHandler = new ResourceHandler(scene, assetsManager);
 	assetsManager.onFinish = function(tasks) {
 		var workWithCookie = false;
 		var tmpLevelCookie = getCookie("tempLevel");
 		if (tmpLevelCookie.length > 10) {
-			workWithCookie = true; // confirm("Found Stupax level in cookies. Do you want to load? Only confirm this if you just started the testing mode from editor.");
+			workWithCookie = true;
 		}
 
 		if (workWithCookie) {
-			mode = new Game(scene, camera, resourceHandler, [], onBeforeLoadingNextLevel);
-			mode.loadLevelFromString(tmpLevelCookie);
+			game = new Game(scene, camera, resourceHandler, []);
+			game.loadLevelFromString(tmpLevelCookie);
 			doRender = true;
 		} else {
 			var levelFileLoader = new LevelFileLoader();
 			levelFileLoader.loadLevelFilesIntoArray(
 				function(arrLevelStrings) {
-					mode = new Game(scene, camera, resourceHandler, arrLevelStrings, onBeforeLoadingNextLevel, onAfterLoadingNextLevel);
-					mode.loadFirstLevel();
-					onAfterLoadingNextLevel();
+					game = new Game(scene, camera, resourceHandler, arrLevelStrings);
+					game.loadFirstLevel();
 					doRender = true;
 				}
 			);
 		}
 	};
-
 	assetsManager.load();
-	// --------------------------------------------------------------------------
+
+	engine.runRenderLoop(function () {
+		if (doRender) {
+			if (game) game.update();
+			$('#spanFps').text( Math.round(engine.fps) );
+			if (scene) scene.render();
+			if (controls) controls.update();
+		}
+	});
 
 	// Setup controls -----------------------------------------------------------
 	function onKeyDown(ctrlCode) {
-	  if (mode) mode.keyDown(ctrlCode);
+	  if (game) game.keyDown(ctrlCode);
 	}
 
 	function onKeyUp(ctrlCode) {
-	  if (mode) mode.keyUp(ctrlCode);
+	  if (game) game.keyUp(ctrlCode);
 	}
 
 	controls = new Controls(onKeyDown, onKeyUp);
 
 	window.addEventListener("keydown", function(event){
-			if (event.keyCode == 27) {
+			if (event.keyCode == 27) { // ESC
 				if (!showOverlay) {
-					showOverlay = true;
-					$('.overlay').show();
-					mode.onPause();
-					doRender = false;
+					showOverlayAndPause();
 				} else {
 					hideOverlayAndUnpause();
 				}
 			}
-			if (!showOverlay && mode) {
-				mode.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (!showOverlay && game) {
+				game.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
 	}, false);
 
 	window.addEventListener("keyup", function(event){
-			if (!showOverlay && mode) {
-				mode.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+			if (!showOverlay && game) {
+				game.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
 			}
 	}, false);
 
@@ -123,17 +117,6 @@ function() {
 
 	window.addEventListener("resize", function () {
 		engine.resize();
-	});
-	// --------------------------------------------------------------------------
-
-	// Render loop --------------------------------------------------------------
-	engine.runRenderLoop(function () {
-		if (doRender) {
-			if (mode) mode.update();
-			$('#spanFps').text( Math.round(engine.fps) );
-			if (scene) scene.render();
-			if (controls) controls.update();
-		}
 	});
 	// --------------------------------------------------------------------------
 
