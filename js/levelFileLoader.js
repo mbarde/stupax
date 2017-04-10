@@ -8,19 +8,26 @@ class LevelFileLoader {
 								 	"threeblocks", "learntojump01", "learntojump02", "learntojump03"];
 	}
 
+	// Load content (strings) of levels files, specified in this._levelNames, into an array.
+	// When all files are loaded successfully callbackFunction will be called
+	// with this array as argument.
+	// Order defined by this._levelNames will be preserved.
 	loadLevelFilesIntoArray(callbackFunction) {
-		var result = new Array();
 		var counter = 0;
+		var levelNames = this._levelNames;
 		var levelNamesLength = this._levelNames.length;
+		var result = new Array(levelNamesLength);
 
 		for (var i = 0; i < levelNamesLength; i++) {
-			jQuery.get("levels/" + this._levelNames[i] + ".txt", function(data) {
-				result.push(data);
-				counter++;
-				if (counter >= levelNamesLength) {
-					callbackFunction(result);
-				}
-			});
+			(function(index) {
+				jQuery.get("levels/" + levelNames[index] + ".txt", function(data) {
+					result[index] = data;
+					counter++;
+					if (counter >= levelNamesLength) {
+						callbackFunction(result);
+					}
+				});
+			}) (i);
 		}
 	}
 }
