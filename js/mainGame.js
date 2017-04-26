@@ -12,6 +12,7 @@ function() {
 	var scene;
 	var resourceHandler;
 	var countOfAllAssetsManagerTasks = 0;
+	var openAssetsManagerTaskNames = [];
 
 	var doRender = false;
 	var showOverlay = true;
@@ -87,10 +88,23 @@ function() {
 
 	};
 	assetsManager.onTaskSuccess = function(task) {
-		$('#spanFps').text("Loading: " + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%");
+		var index = openAssetsManagerTaskNames.indexOf( task.url );
+		openAssetsManagerTaskNames.splice(index, 1);
+
+		var openTasksString = "";
+		for (var i = 0; i < openAssetsManagerTaskNames.length; i++) {
+			openTasksString = openTasksString + "<br>" + openAssetsManagerTaskNames[i];
+		}
+
+		$('#spanFps').html("Loading (" + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%):" + openTasksString);
 	}
 	assetsManager.load();
+
 	countOfAllAssetsManagerTasks = assetsManager.waitingTasksCount;
+	openAssetsManagerTaskNames = new Array();
+	for (var i = 0; i < assetsManager.tasks.length; i++) {
+		openAssetsManagerTaskNames.push( assetsManager.tasks[i].url );
+	}
 
 	engine.runRenderLoop(function () {
 		if (doRender) {
