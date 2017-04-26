@@ -1,3 +1,7 @@
+/*
+* This class takes care of loading all resources (images, sounds, etc.)
+* and keeps references to every file.
+*/
 class ResourceHandler {
 
 	constructor(scene, assetsManager) {
