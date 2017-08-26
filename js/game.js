@@ -82,18 +82,16 @@ class Game extends Mode {
 		if (this._level) {
 			this._level.onPause();
 		}
-		if (this._resourceHandler.soundBackgroundMusic.isPlaying) {
-			this._resourceHandler.soundBackgroundMusic.pause();
-		}
+
+		this._resourceHandler.soundBackgroundMusic.pause();
 	}
 
 	onResume() {
 		if (this._level) {
 			this._level.onResume();
 		}
-		if (!this._resourceHandler.soundBackgroundMusic.isPlaying) {
-			this._resourceHandler.soundBackgroundMusic.play();
-		}
+		
+		this._resourceHandler.soundBackgroundMusic.play();
 	}
 
 	getLevelCount() {

@@ -77,17 +77,8 @@ class ResourceHandler {
 			}
 		}) (this);
 
-		// Background music
-		var soundName = "SoundBackground";
-		var binaryTask = this._assetsManager.addBinaryFileTask(soundName + " task", "sounds/through_space.ogg");
-		(function(thisObject) {
-			binaryTask.onSuccess = function (task) {
-			   thisObject.soundBackgroundMusic = new BABYLON.Sound(soundName, task.data, thisObject._scene,
-					function() {
-						thisObject.soundBackgroundMusic.play();
-					}, { loop: true, volume: 0.3 });
-			}
-		}) (this);
+		// Background music (do not add to assetsManager since we want it to load async)
+		this.soundBackgroundMusic = new BackgroundMusic("sounds/through_space.ogg", this._scene);
 	}
 
 	loadTextures() {

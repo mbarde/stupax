@@ -1,5 +1,5 @@
 requirejs(["js/entity.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
-	"js/countdown.js",
+	"js/backgroundMusic.js", "js/countdown.js",
 	"js/platform.js", "js/collisionHelper.js", "js/mode.js", "js/game.js",
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js",
