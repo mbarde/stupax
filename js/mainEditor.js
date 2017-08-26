@@ -1,4 +1,6 @@
-requirejs([	"js/constants.js", "js/platformMarker.js",
+requirejs([
+	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js",
+	"js/constants.js", "js/platformMarker.js",
 	"js/marker.js", "js/mode.js", "js/editor.js",
 	"js/controls.js", "js/loadingScreen.js"],
 

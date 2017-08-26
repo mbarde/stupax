@@ -1,4 +1,6 @@
-requirejs(["js/entity.js",  "js/mode.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
+requirejs([
+	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js", 
+	"js/entity.js",  "js/mode.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
 	"js/backgroundMusic.js", "js/countdown.js",
 	"js/platform.js", "js/collisionHelper.js", "js/game.js",
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
