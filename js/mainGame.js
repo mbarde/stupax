@@ -1,6 +1,6 @@
-requirejs(["js/entity.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
+requirejs(["js/entity.js",  "js/mode.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
 	"js/backgroundMusic.js", "js/countdown.js",
-	"js/platform.js", "js/collisionHelper.js", "js/mode.js", "js/game.js",
+	"js/platform.js", "js/collisionHelper.js", "js/game.js",
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
 	"js/movablePlatform.js", "js/box.js", "js/guy.js",
 	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js",
