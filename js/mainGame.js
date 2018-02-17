@@ -1,5 +1,5 @@
 requirejs([
-	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js", 
+	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js",
 	"js/entity.js",  "js/mode.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
 	"js/backgroundMusic.js", "js/countdown.js",
 	"js/platform.js", "js/collisionHelper.js", "js/game.js",
@@ -73,7 +73,7 @@ function() {
 		if (workWithCookie) {
 			game = new Game(scene, camera, resourceHandler, []);
 			game.loadLevelFromString(tmpLevelCookie);
-			doRender = true;
+			hideOverlayAndUnpause();
 		} else {
 			var levelFileLoader = new LevelFileLoader();
 			levelFileLoader.loadLevelFilesIntoArray(

@@ -58,7 +58,7 @@ function() {
 		var lvlStr = editor.levelToString(false);
 		if (lvlStr) {
 			document.cookie="tempLevel=" + lvlStr;
-			window.open("/stupax/index.html",'_blank');
+			window.open("index.html",'_blank');
 		}
 	}
 
