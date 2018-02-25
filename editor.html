@@ -12,6 +12,8 @@
 
       <title>Stupax - Level editor</title>
 
+		<link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
+
 		<!-- FileSaver.js (https://github.com/eligrey/FileSaver.js) to save lavel files -->
 		<script src="plugins/FileSaver.min.js"></script>
 
@@ -34,14 +36,29 @@
 		<button class="btn-mode" mode="5" title="Emitter"><img src="textures/emitter.png"/></button>
 		<div>
 			<button class="btn-action" id="btn-load">Load</button>
-			<button class="btn-action" id="btn-save">Save</button>
+			<button class="btn-action" id="btn-download">Download</button>
+			<button class="btn-action" id="btn-show-publish-div">Publish</button>
 			<br>
 			<button class="btn-action" id="btn-test">Test</button>
 			<button class="btn-action" id="btn-clear">Clear</button>
+			<button class="btn-action" id="btn-upload">Upload</button>
 		</div>
 	</div>
 	<div id="div-context-menu"></div>
 	<span id="spanLog"></span>
+
+	<div id="div-level-select" class="overlay"></div>
+
+	<div id="div-publish" class="overlay">
+		<label for="inTitle">Title:</label>
+		<input type="text" name="inTitle" id="inTitle"/>
+		<br/><br/>
+		<label for="inAuthor">Author:</label>
+		<input type="text" name="inAuthor" id="inAuthor"/>
+		<br/>
+		<button id="btn-publish">Publish</button>
+	</div>
+
 	<span id="spanFps" style="display:None"></span>
 	<input type="file" id="inputFile" accept=".txt" style="display:none">
    <canvas id="renderCanvas"></canvas>

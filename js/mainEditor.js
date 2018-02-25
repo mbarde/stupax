@@ -49,6 +49,10 @@ function() {
 		$('#div-context-menu').hide();
 	}
 
+	function isPointerBlocked() {
+		return $('.overlay').is(':visible');
+	}
+
 	function log(message) {
 		updateActiveModeBtn();
 		$('#spanLog').text("> " + message);
@@ -87,7 +91,7 @@ function() {
 
 	scene = createScene();
 	assetsManager = new BABYLON.AssetsManager(scene);
-	editor = new Editor(scene, camera, log, showContextMenu, hideContextMenu, assetsManager);
+	editor = new Editor(scene, camera, log, showContextMenu, hideContextMenu, isPointerBlocked, assetsManager);
 
 	assetsManager.load();
 	assetsManager.onFinish = function(tasks) {
@@ -97,7 +101,7 @@ function() {
 
 	// Setup controls -----------------------------------------------------------
 	function onKeyDown(ctrlCode) {
-	  if (editor) editor.keyDown(ctrlCode);
+	  	if (editor) editor.keyDown(ctrlCode);
 	}
 
 	function onKeyUp(ctrlCode) {
@@ -106,26 +110,32 @@ function() {
 
 	controls = new Controls(onKeyDown, onKeyUp);
 
-	window.addEventListener("keydown", function(event){
-		var focused = $(':focus');
-		if (!focused.hasClass("input-element")) {
-			if (event.keyCode == 76) { // L
-				loadLevelFile();
-			}
-			if (event.keyCode == 84) { // T
-				startLevelTest();
-			}
-			if (editor) {
-				editor.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+	window.addEventListener("keydown", function(event) {
+		if ( $('.overlay').is(':visible') ) {
+			if (event.keyCode == 27) $('.overlay').hide();
+		} else {
+			var focused = $(':focus');
+			if (!focused.hasClass("input-element")) {
+				if (event.keyCode == 76) { // L
+					loadLocalLevelFile();
+				}
+				if (event.keyCode == 84) { // T
+					startLevelTest();
+				}
+				if (editor) {
+					editor.keyDown( controls.keyCodeToCTRLCode(event.keyCode) );
+				}
 			}
 		}
 	}, false);
 
-	window.addEventListener("keyup", function(event){
-		var focused = $(':focus');
-		if (!focused.hasClass("input-element")) {
-			if (editor) {
-				editor.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+	window.addEventListener("keyup", function(event) {
+		if ( !$('.overlay').is(':visible') ) {
+			var focused = $(':focus');
+			if (!focused.hasClass("input-element")) {
+				if (editor) {
+					editor.keyUp( controls.keyCodeToCTRLCode(event.keyCode) );
+				}
 			}
 		}
 	}, false);
@@ -147,18 +157,101 @@ function() {
 	// --------------------------------------------------------------------------
 
 	// Buttons ------------------------------------------------------------------
+	$('button').click( function() {
+		if ( $(this).attr('id') != 'btn-publish') $('.overlay').hide();
+	});
+
 	$('.btn-mode').click( function() {
 		editor.setCurMode( parseInt($(this).attr('mode')) );
 	});
 
-	$('#btn-load').click( loadLevelFile );
-	$('#btn-save').click( function() { editor.saveLevelToFile(); } );
+	$('#btn-load').click( function() {
+		$('.overlay').hide();
+		$('#div-level-select').html('');
+
+		$.get('http://localhost:3000/levels/read', function(levels) {
+			$.get('partials/menu.levels.item.html', function(template) {
+				// clear list
+				var list = $( document.createElement('ul') );
+
+				// populate list
+				for (var i = 0; i < levels.length; i++) {
+					var level = levels[i];
+					list.append(
+						template.replace('$$id$$', 		level.id)
+								  .replace('$$title$$', 	level.title)
+								  .replace('$$author$$', 	level.author)
+  								  .replace('$$date$$', 		new Date(level.timestamp * 1000).toLocaleDateString())
+				 	);
+				}
+
+				$('#div-level-select').append(list);
+				$('#div-level-select').show();
+			});
+		});
+	});
+
+	$('#div-level-select').delegate('li', 'click', function() {
+		loadLevel( $(this).attr('level-id') );
+	});
+
+	$('#btn-download').click( function() {
+		editor.saveLevelToFile();
+	});
+
+	$('#btn-upload').click( loadLocalLevelFile );
+
+	$('#btn-show-publish-div').click( function() {
+		if (editor.levelToString()) {
+			$('.overlay').hide();
+			$('#div-publish').show();
+		}
+	});
+
+	$('#btn-publish').click( function() {
+		$('#div-publish #inTitle').removeClass('error');
+		$('#div-publish #inAuthor').removeClass('error');
+
+		var title = $('#div-publish #inTitle').val();
+		var author = $('#div-publish #inAuthor').val();
+
+		var inputMissing = false;
+		if (!title) {
+			$('#div-publish #inTitle').addClass('error');
+			inputMissing = true;
+		}
+		if (!author) {
+			$('#div-publish #inAuthor').addClass('error');
+			inputMissing = true;
+		}
+		if (inputMissing) return;
+
+		var level = {};
+		level.title = title;
+		level.author = author;
+
+		var date = new Date();
+		level.timestamp = date.valueOf()/1000;
+		level.content = editor.levelToString();
+
+		var data = {};
+		data.level = level;
+		$.ajax({	url: 'http://localhost:3000/levels/create',
+					type: 'POST',
+					data: JSON.stringify(data),
+					contentType: "application/json; charset=utf-8",
+					dataType: "json" });
+
+		$('#div-publish').hide();
+	});
+
 	$('#btn-clear').click( function() { if (confirm("All changes will be lost!")) { editor.clearAll(); } } );
+
 	$('#btn-test').click( startLevelTest );
 	// --------------------------------------------------------------------------
 
 	// Loading ------------------------------------------------------------------
-	function loadLevelFile() {
+	function loadLocalLevelFile() {
 	  	if ('FileReader' in window) {
 	   	$('#inputFile').click();
 	  	} else {
@@ -178,6 +271,13 @@ function() {
 	   	reader.readAsText(fileToLoad, 'UTF-8');
 	  	}
 	};
+
+	function loadLevel(id) {
+		$.get('http://localhost:3000/levels/read/' + id, function(level) {
+			editor.loadLevel(level[0].content);
+			$('#div-level-select').hide();
+		});
+	}
 	// --------------------------------------------------------------------------
 
 }); // requireJS

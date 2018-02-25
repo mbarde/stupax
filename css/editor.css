@@ -1,5 +1,13 @@
+html {
+	font-family: 'Crimson Text', serif;
+}
+
+input {
+	font-family: 'Crimson Text', serif;
+}
+
 .div-tool-box {
-	width: 600px;
+	width: 700px;
 	float: left;
 	height: 68px;
 }
@@ -33,4 +41,110 @@
 
 #spanLog {
 	display: none;
+}
+
+.overlay {
+	position: absolute;
+	color: white;
+	z-index: 10;
+	top: 25%;
+	width: 100%;
+	text-align: center;
+	background-color: rgba(0,0,0,0.7);
+	display: none;
+}
+
+#div-publish {
+	font-size: 25px;
+}
+
+#div-publish label {
+	width: 120px;
+	display: inline-block;
+}
+
+#div-publish input {
+	font-size: 25px;
+	color: white;
+	background-color: rgba(0,0,0,0.6);
+	border: none;
+	border-bottom: 2px solid transparent;
+	border-radius: 4px;
+	box-shadow: none;
+	padding: 4px;
+}
+
+#div-publish input:hover,
+#div-publish input:focus {
+	border-bottom: 2px solid white;
+	background-color: rgba(0,0,0,0.7);
+	outline: none;
+}
+
+#div-publish button {
+	font-size: 25px;
+	color: white;
+	font-family: 'Crimson Text', serif;
+	background-color: Transparent;
+	background-repeat:no-repeat;
+	border: 2px white solid;
+	margin: 15px;
+	padding: 10px;
+	width: 200px;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+#div-publish button:hover,
+#div-publish button:focus {
+	background-color: rgba(0,0,0,0.7);
+}
+
+#div-publish div.error {
+	color: red;
+}
+
+#div-publish input.error {
+	border-bottom: 2px solid red;
+}
+
+#div-level-select ul {
+	list-style-type: none;
+	max-height: 80%;
+	overflow-y: scroll;
+}
+
+#div-level-select ul li h1 {
+	margin: 0;
+}
+
+#div-level-select ul li {
+	padding: 10px;
+	display: inline-block;
+}
+
+#div-level-select ul li:hover {
+	background-color: rgba(0,0,0,0.7);
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+   background-color: rgba(0,0,0,0.6);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+   background: white;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+   background: white;
 }

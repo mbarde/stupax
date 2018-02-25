@@ -1,11 +1,12 @@
 class Editor extends Mode {
 
-	constructor(scene, camera, logFunction, showContextMenuFunction, hideContextMenuFunction, assetsManager) {
+	constructor(scene, camera, logFunction, showContextMenuFunction, hideContextMenuFunction, isPointerBlockedFuntion, assetsManager) {
 		super(scene, camera);
 
 		this._logFunction = logFunction;
 		this._showContextMenuFunction = showContextMenuFunction;
 		this._hideContextMenuFunction = hideContextMenuFunction;
+		this._isPointerBlockedFuntion = isPointerBlockedFuntion;
 		this._assetsManager = assetsManager;
 
 		this._levelWidth = 500;
@@ -57,6 +58,7 @@ class Editor extends Mode {
 
 		this._scene.editor = this;
 		this._scene.onPointerDown = function (evt, pickResult) {
+			if (this.editor._isPointerBlockedFuntion()) return;
 			var hideContextMenu = true;
         	if (pickResult.hit) {
 				if (pickResult.pickedMesh == background) {
@@ -157,7 +159,7 @@ class Editor extends Mode {
 	keyUp(keyCode) {
 	}
 
-	levelToString(withName = true) {
+	levelToString() {
 		var level = {};
 
 		if (!this._guyMarker) {
@@ -177,15 +179,6 @@ class Editor extends Mode {
 		level.finish._posY = this._finishMarker._posY;
 
 		level.finish.target = "";
-
-		var name = "Test level";
-		if (withName) {
-			name = prompt("Please enter level name", "MyLevel");
-			if (!name) {
-				return false;
-			}
-		}
-		level.name = name;
 
 		var pms = new Array(); // platform markers
 		var movPms = new Array(); // movable platform markers
@@ -238,7 +231,7 @@ class Editor extends Mode {
 			return;
 		}
 		var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
-		saveAs(blob, "level.txt");
+		saveAs(blob, "level.json");
 	}
 
 	clearAll() {
