@@ -15,13 +15,17 @@
 		<!-- jQuery to load level files -->
 		<script src="plugins/jquery-3.1.1.min.js"></script>
 
-		<!-- RequireJS to load game files -->
+    <!-- Engine files -->
+		<script src="plugins/oimo.min.js"></script>
+		<script src="plugins/babylon.custom.js"></script>
+
+    <!-- RequireJS to load game files -->
 		<script data-main="js/mainGame" src="plugins/require.js"></script>
 
 		<link rel="stylesheet" href="css\style.css" type="text/css" >
    </head>
 <body>
-	<span id="spanFps"></span>
+	<span id="spanLoadingInfo"></span>
 	<div id="divMenuOverlay" class="overlay">
 		<span class="title"><i>STUPAX</i></span><br>
 	</div>

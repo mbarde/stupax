@@ -20,7 +20,11 @@
 		<!-- jQuery to load level files -->
 		<script src="plugins/jquery-3.1.1.min.js"></script>
 
-		<!-- RequireJS to load game files -->
+    <!-- Engine files -->
+		<script src="plugins/oimo.min.js"></script>
+		<script src="plugins/babylon.custom.js"></script>
+
+    <!-- RequireJS to load game files -->
 		<script data-main="js/mainEditor" src="plugins/require.js"></script>
 
 		<link rel="stylesheet" href="css\style.css" type="text/css" >
@@ -35,9 +39,9 @@
 		<button class="btn-mode" mode="4" title="Box"><img src="textures/block02.png"/></button>
 		<button class="btn-mode" mode="5" title="Emitter"><img src="textures/emitter.png"/></button>
 		<div>
-			<button class="btn-action" id="btn-load">Load</button>
+			<!--<button class="btn-action" id="btn-load">Load</button>-->
 			<button class="btn-action" id="btn-download">Download</button>
-			<button class="btn-action" id="btn-show-publish-div">Publish</button>
+			<!--<button class="btn-action" id="btn-show-publish-div">Publish</button>-->
 			<br>
 			<button class="btn-action" id="btn-test">Test</button>
 			<button class="btn-action" id="btn-clear">Clear</button>
@@ -59,8 +63,8 @@
 		<button id="btn-publish">Publish</button>
 	</div>
 
-	<span id="spanFps" style="display:None"></span>
+	<span id="spanLoadingInfo" style="display:None"></span>
 	<input type="file" id="inputFile" accept=".txt" style="display:none">
-   <canvas id="renderCanvas"></canvas>
+  <canvas id="renderCanvas"></canvas>
 </body>
 </html>

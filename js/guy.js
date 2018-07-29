@@ -48,7 +48,10 @@ class Guy extends Animatable {
 		this._resourceHandler.soundGuyRun.attachToMesh(this._mesh);
 		this._resourceHandler.soundGuyDie.attachToMesh(this._mesh);
 
-		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: CONS_GUY_MASS, restitution: CONS_RESTITUTION_GUY, move: true });
+		this._mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+				this._mesh, BABYLON.PhysicsEngine.PlaneImpostor,
+				{ mass: CONS_GUY_MASS, restitution: CONS_RESTITUTION_GUY, move: true },
+				this._scene);
 	}
 
 	initAnimations() {
@@ -223,8 +226,8 @@ class Guy extends Animatable {
 		this._mesh.position.z = 0;
 
 		// Clip mesh containing texture of the guy to it´s physics object.
-		this._planeMesh.position = this._mesh.getAbsolutePosition();
-		this._planeMesh.position.y += 0.7;
+		this._planeMesh.position.x = this._mesh.getAbsolutePosition().x;
+		this._planeMesh.position.y = this._mesh.getAbsolutePosition().y + 0.7;
 	}
 
 	updateAnimationAndGuyMode() {

@@ -82,7 +82,10 @@ class Platform extends Entity {
 	}
 
 	setPhysicsState() {
-		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false });
+		this._mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+				this._mesh, BABYLON.PhysicsEngine.BoxImpostor,
+				{ mass: 0, restitution: CONS_RESTITUTION_PLAT, move: false },
+				this._scene);
 	}
 
 	getTexture() {

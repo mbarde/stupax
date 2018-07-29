@@ -137,7 +137,10 @@ class MovablePlatform extends Platform {
 	}
 
 	setPhysicsState() {
-		this._mesh.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, move: true });
+			this._mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+					this._mesh, BABYLON.PhysicsEngine.BoxImpostor,
+					{ mass: 0, restitution: CONS_RESTITUTION_PLAT, move: true },
+					this._scene);
 	}
 
 	getTexture() {
@@ -167,7 +170,7 @@ class MovablePlatform extends Platform {
 	}
 
 	onResume() {
-		
+
 	}
 
 	destroy() {

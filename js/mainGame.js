@@ -1,5 +1,5 @@
 requirejs([
-	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js",
+	"plugins/hand.minified-1.2.js",
 	"js/entity.js",  "js/mode.js", "js/constants.js", "js/animatable.js", "js/resourceHandler.js",
 	"js/backgroundMusic.js", "js/countdown.js",
 	"js/platform.js", "js/collisionHelper.js", "js/game.js",
@@ -64,6 +64,8 @@ function() {
 	var assetsManager = new BABYLON.AssetsManager(scene);
 	resourceHandler = new ResourceHandler(scene, assetsManager);
 	assetsManager.onFinish = function(tasks) {
+		$('#spanLoadingInfo').hide();
+
 		var workWithCookie = false;
 		var tmpLevelCookie = getCookie("tempLevel");
 		if (tmpLevelCookie.length > 10) {
@@ -98,20 +100,19 @@ function() {
 			openTasksString = openTasksString + "<br>" + openAssetsManagerTaskNames[i];
 		}
 
-		$('#spanFps').html("Loading (" + Math.round((1 - (assetsManager.waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%):" + openTasksString);
+		$('#spanLoadingInfo').html("Loading (" + Math.round((1 - (assetsManager._waitingTasksCount / countOfAllAssetsManagerTasks)) * 100) + "%):" + openTasksString);
 	}
 	assetsManager.load();
 
-	countOfAllAssetsManagerTasks = assetsManager.waitingTasksCount;
+	countOfAllAssetsManagerTasks = assetsManager._totalTasksCount;
 	openAssetsManagerTaskNames = new Array();
-	for (var i = 0; i < assetsManager.tasks.length; i++) {
-		openAssetsManagerTaskNames.push( assetsManager.tasks[i].url );
+	for (var i = 0; i < assetsManager._totalTasksCount; i++) {
+		openAssetsManagerTaskNames.push( assetsManager._tasks[i].url );
 	}
 
 	engine.runRenderLoop(function () {
 		if (doRender) {
 			if (game) game.update();
-			$('#spanFps').text( Math.round(engine.fps) );
 			if (scene) scene.render();
 			if (controls) controls.update();
 		}

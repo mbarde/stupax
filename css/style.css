@@ -12,7 +12,7 @@ html, body {
 	touch-action: none;
 }
 
-#spanFps {
+#spanLoadingInfo {
 	position: absolute;
 	left: 0px;
 	top: 0px;

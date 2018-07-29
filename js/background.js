@@ -27,7 +27,10 @@ class Background extends Entity {
 		this._backgroundMesh.position.z = CONS_SCALE/2;
 		this._backgroundMesh.receiveShadows = false;
 
-		this._backgroundMesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
+		this._backgroundMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+				this._backgroundMesh, BABYLON.PhysicsEngine.PlaneImpostor,
+				{ mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false },
+				this._scene);
 	}
 
 	initInvisibleFrontPlane() {
@@ -38,7 +41,11 @@ class Background extends Entity {
 		this._invisibleFrontPlaneMesh.position.x = (this._levelWidth * CONS_SCALE) / 2;
 		this._invisibleFrontPlaneMesh.position.y = (this._levelHeight * CONS_SCALE) / 2 - 4 * CONS_SCALE;
 		this._invisibleFrontPlaneMesh.position.z = -CONS_SCALE/2;
-		this._invisibleFrontPlaneMesh.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false });
+
+		this._invisibleFrontPlaneMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+			 this._invisibleFrontPlaneMesh, BABYLON.PhysicsEngine.PlaneImpostor,
+			 { mass: 0, restitution: CONS_RESTITUTION_PLAT, friction: 0, move: false },
+			 this._scene);
 	}
 
 	destroy() {

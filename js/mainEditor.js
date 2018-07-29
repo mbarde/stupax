@@ -1,5 +1,5 @@
 requirejs([
-	"plugins/hand.minified-1.2.js", "plugins/oimo.js", "plugins/babylon.custom.js",
+	"plugins/hand.minified-1.2.js",
 	"js/constants.js", "js/platformMarker.js",
 	"js/marker.js", "js/mode.js", "js/editor.js",
 	"js/controls.js", "js/loadingScreen.js"],
@@ -149,7 +149,6 @@ function() {
 	engine.runRenderLoop(function () {
 		if (doRender) {
 			if (editor) editor.update();
-			$('#spanFps').text( Math.round(engine.fps) );
 			if (scene) scene.render();
 			if (controls) controls.update();
 		}

@@ -7,7 +7,10 @@ input {
 }
 
 .div-tool-box {
-	width: 700px;
+	width: 100%;
+	background-color: white;
+	position: absolute;
+	top: 0;
 	float: left;
 	height: 68px;
 }
