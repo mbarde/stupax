@@ -323,9 +323,26 @@ class Guy extends Animatable {
 		return this._forward;
 	}
 
+	explode() {
+		var balls = [];
+		var textures = this._resourceHandler.getGuyBodyPartTextures();
+		for (var i = 0; i < textures.length; i++) {
+			var material = new BABYLON.StandardMaterial("bodypart", this._scene);
+			material.diffuseTexture = textures[i];
+			material.diffuseTexture.hasAlpha = true;
+			material.backFaceCulling = false;
+
+			var dir = new BABYLON.Vector3(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+			var pos = { x: this._mesh.position.x, y: this._mesh.position.y };
+			pos.y += 3 * CONS_SCALE;
+			balls.push(new Ball(1, 1, pos, dir, 1, this._scene, this._resourceHandler, material));
+		}
+	}
+
 	keyDown(keyCode) {
 		if (keyCode == CTRL_GUY_JUMP) {
-			console.log(this._mesh.blockStatus);
+			//console.log(this._mesh.blockStatus);
+			this.explode();
 		}
 	}
 

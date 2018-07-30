@@ -14,7 +14,7 @@ class Projectile extends Entity {
 	}
 
 	initGeometry(position) {
-		this._mesh = BABYLON.MeshBuilder.CreatePlane("finish", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
+		this._mesh = BABYLON.MeshBuilder.CreatePlane("projectile", {height: this._height * CONS_SCALE, width: this._width * CONS_SCALE}, this._scene);
 		this._mesh.material = this._material;
 		this._mesh.position = new BABYLON.Vector3(position.x, position.y, 0);
 

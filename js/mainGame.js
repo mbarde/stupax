@@ -4,7 +4,7 @@ requirejs([
 	"js/backgroundMusic.js", "js/countdown.js",
 	"js/platform.js", "js/collisionHelper.js", "js/game.js",
 	"js/level.js", "js/finish.js", "js/levelFileLoader.js", "js/background.js",
-	"js/movablePlatform.js", "js/box.js", "js/guy.js",
+	"js/movablePlatform.js", "js/box.js", "js/guy.js", "js/ball.js",
 	"js/projectile.js", "js/emitter.js", "js/controls.js", "js/loadingScreen.js",
 	"js/levelFactory.js", "js/menuManager.js"],
 

@@ -314,6 +314,55 @@ class ResourceHandler {
 				thisObject.texGuyDie02.hasAlpha = true;
 			}
 		}) (this);
+
+		// body parts
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/head.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyHead = task.texture;
+				thisObject.texGuyHead.hasAlpha = true;
+			}
+		}) (this);
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/torso.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyTorso = task.texture;
+				thisObject.texGuyTorso.hasAlpha = true;
+			}
+		}) (this);
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/arm_left.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyArmLeft = task.texture;
+				thisObject.texGuyArmLeft.hasAlpha = true;
+			}
+		}) (this);
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/arm_right.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyArmRight = task.texture;
+				thisObject.texGuyArmRight.hasAlpha = true;
+			}
+		}) (this);
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/leg_right.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyLegRight = task.texture;
+				thisObject.texGuyLegRight.hasAlpha = true;
+			}
+		}) (this);
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/guy/parts/leg_left.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texGuyLegLeft = task.texture;
+				thisObject.texGuyLegLeft.hasAlpha = true;
+			}
+		}) (this);
+	}
+
+	getGuyBodyPartTextures() {
+		return [this.texGuyHead, this.texGuyTorso, this.texGuyArmLeft,
+					 	this.texGuyArmRight, this.texGuyLegLeft, this.texGuyLegRight];
 	}
 
 }
