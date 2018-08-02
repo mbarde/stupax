@@ -358,6 +358,15 @@ class ResourceHandler {
 				thisObject.texGuyLegLeft.hasAlpha = true;
 			}
 		}) (this);
+
+		// flare for particle system
+		var textureTask = this._assetsManager.addTextureTask("texture task", "textures/flare.png");
+		(function(thisObject) {
+			textureTask.onSuccess = function(task) {
+				thisObject.texFlare = task.texture;
+				thisObject.texFlare.hasAlpha = true;
+			}
+		}) (this);
 	}
 
 	getGuyBodyPartTextures() {

@@ -13,6 +13,7 @@ class Level {
 
 		this._finishedCountdown = false; 			// will contain timestamp of win when player reaches door
 		this._diedCountdown = false;					// will contain timestamp of death when player died
+		this._guyExploded = false;						// true if Guy exploded
 		this._firstUpdate = true;
 		this._camFlyEndCallsOnResume = true;
 	}
@@ -20,13 +21,14 @@ class Level {
 	restart() {
 		var lvl = this._levelJSON;
 
-		this._guy.reset(lvl.guy._posX, lvl.guy._posY);
+		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._resourceHandler);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
 		this._finish.reset();
 
 		this._finishedCountdown = false;
 		this._diedCountdown = false;
+		this._guyExploded = false;
 
 		for (var i = 0; i < this._boxes.length; i++) {
 			this._boxes[i].reset();
@@ -46,7 +48,7 @@ class Level {
 	}
 
 	update() {
-		this._guy.update();
+		if (!this._guyExploded) this._guy.update();
 		this._movablePlatform.update();
 
 		this.updateEmitters();
@@ -148,12 +150,15 @@ class Level {
 	keyDown(ctrlCode) {
 		if (this._camFly) return;
 
-		this._guy.keyDown(ctrlCode);
+		//this._guy.keyDown(ctrlCode);
 		this._movablePlatform.keyDown(ctrlCode);
 
 		switch (ctrlCode) {
 			case CTRL_RESTART:
 				this.restart();
+				return;
+			case CTRL_GUY_JUMP:
+				this.guyExplode();
 				return;
 		}
 	}
@@ -184,6 +189,71 @@ class Level {
 		this._finish.destroy();
 		this._guy.destroy();
 		this._movablePlatform.destroy();
+	}
+
+	guyExplode() {
+		var pos = { x: this._guy._mesh.position.x, y: this._guy._mesh.position.y };
+
+		this._guy.destroy();
+		this._guyExploded = true;
+
+		 var particleSystem = new BABYLON.ParticleSystem("particles", 10, this._scene);
+
+		//Texture of each particle
+		particleSystem.particleTexture = this._resourceHandler.texFlare;
+
+		// Colors of all particles
+		particleSystem.color1 = new BABYLON.Color4(1.0, 0.8, 0.0, 1.0);
+    particleSystem.color2 = new BABYLON.Color4(0.8, 1.0, 0.0, 1.0);
+    particleSystem.colorDead = new BABYLON.Color4(1.0, 0, 0.2, 0.0);
+
+		// Size of each particle (random between...
+		particleSystem.minSize = 0.1;
+		particleSystem.maxSize = 0.5;
+
+		// Life time of each particle (random between...
+		particleSystem.minLifeTime = 0.3;
+		particleSystem.maxLifeTime = 1.5;
+
+		// Emission rate
+		particleSystem.emitRate = 1500;
+
+		// Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+		particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+		// Set the gravity of all particles
+		particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+		// Direction of each particle after it has been emitted
+		particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
+		particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+
+		// Angular speed, in radians
+		particleSystem.minAngularSpeed = 0;
+		particleSystem.maxAngularSpeed = Math.PI;
+
+		// Speed
+		particleSystem.minEmitPower = 1;
+		particleSystem.maxEmitPower = 3;
+		particleSystem.updateSpeed = 0.005;
+
+		var balls = [];
+		var textures = this._resourceHandler.getGuyBodyPartTextures();
+		for (var i = 0; i < textures.length; i++) {
+			var material = new BABYLON.StandardMaterial("bodypart", this._scene);
+			material.diffuseTexture = textures[i];
+			material.diffuseTexture.hasAlpha = true;
+			material.backFaceCulling = false;
+
+			var dir = new BABYLON.Vector3(Math.random() * 50 - 25, Math.random() * 50 - 25, 0);
+
+			var newBall = new Ball(0.4, 0.4, pos, dir, 1, this._scene, this._resourceHandler, material)
+			var newPS = particleSystem.clone('bodypartps', newBall._mesh);
+			newPS.direction1 = dir;
+			newPS.direction2 = dir;
+			newPS.start();
+			balls.push(newBall);
+		}
 	}
 
 	initCameraForFinishToStartFlight() {
