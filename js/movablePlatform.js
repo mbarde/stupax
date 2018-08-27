@@ -126,13 +126,21 @@ class MovablePlatform extends Platform {
 		var ray = this._collisionHelper.getCollisionRayLeftVertical();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
-			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
+			this._level.guyExplode();/**
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(
+				new BABYLON.Vector3(-CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0),
+				pickInfo.pickedMesh.getAbsolutePosition()
+			);**/
 		}
 
 		var ray = this._collisionHelper.getCollisionRayRightVertical();
 		var pickInfo = this._scene.pickWithRay(ray, function(item) { return item.isGuy; });
 		if (pickInfo.hit) {
-			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0), pickInfo.pickedMesh.getAbsolutePosition());
+			this._level.guyExplode();/**
+			pickInfo.pickedMesh.getPhysicsImpostor().applyImpulse(
+				new BABYLON.Vector3(CONS_RESTITUTION_PENALTY_GUY_MOV_PLAT, 0, 0),
+				pickInfo.pickedMesh.getAbsolutePosition()
+			);**/
 		}
 	}
 

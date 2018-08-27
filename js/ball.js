@@ -1,6 +1,6 @@
 class Ball extends Entity {
 
-	constructor(width, height, position, direction, mass, scene, resourceHandler, material) {
+	constructor(width, height, position, mass, scene, resourceHandler, material) {
 		super(width, height, 0, scene, resourceHandler);
 
     this._material = material;
@@ -8,8 +8,6 @@ class Ball extends Entity {
 
     this._mass = mass;
     this.setPhysicsState();
-
-    this._mesh.physicsImpostor.applyImpulse(direction, this._mesh.getAbsolutePosition());
 	}
 
 	initGeometry(position) {
@@ -26,6 +24,10 @@ class Ball extends Entity {
 	}
 
 	update() {
+	}
+
+	destroy() {
+		this._mesh.dispose();		
 	}
 
 }
