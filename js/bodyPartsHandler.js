@@ -15,7 +15,7 @@ class BodyPartsHandler {
       material.diffuseTexture.hasAlpha = true;
       material.backFaceCulling = false;
 
-      var bodyPart = new BodyPart(0.4, 0.4, pos, 1000, 1, this._scene, this._resourceHandler, material)
+      var bodyPart = new BodyPart(0.4, 0.4, pos, 1, this._scene, this._resourceHandler, material)
       bodyPart.applyRandomImpulse();
       bodyPart.startParticleSystem();
       this._bodyParts.push(bodyPart);
@@ -24,17 +24,19 @@ class BodyPartsHandler {
 
   update() {
     for (var i = 0; i < this._bodyParts.length; i++) {
-      if (this._bodyParts[i].update() === false) {
-        this._bodyParts[i].destroy();
-      }
+      this._bodyParts[i].update();
     }
   }
 
-  destroyAllBodyParts() {
+  reset() {
     for (var i = 0; i < this._bodyParts.length; i++) {
       this._bodyParts[i].destroy();
     }
     this._bodyParts = [];
+  }
+
+  destroy() {
+    this.reset();
   }
 
 }

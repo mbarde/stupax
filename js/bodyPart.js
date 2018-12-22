@@ -1,9 +1,7 @@
 class BodyPart extends Ball {
 
-  constructor(width, height, position, lifetime, mass, scene, resourceHandler, material) {
+  constructor(width, height, position, mass, scene, resourceHandler, material) {
     super(width, height, position, mass, scene, resourceHandler, material);
-
-    this._lifetime = lifetime;
 
     this.initParticleSystem();
   }
@@ -16,15 +14,13 @@ class BodyPart extends Ball {
   }
 
   initParticleSystem() {
-		this._particleSystem = new BABYLON.ParticleSystem("particles", 10, this._scene);
-
-		//Texture of each particle
-		this._particleSystem.particleTexture = this._resourceHandler.texFlare;
+		this._particleSystem = BABYLON.ParticleHelper.CreateDefault(this._mesh, 100, this._scene);
 
 		// Colors of all particles
 		this._particleSystem.color1 = new BABYLON.Color4(1.0, 0.8, 0.0, 1.0);
     this._particleSystem.color2 = new BABYLON.Color4(0.8, 1.0, 0.0, 1.0);
     this._particleSystem.colorDead = new BABYLON.Color4(1.0, 0, 0.2, 0.0);
+
 
 		// Size of each particle
 		this._particleSystem.minSize = 0.1;
@@ -32,11 +28,11 @@ class BodyPart extends Ball {
 
 		// Life time of each particle
 		this._particleSystem.minLifeTime = 0.3;
-		this._particleSystem.maxLifeTime = 1.5;
+		this._particleSystem.maxLifeTime = 1.0;
 
 		// Emission rate
-		this._particleSystem.emitRate = 1500;
-
+		this._particleSystem.emitRate = 50;
+    /**
 		// Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
 		this._particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
 
@@ -55,8 +51,11 @@ class BodyPart extends Ball {
 		this._particleSystem.minEmitPower = 1;
 		this._particleSystem.maxEmitPower = 3;
 		this._particleSystem.updateSpeed = 0.005;
+    **/
 
-    this._particleSystem.emitter = this._mesh;
+    // One shot of particles
+    this._particleSystem.targetStopDuration = 10;
+    this._particleSystem.disposeOnStop = true;
   }
 
   startParticleSystem() {
@@ -64,11 +63,10 @@ class BodyPart extends Ball {
   }
 
   update() {
-    return true;
   }
 
   destroy() {
-    this._particleSystem.stop();
+    this._particleSystem.reset();
     super.destroy();
   }
 

@@ -18,13 +18,18 @@ class Level {
 		this._camFlyEndCallsOnResume = true;
 
 		this._bodyPartsHandler = new BodyPartsHandler(scene, resourceHandler);
+
+		this._guy = false;
 	}
 
 	restart() {
-		if (this._guyExploded) { this._bodyPartsHandler.destroyAllBodyParts(); }
+		this._bodyPartsHandler.reset();
 
 		var lvl = this._levelJSON;
 
+		if (this._guy) {
+			this._guy.destroy();
+		}
 		this._guy = new Guy(lvl.guy._posX, lvl.guy._posY, this._scene, this._resourceHandler);
 		this._movablePlatform.reset(lvl.movPlatform._posX, lvl.movPlatform._posY);
 
@@ -195,6 +200,7 @@ class Level {
 		this._finish.destroy();
 		this._guy.destroy();
 		this._movablePlatform.destroy();
+		this._bodyPartsHandler.destroy();
 	}
 
 	guyExplode() {
